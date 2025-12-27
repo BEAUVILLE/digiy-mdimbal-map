@@ -1,423 +1,1472 @@
-import os
-
-base_dir="/mnt/data"
-paths = {
-    "modal": os.path.join(base_dir,"snippet-modal-searchpro.html"),
-    "css": os.path.join(base_dir,"snippet-styles-searchpro.css"),
-    "zones": os.path.join(base_dir,"zones-senegal.js"),
-    "db": os.path.join(base_dir,"digiy-business-database-senegal.js"),
-    "engine": os.path.join(base_dir,"search-pro-map.js"),
-}
-
-def read(p):
-    with open(p,"r",encoding="utf-8") as f:
-        return f.read()
-
-modal_html = read(paths["modal"]).strip()
-css = read(paths["css"]).strip()
-zones = read(paths["zones"]).strip()
-db = read(paths["db"]).strip()
-engine = read(paths["engine"]).strip()
-
-global_css = """
-:root{
-  --bg:#020617; --bg2:#0B1120; --line:rgba(148,163,184,.22);
-  --text:#e5e7eb; --muted:rgba(229,231,235,.72);
-  --gold:#facc15; --orange:#f97316; --cyan:#22d3ee;
-  --shadow:0 14px 40px rgba(0,0,0,.45);
-}
-*{box-sizing:border-box}
-body{
-  margin:0; color:var(--text);
-  font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:
-    radial-gradient(1000px 520px at 18% -10%, rgba(249,115,22,.22), transparent 60%),
-    radial-gradient(980px 540px at 92% 0%, rgba(34,211,238,.18), transparent 55%),
-    linear-gradient(180deg, var(--bg), var(--bg2));
-  min-height:100vh;
-}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1100px;margin:0 auto;padding:18px}
-header{
-  border:1px solid var(--line);
-  background:rgba(2,6,23,.55);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:14px;
-  position:sticky; top:10px; z-index:10;
-  backdrop-filter: blur(10px);
-}
-.header-content{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{
-  width:44px;height:44px;border-radius:16px;
-  display:grid;place-items:center;
-  font-family:Outfit,sans-serif;font-weight:950;
-  color:#111827;
-  background:linear-gradient(135deg, var(--gold), var(--orange));
-  box-shadow:0 12px 26px rgba(250,204,21,.22);
-}
-.titles .t1{font-family:Outfit,sans-serif;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
-.titles .t2{font-size:12px;color:var(--muted);font-weight:800;margin-top:2px}
-.right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-.btn{
-  border:1px solid rgba(148,163,184,.28);
-  background:rgba(2,6,23,.35);
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:14px;
-  cursor:pointer;
-  font-weight:900;
-  font-family:Outfit,sans-serif;
-  letter-spacing:.03em;
-  transition:transform .12s ease, border-color .12s ease, background .12s ease;
-  display:inline-flex;align-items:center;gap:8px;
-}
-.btn:hover{transform:translateY(-1px);border-color:rgba(249,115,22,.55);background:rgba(249,115,22,.12)}
-.btn:active{transform:translateY(0)}
-.btn-primary{
-  background:linear-gradient(135deg, rgba(250,204,21,.95), rgba(249,115,22,.92));
-  color:#111827;
-  border:none;
-}
-.btn-primary:hover{background:linear-gradient(135deg, rgba(250,204,21,1), rgba(249,115,22,1))}
-.btn-secondary{background:rgba(2,6,23,.35)}
-.card{
-  margin-top:16px;
-  border:1px solid var(--line);
-  background:rgba(2,6,23,.55);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:16px;
-}
-.card h1{
-  margin:0 0 6px;
-  font-family:Outfit,sans-serif;
-  font-weight:950;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  font-size:1.05rem;
-}
-.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
-@keyframes spin{to{transform:rotate(360deg)}}
-"""
-
-SUPABASE_URL="https://wesqmwjjtsefyjnluosj.supabase.co"
-SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA"
-
-index_html = f"""<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <title>DIGIY • NDIMBAL — Search PRO (FULL DB • Monobloc)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0A0E1A">
-  <meta name="description" content="NDIMBAL — Search PRO V3 (carte + liste) • FULL DB Sénégal inline • GitHub Pages OK.">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIGIY NDIMBAL MAP - Carte Interactive Nationale du Sénégal</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    
+    <style>
+        /* ================================
+           VARIABLES CSS
+        ================================ */
+        :root {
+            --primary-color: #FF6B35;
+            --primary-dark: #E55A2B;
+            --secondary-color: #4ECDC4;
+            --success-color: #95E1D3;
+            --warning-color: #FFD93D;
+            --danger-color: #FF6B6B;
+            --dark-bg: #1A1A2E;
+            --card-bg: #16213E;
+            --sidebar-bg: #0F1419;
+            --text-light: #FFFFFF;
+            --text-gray: #B8B8B8;
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+            
+            /* COULEURS PAR CATÉGORIE */
+            --color-restaurant: #FF6B35;
+            --color-commerce: #4ECDC4;
+            --color-logement: #FFD93D;
+            --color-taxi: #95E1D3;
+            --color-notable: #9B59B6;
+            --color-batiment: #E67E22;
+            --color-voiture: #3498DB;
+            --color-voyage: #1ABC9C;
+            --color-loisir: #E91E63;
+            --color-hotel: #FF9800;
+        }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
 
-  <style>
-{global_css}
+        /* ================================
+           HEADER COMPACT
+        ================================ */
+        .header {
+            background: linear-gradient(135deg, var(--dark-bg), #0F3460);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1000;
+        }
 
-{css}
-  </style>
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-infinity {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            margin-bottom: 0.2rem;
+        }
+
+        .logo-text p {
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .header-search {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            color: var(--text-light);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+        }
+
+        /* ================================
+           LAYOUT PRINCIPAL
+        ================================ */
+        .main-container {
+            display: flex;
+            height: calc(100vh - 80px);
+        }
+
+        /* ================================
+           SIDEBAR CATÉGORIES
+        ================================ */
+        .sidebar {
+            width: 320px;
+            background: var(--sidebar-bg);
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 900;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            text-align: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-section {
+            padding: 1rem;
+        }
+
+        .category-title {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            padding: 0 0.5rem;
+        }
+
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+            position: relative;
+        }
+
+        .category-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .category-item.active {
+            background: rgba(255, 107, 53, 0.2);
+            border-left-color: var(--primary-color);
+        }
+
+        .category-icon {
+            font-size: 1.8rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .category-info {
+            flex: 1;
+        }
+
+        .category-name {
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .category-count {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+        }
+
+        .category-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        /* PINS COLORÉS PAR CATÉGORIE */
+        .category-item[data-category="restaurant"] { border-left-color: var(--color-restaurant); }
+        .category-item[data-category="commerce"] { border-left-color: var(--color-commerce); }
+        .category-item[data-category="logement"] { border-left-color: var(--color-logement); }
+        .category-item[data-category="taxi"] { border-left-color: var(--color-taxi); }
+        .category-item[data-category="notable"] { border-left-color: var(--color-notable); }
+        .category-item[data-category="batiment"] { border-left-color: var(--color-batiment); }
+        .category-item[data-category="voiture"] { border-left-color: var(--color-voiture); }
+        .category-item[data-category="voyage"] { border-left-color: var(--color-voyage); }
+        .category-item[data-category="loisir"] { border-left-color: var(--color-loisir); }
+        .category-item[data-category="hotel"] { border-left-color: var(--color-hotel); }
+
+        /* ================================
+           RÉGION FILTER
+        ================================ */
+        .region-filter {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            margin: 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .region-filter-title {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .region-btn {
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .region-btn:hover {
+            background: rgba(78, 205, 196, 0.2);
+            border-color: var(--secondary-color);
+        }
+
+        .region-btn.active {
+            background: var(--secondary-color);
+            color: var(--dark-bg);
+            font-weight: bold;
+            border-color: var(--secondary-color);
+        }
+
+        /* ================================
+           CARTE PRINCIPALE
+        ================================ */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ================================
+           CONTROLS CARTE
+        ================================ */
+        .map-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 800;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            background: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            font-size: 1.2rem;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ================================
+           POPUP CUSTOM
+        ================================ */
+        .leaflet-popup-content-wrapper {
+            background: var(--card-bg);
+            color: var(--text-light);
+            border-radius: var(--border-radius);
+            padding: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .leaflet-popup-content {
+            margin: 0;
+            min-width: 280px;
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            padding: 1rem;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .popup-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.3rem;
+        }
+
+        .popup-category {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .popup-body {
+            padding: 1rem;
+        }
+
+        .popup-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .popup-description {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .popup-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .popup-btn {
+            flex: 1;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+
+        .popup-btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .popup-btn-secondary {
+            background: var(--secondary-color);
+            color: var(--dark-bg);
+        }
+
+        .popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ================================
+           LEGEND
+        ================================ */
+        .map-legend {
+            position: absolute;
+            bottom: 2rem;
+            left: 1rem;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 800;
+            max-width: 280px;
+        }
+
+        .legend-title {
+            color: var(--text-light);
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-gray);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* ================================
+           MODAL DÉTAILS
+        ================================ */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close {
+            color: var(--text-gray);
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close:hover {
+            color: var(--danger-color);
+        }
+
+        .modal-body h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .modal-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+        }
+
+        .info-label {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* ================================
+           LOADER
+        ================================ */
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            z-index: 1000;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* ================================
+           RESPONSIVE
+        ================================ */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .header-stats {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .header-search {
+                margin: 0;
+                max-width: 100%;
+            }
+
+            .sidebar {
+                position: absolute;
+                left: -320px;
+                height: calc(100vh - 140px);
+                transition: left 0.3s ease;
+                z-index: 1000;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .region-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .map-legend {
+                display: none;
+            }
+
+            .modal-content {
+                margin: 5% 1rem;
+                max-width: calc(100% - 2rem);
+            }
+
+            .modal-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ================================
+           UTILITY CLASSES
+        ================================ */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ================================
+           SCROLLBAR
+        ================================ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* ================================
+           CUSTOM MARKERS
+        ================================ */
+        .custom-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.2);
+        }
+
+        .marker-restaurant { background: var(--color-restaurant); }
+        .marker-commerce { background: var(--color-commerce); }
+        .marker-logement { background: var(--color-logement); }
+        .marker-taxi { background: var(--color-taxi); }
+        .marker-notable { background: var(--color-notable); }
+        .marker-batiment { background: var(--color-batiment); }
+        .marker-voiture { background: var(--color-voiture); }
+        .marker-voyage { background: var(--color-voyage); }
+        .marker-loisir { background: var(--color-loisir); }
+        .marker-hotel { background: var(--color-hotel); }
+    </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <div class="header-content">
-        <div class="brand">
-          <div class="logo">♾️</div>
-          <div class="titles">
-            <div class="t1">DIGIY • NDIMBAL</div>
-            <div class="t2">Recherche PRO — Carte + Liste • FULL DB Sénégal</div>
-          </div>
+
+    <!-- ================================
+         HEADER
+    ================================ -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo-infinity">∞</div>
+            <div class="logo-text">
+                <h1>DIGIY NDIMBAL MAP</h1>
+                <p>L'annuaire géolocalisé du Sénégal</p>
+            </div>
         </div>
-        <div class="right">
-          <button id="openSearchPro" class="btn btn-primary" type="button">🔎 Rechercher un PRO</button>
+        
+        <div class="header-search">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un service, une ville, un nom...">
         </div>
-      </div>
+
+        <div class="header-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalPros">0</div>
+                <div class="stat-label">Professionnels</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">14</div>
+                <div class="stat-label">Régions</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">10</div>
+                <div class="stat-label">Catégories</div>
+            </div>
+        </div>
     </header>
 
-    <div class="card">
-      <h1>FULL DB prêt à poser</h1>
-      <p>
-        1 fichier = <b>index.html</b> • Tout est inline (styles + zones + base Sénégal + moteur Search PRO).<br>
-        Si tu n’as pas encore la RPC Supabase, le moteur utilise le fallback prévu (table/view <b>pros_public</b> si disponible).
-      </p>
+    <!-- ================================
+         MAIN CONTAINER
+    ================================ -->
+    <div class="main-container">
+        
+        <!-- SIDEBAR CATÉGORIES -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>🗂️ Catégories</h2>
+                <p style="font-size: 0.85rem; opacity: 0.9;">Cliquez pour filtrer</p>
+            </div>
+
+            <div class="category-section">
+                <div class="category-title">Services Principaux</div>
+                <div class="category-list">
+                    <div class="category-item active" data-category="all">
+                        <span class="category-icon">🌍</span>
+                        <div class="category-info">
+                            <div class="category-name">Tout afficher</div>
+                            <div class="category-count" id="count-all">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="restaurant">
+                        <span class="category-icon">🍽️</span>
+                        <div class="category-info">
+                            <div class="category-name">Restaurants & Food</div>
+                            <div class="category-count" id="count-restaurant">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="commerce">
+                        <span class="category-icon">🏪</span>
+                        <div class="category-info">
+                            <div class="category-name">Commerces</div>
+                            <div class="category-count" id="count-commerce">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="logement">
+                        <span class="category-icon">🏠</span>
+                        <div class="category-info">
+                            <div class="category-name">Logements Saisonniers</div>
+                            <div class="category-count" id="count-logement">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="taxi">
+                        <span class="category-icon">🚕</span>
+                        <div class="category-info">
+                            <div class="category-name">Taxis & VTC</div>
+                            <div class="category-count" id="count-taxi">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="notable">
+                        <span class="category-icon">👔</span>
+                        <div class="category-info">
+                            <div class="category-name">Notables</div>
+                            <div class="category-count" id="count-notable">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="batiment">
+                        <span class="category-icon">🔨</span>
+                        <div class="category-info">
+                            <div class="category-name">Ouvriers du Bâtiment</div>
+                            <div class="category-count" id="count-batiment">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="voiture">
+                        <span class="category-icon">🚗</span>
+                        <div class="category-info">
+                            <div class="category-name">Vente de Voitures</div>
+                            <div class="category-count" id="count-voiture">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="voyage">
+                        <span class="category-icon">✈️</span>
+                        <div class="category-info">
+                            <div class="category-name">Agences de Voyage</div>
+                            <div class="category-count" id="count-voyage">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="loisir">
+                        <span class="category-icon">🎭</span>
+                        <div class="category-info">
+                            <div class="category-name">Loisirs & Divertissement</div>
+                            <div class="category-count" id="count-loisir">0 résultats</div>
+                        </div>
+                    </div>
+
+                    <div class="category-item" data-category="hotel">
+                        <span class="category-icon">🏨</span>
+                        <div class="category-info">
+                            <div class="category-name">Hôtels & Hébergements</div>
+                            <div class="category-count" id="count-hotel">0 résultats</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTRE RÉGIONS -->
+            <div class="region-filter">
+                <div class="region-filter-title">🗺️ Filtrer par région</div>
+                <div class="region-grid" id="regionGrid">
+                    <button class="region-btn active" data-region="all">Toutes</button>
+                    <button class="region-btn" data-region="dakar">Dakar</button>
+                    <button class="region-btn" data-region="thies">Thiès</button>
+                    <button class="region-btn" data-region="diourbel">Diourbel</button>
+                    <button class="region-btn" data-region="fatick">Fatick</button>
+                    <button class="region-btn" data-region="kaolack">Kaolack</button>
+                    <button class="region-btn" data-region="kaffrine">Kaffrine</button>
+                    <button class="region-btn" data-region="kolda">Kolda</button>
+                    <button class="region-btn" data-region="louga">Louga</button>
+                    <button class="region-btn" data-region="matam">Matam</button>
+                    <button class="region-btn" data-region="saint-louis">Saint-Louis</button>
+                    <button class="region-btn" data-region="sedhiou">Sédhiou</button>
+                    <button class="region-btn" data-region="tambacounda">Tambacounda</button>
+                    <button class="region-btn" data-region="kedougou">Kédougou</button>
+                    <button class="region-btn" data-region="ziguinchor">Ziguinchor</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CARTE PRINCIPALE -->
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <!-- CONTROLS -->
+            <div class="map-controls">
+                <button class="control-btn" onclick="centerMap()" title="Centrer sur le Sénégal">
+                    🎯
+                </button>
+                <button class="control-btn" onclick="locateUser()" title="Ma position">
+                    📍
+                </button>
+                <button class="control-btn" onclick="toggleSidebar()" title="Menu" style="display: none;" id="menuBtn">
+                    ☰
+                </button>
+            </div>
+
+            <!-- LEGEND -->
+            <div class="map-legend">
+                <div class="legend-title">📍 Légende des catégories</div>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-restaurant);"></div>
+                        <span>Restaurants</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-commerce);"></div>
+                        <span>Commerces</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-logement);"></div>
+                        <span>Logements</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-taxi);"></div>
+                        <span>Taxis</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-batiment);"></div>
+                        <span>Bâtiment</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--color-voiture);"></div>
+                        <span>Voitures</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOADER -->
+            <div class="loader" id="loader"></div>
+        </div>
     </div>
-  </div>
 
-  <!-- =========================
-     MODAL SEARCH PRO V3
-  ========================== -->
-{modal_html}
+    <!-- ================================
+         MODAL DÉTAILS
+    ================================ -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: var(--primary-color);">Détails du professionnel</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenu dynamique -->
+            </div>
+        </div>
+    </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- ================================
+         SCRIPTS
+    ================================ -->
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
-  // 🔐 SUPABASE — DÉJÀ POSÉ (DIGIY)
-  const SB = supabase.createClient("{SUPABASE_URL}", "{SUPABASE_ANON}");
-  </script>
+    <script>
+        // ================================
+        // CONFIGURATION SUPABASE
+        // ================================
+        const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <script>
-/* =========================
-   ZONES SÉNÉGAL — INLINE
-========================= */
-{zones}
-  </script>
+        // ================================
+        // VARIABLES GLOBALES
+        // ================================
+        let map;
+        let markerCluster;
+        let allProfessionals = [];
+        let filteredProfessionals = [];
+        let currentCategory = 'all';
+        let currentRegion = 'all';
+        let markers = [];
 
-  <script>
-/* =========================
-   DIGIY BUSINESS DB — SÉNÉGAL (FULL) — INLINE
-========================= */
-{db}
-  </script>
+        // ICÔNES PAR CATÉGORIE
+        const categoryIcons = {
+            restaurant: '🍽️',
+            commerce: '🏪',
+            logement: '🏠',
+            taxi: '🚕',
+            notable: '👔',
+            batiment: '🔨',
+            voiture: '🚗',
+            voyage: '✈️',
+            loisir: '🎭',
+            hotel: '🏨'
+        };
 
-  <script>
-/* =========================
-   SEARCH PRO MAP ENGINE — INLINE
-========================= */
-{engine}
-  </script>
+        const categoryColors = {
+            restaurant: '#FF6B35',
+            commerce: '#4ECDC4',
+            logement: '#FFD93D',
+            taxi: '#95E1D3',
+            notable: '#9B59B6',
+            batiment: '#E67E22',
+            voiture: '#3498DB',
+            voyage: '#1ABC9C',
+            loisir: '#E91E63',
+            hotel: '#FF9800'
+        };
 
-  <script>
-  // Boot safe
-  (function(){
-    const m = document.getElementById("searchProModal");
-    if(m) m.style.display = "none";
-  })();
-  </script>
+        // ================================
+        // INITIALISATION
+        // ================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 DIGIY NDIMBAL MAP - Initialisation...');
+            
+            initMap();
+            await loadProfessionals();
+            setupEventListeners();
+            
+            document.getElementById('loader').classList.add('hidden');
+            
+            console.log('✅ Application prête !');
+        });
+
+        // ================================
+        // CARTE
+        // ================================
+        function initMap() {
+            // Centrer sur le Sénégal
+            map = L.map('map').setView([14.4974, -14.4524], 7);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap | DIGIYLYFE',
+                maxZoom: 19
+            }).addTo(map);
+            
+            // Initialiser le cluster
+            markerCluster = L.markerClusterGroup({
+                showCoverageOnHover: false,
+                maxClusterRadius: 50
+            });
+            map.addLayer(markerCluster);
+            
+            console.log('🗺️ Carte initialisée');
+        }
+
+        function centerMap() {
+            map.setView([14.4974, -14.4524], 7);
+        }
+
+        function locateUser() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        map.setView([latitude, longitude], 13);
+                        
+                        L.marker([latitude, longitude])
+                            .addTo(map)
+                            .bindPopup('📍 Vous êtes ici')
+                            .openPopup();
+                    },
+                    (error) => {
+                        alert('Impossible de récupérer votre position');
+                    }
+                );
+            }
+        }
+
+        // ================================
+        // CHARGEMENT DONNÉES
+        // ================================
+        async function loadProfessionals() {
+            try {
+                console.log('📥 Chargement des professionnels...');
+                
+                const { data, error } = await supabaseClient
+                    .from('professionals')
+                    .select('*');
+                
+                if (error) {
+                    console.error('Erreur Supabase:', error);
+                    allProfessionals = generateDemoData();
+                } else {
+                    allProfessionals = data || generateDemoData();
+                }
+                
+                filteredProfessionals = [...allProfessionals];
+                displayMarkers(filteredProfessionals);
+                updateCounts();
+                
+                console.log(`✅ ${allProfessionals.length} professionnels chargés`);
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                allProfessionals = generateDemoData();
+                filteredProfessionals = [...allProfessionals];
+                displayMarkers(filteredProfessionals);
+                updateCounts();
+            }
+        }
+
+        // ================================
+        // DONNÉES DÉMO
+        // ================================
+        function generateDemoData() {
+            const categories = ['restaurant', 'commerce', 'logement', 'taxi', 'notable', 'batiment', 'voiture', 'voyage', 'loisir', 'hotel'];
+            const regions = ['dakar', 'thies', 'diourbel', 'saint-louis', 'kaolack', 'ziguinchor', 'louga', 'tambacounda', 'fatick', 'matam'];
+            
+            const names = {
+                restaurant: ['Restaurant Teranga', 'Chez Fatou', 'Le Safoutier', 'La Linguère', 'Ocean View'],
+                commerce: ['Boutique Élégance', 'Market Plus', 'Super Shop', 'Commerce du Coin', 'Grand Marché'],
+                logement: ['Villa Vacances', 'Appartement Seaside', 'Casa Sénégal', 'Résidence Océane', 'Maison Teranga'],
+                taxi: ['Taxi Rapide Dakar', 'VTC Premium', 'Transport Express', 'Chauffeur Pro', 'Taxi Confort'],
+                notable: ['Mairie', 'Chef de Village', 'Conseil Régional', 'Notable Local', 'Autorité Traditionnelle'],
+                batiment: ['Maçonnerie Pro', 'Électricien Expert', 'Plomberie Service', 'Menuiserie Moderne', 'Peinture Plus'],
+                voiture: ['Auto Occasion', 'Garage Premium', 'Vente Auto Express', 'Concessionnaire', 'Voitures Neuves'],
+                voyage: ['Voyage Découverte', 'Tourisme Sénégal', 'Agence Safari', 'Travel Plus', 'Excursions Pro'],
+                loisir: ['Centre de Loisirs', 'Parc Attractions', 'Salle de Jeux', 'Club Sportif', 'Espace Détente'],
+                hotel: ['Hôtel Teranga', 'Auberge du Coin', 'Résidence Hôtelière', 'Lodge Safari', 'Boutique Hotel']
+            };
+            
+            const demoData = [];
+            
+            for (let i = 0; i < 100; i++) {
+                const category = categories[i % categories.length];
+                const region = regions[Math.floor(Math.random() * regions.length)];
+                const nameList = names[category];
+                
+                demoData.push({
+                    id: `demo-${i}`,
+                    name: nameList[i % nameList.length] + ` ${Math.floor(i / nameList.length) + 1}`,
+                    category: category,
+                    region: region,
+                    city: getCityForRegion(region),
+                    address: `Rue ${i + 1}, Quartier ${Math.floor(Math.random() * 10) + 1}`,
+                    description: getDescriptionForCategory(category),
+                    phone: `+221 77 ${Math.floor(100 + Math.random() * 900)} ${Math.floor(10 + Math.random() * 90)} ${Math.floor(10 + Math.random() * 90)}`,
+                    email: `contact${i}@digiylyfe.sn`,
+                    website: `www.pro${i}.digiylyfe.sn`,
+                    rating: (4 + Math.random()).toFixed(1),
+                    latitude: getLatitudeForRegion(region),
+                    longitude: getLongitudeForRegion(region),
+                    hours: 'Lun-Sam 8h-20h',
+                    services: getServicesForCategory(category)
+                });
+            }
+            
+            return demoData;
+        }
+
+        function getCityForRegion(region) {
+            const cities = {
+                dakar: ['Dakar', 'Pikine', 'Guédiawaye', 'Rufisque'],
+                thies: ['Thiès', 'Mbour', 'Tivaouane', 'Joal-Fadiouth'],
+                diourbel: ['Diourbel', 'Touba', 'Mbacké'],
+                'saint-louis': ['Saint-Louis', 'Dagana', 'Podor'],
+                kaolack: ['Kaolack', 'Nioro', 'Karang'],
+                ziguinchor: ['Ziguinchor', 'Oussouye', 'Bignona'],
+                louga: ['Louga', 'Kébémer', 'Linguère'],
+                tambacounda: ['Tambacounda', 'Bakel', 'Goudiry'],
+                fatick: ['Fatick', 'Foundiougne', 'Gossas'],
+                matam: ['Matam', 'Kanel', 'Ranérou']
+            };
+            const cityList = cities[region] || ['Ville'];
+            return cityList[Math.floor(Math.random() * cityList.length)];
+        }
+
+        function getLatitudeForRegion(region) {
+            const coords = {
+                dakar: 14.7167 + (Math.random() - 0.5) * 0.3,
+                thies: 14.7889 + (Math.random() - 0.5) * 0.3,
+                diourbel: 14.6522 + (Math.random() - 0.5) * 0.3,
+                'saint-louis': 16.0179 + (Math.random() - 0.5) * 0.3,
+                kaolack: 14.1472 + (Math.random() - 0.5) * 0.3,
+                ziguinchor: 12.5681 + (Math.random() - 0.5) * 0.3,
+                louga: 15.6133 + (Math.random() - 0.5) * 0.3,
+                tambacounda: 13.7707 + (Math.random() - 0.5) * 0.3,
+                fatick: 14.3333 + (Math.random() - 0.5) * 0.3,
+                matam: 15.6556 + (Math.random() - 0.5) * 0.3
+            };
+            return coords[region] || 14.4974;
+        }
+
+        function getLongitudeForRegion(region) {
+            const coords = {
+                dakar: -17.4677 + (Math.random() - 0.5) * 0.3,
+                thies: -16.9406 + (Math.random() - 0.5) * 0.3,
+                diourbel: -16.2297 + (Math.random() - 0.5) * 0.3,
+                'saint-louis': -16.5119 + (Math.random() - 0.5) * 0.3,
+                kaolack: -16.0761 + (Math.random() - 0.5) * 0.3,
+                ziguinchor: -16.2633 + (Math.random() - 0.5) * 0.3,
+                louga: -16.2167 + (Math.random() - 0.5) * 0.3,
+                tambacounda: -13.6714 + (Math.random() - 0.5) * 0.3,
+                fatick: -16.4167 + (Math.random() - 0.5) * 0.3,
+                matam: -13.2553 + (Math.random() - 0.5) * 0.3
+            };
+            return coords[region] || -14.4524;
+        }
+
+        function getDescriptionForCategory(category) {
+            const descriptions = {
+                restaurant: 'Restaurant traditionnel sénégalais avec spécialités locales et internationales. Ambiance conviviale et service de qualité.',
+                commerce: 'Commerce de proximité offrant une large gamme de produits. Service rapide et prix compétitifs.',
+                logement: 'Logement saisonnier tout équipé, proche des commodités. Idéal pour vacances et séjours professionnels.',
+                taxi: 'Service de taxi professionnel et fiable. Véhicules confortables et chauffeurs expérimentés.',
+                notable: 'Autorité locale reconnue. Point de contact pour les démarches administratives et communautaires.',
+                batiment: 'Ouvrier qualifié du bâtiment. Travaux de qualité et respect des délais.',
+                voiture: 'Vente de véhicules neufs et occasions. Large choix et garantie constructeur.',
+                voyage: 'Agence de voyage proposant circuits touristiques et excursions au Sénégal et en Afrique.',
+                loisir: 'Espace de loisirs et divertissement pour toute la famille. Activités variées.',
+                hotel: 'Hébergement confortable avec services complets. Accueil chaleureux à la sénégalaise.'
+            };
+            return descriptions[category] || 'Service professionnel de qualité';
+        }
+
+        function getServicesForCategory(category) {
+            const services = {
+                restaurant: ['Cuisine locale', 'Plats à emporter', 'Terrasse', 'Wifi gratuit'],
+                commerce: ['Épicerie', 'Produits frais', 'Livraison', 'Paiement mobile'],
+                logement: ['Wifi', 'Climatisation', 'Parking', 'Sécurité 24h'],
+                taxi: ['Aéroport', 'Longue distance', 'Climatisation', 'Paiement mobile'],
+                notable: ['Conseils', 'Médiation', 'Démarches', 'Réunions'],
+                batiment: ['Maçonnerie', 'Électricité', 'Plomberie', 'Rénovation'],
+                voiture: ['Neuf', 'Occasion', 'Financement', 'Garantie'],
+                voyage: ['Circuits', 'Excursions', 'Réservations', 'Guides'],
+                loisir: ['Jeux', 'Sports', 'Animations', 'Restauration'],
+                hotel: ['Restaurant', 'Piscine', 'Spa', 'Wifi']
+            };
+            return services[category] || ['Service 1', 'Service 2'];
+        }
+
+        // ================================
+        // AFFICHAGE MARKERS
+        // ================================
+        function displayMarkers(professionals) {
+            // Nettoyer les markers existants
+            markerCluster.clearLayers();
+            
+            professionals.forEach(pro => {
+                if (pro.latitude && pro.longitude) {
+                    const icon = L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div class="custom-marker marker-${pro.category}">${categoryIcons[pro.category] || '📍'}</div>`,
+                        iconSize: [35, 35],
+                        iconAnchor: [17, 17]
+                    });
+                    
+                    const marker = L.marker([pro.latitude, pro.longitude], { icon: icon });
+                    
+                    marker.bindPopup(createPopupContent(pro));
+                    marker.on('click', () => {
+                        // Optionnel : analytics ou actions supplémentaires
+                    });
+                    
+                    markerCluster.addLayer(marker);
+                }
+            });
+            
+            console.log(`📍 ${professionals.length} markers affichés`);
+        }
+
+        function createPopupContent(pro) {
+            return `
+                <div class="popup-header">
+                    <div class="popup-title">${pro.name}</div>
+                    <div class="popup-category">${getCategoryLabel(pro.category)}</div>
+                </div>
+                <div class="popup-body">
+                    <div class="popup-info">
+                        📍 ${pro.city}, ${getRegionLabel(pro.region)}
+                    </div>
+                    <div class="popup-info">
+                        ⭐ ${pro.rating || '5.0'} | 📞 ${pro.phone}
+                    </div>
+                    <div class="popup-description">
+                        ${pro.description ? pro.description.substring(0, 100) + '...' : 'Service professionnel'}
+                    </div>
+                    <div class="popup-actions">
+                        <button class="popup-btn popup-btn-primary" onclick='openDetailsModal("${pro.id}")'>
+                            👁️ Détails
+                        </button>
+                        <button class="popup-btn popup-btn-secondary" onclick='contactPro("${pro.id}")'>
+                            📞 Contact
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================================
+        // FILTRAGE
+        // ================================
+        function filterProfessionals() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let results = [...allProfessionals];
+            
+            // Filtre catégorie
+            if (currentCategory !== 'all') {
+                results = results.filter(p => p.category === currentCategory);
+            }
+            
+            // Filtre région
+            if (currentRegion !== 'all') {
+                results = results.filter(p => p.region === currentRegion);
+            }
+            
+            // Filtre recherche
+            if (searchTerm) {
+                results = results.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm) ||
+                    p.city.toLowerCase().includes(searchTerm) ||
+                    (p.description && p.description.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            filteredProfessionals = results;
+            displayMarkers(results);
+            updateCounts();
+        }
+
+        function updateCounts() {
+            // Total
+            document.getElementById('totalPros').textContent = allProfessionals.length;
+            document.getElementById('count-all').textContent = `${filteredProfessionals.length} résultats`;
+            
+            // Par catégorie
+            const categories = ['restaurant', 'commerce', 'logement', 'taxi', 'notable', 'batiment', 'voiture', 'voyage', 'loisir', 'hotel'];
+            
+            categories.forEach(cat => {
+                const count = filteredProfessionals.filter(p => p.category === cat).length;
+                const element = document.getElementById(`count-${cat}`);
+                if (element) {
+                    element.textContent = `${count} résultats`;
+                }
+            });
+        }
+
+        // ================================
+        // MODAL
+        // ================================
+        function openDetailsModal(proId) {
+            const pro = allProfessionals.find(p => p.id === proId);
+            if (!pro) return;
+            
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <h2>${pro.name}</h2>
+                <p style="color: var(--secondary-color); margin-bottom: 1rem;">${getCategoryLabel(pro.category)}</p>
+                
+                <div class="modal-info-grid">
+                    <div class="info-card">
+                        <div class="info-label">📍 Localisation</div>
+                        <div class="info-value">${pro.city}, ${getRegionLabel(pro.region)}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">⭐ Note</div>
+                        <div class="info-value">${pro.rating || '5.0'} / 5</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">📞 Téléphone</div>
+                        <div class="info-value">${pro.phone}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">📧 Email</div>
+                        <div class="info-value">${pro.email}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">🌐 Site web</div>
+                        <div class="info-value">${pro.website || 'N/A'}</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-label">⏰ Horaires</div>
+                        <div class="info-value">${pro.hours || 'N/A'}</div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.5rem;">📝 Description</div>
+                    <p style="color: var(--text-light); line-height: 1.6;">${pro.description}</p>
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <div style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.5rem;">🏷️ Services</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        ${(pro.services || []).map(s => `<span style="background: rgba(78, 205, 196, 0.2); color: var(--secondary-color); padding: 0.4rem 1rem; border-radius: 15px; font-size: 0.85rem;">${s}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem;">
+                    <button onclick="contactPro('${pro.id}')" style="flex: 1; padding: 1rem; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                        📞 Contacter
+                    </button>
+                    <button onclick="viewOnMap('${pro.id}')" style="flex: 1; padding: 1rem; background: var(--secondary-color); color: var(--dark-bg); border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                        🗺️ Voir sur la carte
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('detailsModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        function contactPro(proId) {
+            const pro = allProfessionals.find(p => p.id === proId);
+            if (!pro) return;
+            
+            window.location.href = `tel:${pro.phone}`;
+        }
+
+        function viewOnMap(proId) {
+            const pro = allProfessionals.find(p => p.id === proId);
+            if (!pro || !pro.latitude || !pro.longitude) return;
+            
+            closeModal();
+            map.setView([pro.latitude, pro.longitude], 15);
+        }
+
+        // ================================
+        // UTILS
+        // ================================
+        function getCategoryLabel(category) {
+            const labels = {
+                restaurant: '🍽️ Restaurant',
+                commerce: '🏪 Commerce',
+                logement: '🏠 Logement Saisonnier',
+                taxi: '🚕 Taxi/VTC',
+                notable: '👔 Notable',
+                batiment: '🔨 Bâtiment',
+                voiture: '🚗 Vente Voiture',
+                voyage: '✈️ Agence Voyage',
+                loisir: '🎭 Loisir',
+                hotel: '🏨 Hôtel'
+            };
+            return labels[category] || category;
+        }
+
+        function getRegionLabel(region) {
+            return region.charAt(0).toUpperCase() + region.slice(1);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ================================
+        // EVENT LISTENERS
+        // ================================
+        function setupEventListeners() {
+            // Recherche
+            document.getElementById('searchInput').addEventListener('input', filterProfessionals);
+            
+            // Catégories
+            document.querySelectorAll('.category-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    currentCategory = item.dataset.category;
+                    filterProfessionals();
+                });
+            });
+            
+            // Régions
+            document.querySelectorAll('.region-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    currentRegion = btn.dataset.region;
+                    filterProfessionals();
+                });
+            });
+            
+            // Modal
+            window.onclick = (event) => {
+                if (event.target.id === 'detailsModal') {
+                    closeModal();
+                }
+            };
+            
+            // Responsive
+            if (window.innerWidth <= 768) {
+                document.getElementById('menuBtn').style.display = 'block';
+            }
+        }
+
+        console.log('✅ DIGIY NDIMBAL MAP - Système opérationnel ! 🗺️🇸🇳');
+    </script>
+
 </body>
 </html>
-"""
-
-out_path = os.path.join(base_dir, "index.html")
-with open(out_path, "w", encoding="utf-8") as f:
-    f.write(index_html)
-
-out_path
-  Cell In[1], line 193
-    const m = document.getElementById("searchProModal");
-    ^
-SyntaxError: f-string: invalid syntax. Perhaps you forgot a comma?
-
-
-Analysé
-python
-Toujours afficher les détails
-
-Copier le code
-import os
-
-base_dir="/mnt/data"
-def read(p):
-    with open(p,"r",encoding="utf-8") as f:
-        return f.read()
-
-modal_html = read(os.path.join(base_dir,"snippet-modal-searchpro.html")).strip()
-css = read(os.path.join(base_dir,"snippet-styles-searchpro.css")).strip()
-zones = read(os.path.join(base_dir,"zones-senegal.js")).strip()
-db = read(os.path.join(base_dir,"digiy-business-database-senegal.js")).strip()
-engine = read(os.path.join(base_dir,"search-pro-map.js")).strip()
-
-global_css = """
-:root{
-  --bg:#020617; --bg2:#0B1120; --line:rgba(148,163,184,.22);
-  --text:#e5e7eb; --muted:rgba(229,231,235,.72);
-  --gold:#facc15; --orange:#f97316; --cyan:#22d3ee;
-  --shadow:0 14px 40px rgba(0,0,0,.45);
-}
-*{box-sizing:border-box}
-body{
-  margin:0; color:var(--text);
-  font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:
-    radial-gradient(1000px 520px at 18% -10%, rgba(249,115,22,.22), transparent 60%),
-    radial-gradient(980px 540px at 92% 0%, rgba(34,211,238,.18), transparent 55%),
-    linear-gradient(180deg, var(--bg), var(--bg2));
-  min-height:100vh;
-}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:1100px;margin:0 auto;padding:18px}
-header{
-  border:1px solid var(--line);
-  background:rgba(2,6,23,.55);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:14px;
-  position:sticky; top:10px; z-index:10;
-  backdrop-filter: blur(10px);
-}
-.header-content{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{
-  width:44px;height:44px;border-radius:16px;
-  display:grid;place-items:center;
-  font-family:Outfit,sans-serif;font-weight:950;
-  color:#111827;
-  background:linear-gradient(135deg, var(--gold), var(--orange));
-  box-shadow:0 12px 26px rgba(250,204,21,.22);
-}
-.titles .t1{font-family:Outfit,sans-serif;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
-.titles .t2{font-size:12px;color:var(--muted);font-weight:800;margin-top:2px}
-.right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-.btn{
-  border:1px solid rgba(148,163,184,.28);
-  background:rgba(2,6,23,.35);
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:14px;
-  cursor:pointer;
-  font-weight:900;
-  font-family:Outfit,sans-serif;
-  letter-spacing:.03em;
-  transition:transform .12s ease, border-color .12s ease, background .12s ease;
-  display:inline-flex;align-items:center;gap:8px;
-}
-.btn:hover{transform:translateY(-1px);border-color:rgba(249,115,22,.55);background:rgba(249,115,22,.12)}
-.btn:active{transform:translateY(0)}
-.btn-primary{
-  background:linear-gradient(135deg, rgba(250,204,21,.95), rgba(249,115,22,.92));
-  color:#111827;
-  border:none;
-}
-.btn-primary:hover{background:linear-gradient(135deg, rgba(250,204,21,1), rgba(249,115,22,1))}
-.btn-secondary{background:rgba(2,6,23,.35)}
-.card{
-  margin-top:16px;
-  border:1px solid var(--line);
-  background:rgba(2,6,23,.55);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:16px;
-}
-.card h1{
-  margin:0 0 6px;
-  font-family:Outfit,sans-serif;
-  font-weight:950;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  font-size:1.05rem;
-}
-.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
-@keyframes spin{to{transform:rotate(360deg)}}
-"""
-
-SUPABASE_URL="https://wesqmwjjtsefyjnluosj.supabase.co"
-SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA"
-
-template = """<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <title>DIGIY • NDIMBAL — Search PRO (FULL DB • Monobloc)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0A0E1A">
-  <meta name="description" content="NDIMBAL — Search PRO V3 (carte + liste) • FULL DB Sénégal inline • GitHub Pages OK.">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-  <style>
-__GLOBAL_CSS__
-
-__SEARCHPRO_CSS__
-  </style>
-</head>
-
-<body>
-  <div class="wrap">
-    <header>
-      <div class="header-content">
-        <div class="brand">
-          <div class="logo">♾️</div>
-          <div class="titles">
-            <div class="t1">DIGIY • NDIMBAL</div>
-            <div class="t2">Recherche PRO — Carte + Liste • FULL DB Sénégal</div>
-          </div>
-        </div>
-        <div class="right">
-          <button id="openSearchPro" class="btn btn-primary" type="button">🔎 Rechercher un PRO</button>
-        </div>
-      </div>
-    </header>
-
-    <div class="card">
-      <h1>FULL DB prêt à poser</h1>
-      <p>
-        1 fichier = <b>index.html</b> • Tout est inline (styles + zones + base Sénégal + moteur Search PRO).<br>
-        Si tu n’as pas encore la RPC Supabase, le moteur utilise le fallback prévu (table/view <b>pros_public</b> si disponible).
-      </p>
-    </div>
-  </div>
-
-  <!-- =========================
-     MODAL SEARCH PRO V3
-  ========================== -->
-__MODAL_HTML__
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-  // 🔐 SUPABASE — DÉJÀ POSÉ (DIGIY)
-  const SB = supabase.createClient("__SUPABASE_URL__", "__SUPABASE_ANON__");
-  </script>
-
-  <script>
-/* =========================
-   ZONES SÉNÉGAL — INLINE
-========================= */
-__ZONES_JS__
-  </script>
-
-  <script>
-/* =========================
-   DIGIY BUSINESS DB — SÉNÉGAL (FULL) — INLINE
-========================= */
-__DB_JS__
-  </script>
-
-  <script>
-/* =========================
-   SEARCH PRO MAP ENGINE — INLINE
-========================= */
-__ENGINE_JS__
-  </script>
-
-  <script>
-  // Boot safe
-  (function(){
-    var m = document.getElementById("searchProModal");
-    if(m) m.style.display = "none";
-  })();
-  </script>
-</body>
-</html>
-"""
-
-index_html = (template
-              .replace("__GLOBAL_CSS__", global_css.strip())
-              .replace("__SEARCHPRO_CSS__", css.strip())
-              .replace("__MODAL_HTML__", modal_html)
-              .replace("__SUPABASE_URL__", SUPABASE_URL)
-              .replace("__SUPABASE_ANON__", SUPABASE_ANON)
-              .replace("__ZONES_JS__", zones)
-              .replace("__DB_JS__", db)
-              .replace("__ENGINE_JS__", engine))
-
-out_path = os.path.join(base_dir, "index-full-db-ndimbal.html")
-with open(out_path, "w", encoding="utf-8") as f:
-    f.write(index_html)
-
-out_path
