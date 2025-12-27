@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DIGIYLYFE — Catalogue Local Premium (Sable & Or) — NDIMBAL</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root{
+    --bg-1:#f7f3ea; --bg-2:#efe7d6; --ink:#1f2937; --muted:#6b7280;
+    --card:#fff; --line:rgba(31,41,55,.08); --shadow:0 10px 30px rgba(0,0,0,.06);
+    --gold-1:#d1b464; --gold-2:#b89231; --gold-3:#f3e6b3;
+    --accent-cta-1:#b38728; --accent-cta-2:#f9d976;
+    --radius-xl:28px; --radius-lg:18px; --topbar-h:64px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; padding:20px; min-height:100svh; color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 10% 0%, var(--bg-2), transparent),
+      radial-gradient(1200px 600px at 100% 30%, var(--bg-1), transparent),
+      linear-gradient(180deg, var(--bg-1), #fbfaf7 40%, #ffffff 100%);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --ink:#f4f5f7; --card:#0f141b; --line:rgba(255,255,255,.10); --bg-1:#0a0d12; --bg-2:#141922; --muted:#a3aab6; --shadow:0 10px 30px rgba(0,0,0,.45); }
+    body{ background: linear-gradient(180deg,#0b0f15,#10161e 60%,#0b0f15); }
+  }
+
+  .digiy-wrap{
+    max-width:1200px; margin:0 auto; padding:24px;
+    background: rgba(255,255,255,.85);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: var(--radius-xl);
+    border:1px solid var(--line);
+    box-shadow: 0 24px 60px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.6) inset;
+    position:relative; overflow:hidden;
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-wrap{ background: rgba(15,20,27,.86); box-shadow:0 24px 70px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset; }
+  }
+  .digiy-wrap::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(90deg, transparent 0%, rgba(209,180,100,.08) 50%, transparent 100%);
+    mask: linear-gradient(90deg, transparent 0%, black 45%, black 55%, transparent 100%);
+  }
+
+  .digiy-topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    position:sticky; top:0; z-index:20;
+    height: var(--topbar-h);
+    padding:12px 18px; margin:-24px -24px 12px; width: calc(100% + 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    border-bottom:1px solid var(--line);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-topbar{ background: linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.82)); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  }
+  .digiy-brand{ display:flex; align-items:center; gap:10px; min-width:220px; }
+  .digiy-inf{
+    font-weight:900; font-size:22px;
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    -webkit-background-clip:text; background-clip:text;
+    color:transparent;
+  }
+  .digiy-brand-title{ margin:0; font-size:14px; font-weight:900; letter-spacing:.2px; }
+  .digiy-brand-sub{ margin:0; font-size:12px; color:var(--muted); font-weight:800; }
+
+  .digiy-back{
+    text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    padding:10px 12px; border-radius:12px;
+    border:1px solid var(--line);
+    background: rgba(255,255,255,.7);
+    color: var(--ink);
+    font-weight:900; font-size:13px;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    white-space:nowrap;
+  }
+  @media (prefers-color-scheme: dark){ .digiy-back{ background: rgba(255,255,255,.06); } }
+  .digiy-back:hover{
+    transform: translateY(-1px);
+    border-color: rgba(209,180,100,.45);
+    box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  }
+
+  .digiy-toolbar{
+    display:flex; gap:12px;
+    position:sticky; top: var(--topbar-h); z-index:19;
+    padding:14px 18px; margin:0 -24px 18px; width: calc(100% + 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){ .digiy-toolbar{ background: linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.82)); } }
+  .digiy-toolbar input, .digiy-toolbar select{
+    flex:1; padding:11px 14px; font-size:14px; color:var(--ink);
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .15s ease;
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-toolbar input, .digiy-toolbar select{ background: rgba(255,255,255,.06); color: var(--ink); }
+  }
+  .digiy-toolbar input:focus, .digiy-toolbar select:focus{
+    outline:none; border-color: var(--gold-1);
+    box-shadow: 0 0 0 3px rgba(209,180,100,.25);
+    transform: translateY(-1px);
+  }
+
+  .digiy-count{ margin:10px 0 8px; font-weight:900; color:var(--muted); }
+  mark{ background: linear-gradient(120deg, var(--gold-3), #fde68a); border-radius:4px; padding:0 4px; }
+
+  .digiy-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:22px; }
+
+  .digiy-card{
+    display:flex; flex-direction:column;
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    border:1px solid var(--line);
+    box-shadow: var(--shadow);
+    position:relative; overflow:hidden;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    cursor: pointer;
+  }
+  .digiy-card:hover{ transform: translateY(-5px); box-shadow: 0 18px 40px rgba(0,0,0,.10); border-color: rgba(209,180,100,.45); }
+  .digiy-card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .2s ease;
+    background: radial-gradient(400px 120px at 80% 0%, rgba(209,180,100,.18), transparent 60%);
+  }
+  .digiy-card:hover::after{ opacity:1; }
+
+  .digiy-thumb{ height:220px; position:relative; overflow:hidden; background: linear-gradient(135deg, #c8b27a, #e9d9a4); }
+  .digiy-thumb img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease; }
+  .digiy-card:hover .digiy-thumb img{ transform: scale(1.05); }
+
+  .digiy-badge{
+    position:absolute; top:12px; right:12px; z-index:2;
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    color:#111; border-radius:10px; font-size:11px; font-weight:900; padding:6px 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35) inset;
+  }
+
+  .digiy-body{ padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .digiy-title{ margin:0; font-size:18px; font-weight:900; color:var(--ink); letter-spacing:.2px; }
+  .digiy-meta{ margin:0; font-size:13px; color:var(--muted); font-weight:800; }
+  .digiy-desc{ margin:0; font-size:13px; color:#4b5563; }
+  @media (prefers-color-scheme: dark){ .digiy-desc{ color:#cbd5e1; } }
+  .digiy-price{ margin:6px 0 10px; font-weight:900; font-size:17px; color:var(--ink); }
+
+  .digiy-footer{ border-top:1px solid var(--line); padding-top:10px; margin-top:auto; }
+  .digiy-cta{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  .digiy-btn{
+    flex:1; text-align:center; text-decoration:none; font-weight:900; font-size:13px;
+    padding:10px 14px; border-radius:12px; color:#111; position:relative; overflow:hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+    user-select:none;
+  }
+  .digiy-btn:focus{ outline:3px solid rgba(209,180,100,.35); outline-offset:2px; }
+  .digiy-btn:hover{ transform: translateY(-1px); }
+
+  .digiy-btn.ndimbal{
+    color:#111;
+    background: linear-gradient(135deg, #fde68a, var(--accent-cta-1));
+    box-shadow: 0 6px 16px rgba(179,135,40,.28);
+  }
+  .digiy-btn.whatsapp{ color:#fff; background: linear-gradient(135deg, #35d07f, #0d9f54); box-shadow: 0 6px 16px rgba(13,159,84,.28); }
+  .digiy-btn.call{ color:#fff; background: linear-gradient(135deg, #334155, #111827); box-shadow: 0 6px 16px rgba(0,0,0,.18); }
+
+  .empty-state-box{
+    text-align:center; padding:56px 18px;
+    background: rgba(255,255,255,.6);
+    border-radius: 18px;
+    border: 2px dashed rgba(31,41,55,.12);
+    margin: 18px 0;
+  }
+  @media (prefers-color-scheme: dark){
+    .empty-state-box{ background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); }
+  }
+  .empty-state-box p:first-child{ font-size:18px; font-weight:900; margin:0 0 8px; }
+  .empty-state-box p:last-child{ font-size:14px; color:var(--muted); margin:0; }
+
+  .loader{
+    display:inline-flex; align-items:center; gap:10px;
+    font-weight:900; color:var(--muted);
+    padding:14px 16px; border:1px solid var(--line); border-radius:14px;
+    background: rgba(255,255,255,.55);
+  }
+  @media (prefers-color-scheme: dark){ .loader{ background: rgba(255,255,255,.05); } }
+  .dot{ width:10px; height:10px; border-radius:50%; background: rgba(209,180,100,.8); animation: pulse 1s infinite ease-in-out; }
+  .dot:nth-child(2){ animation-delay:.15s }
+  .dot:nth-child(3){ animation-delay:.30s }
+  @keyframes pulse{ 0%,100%{ transform:scale(1); opacity:.7 } 50%{ transform:scale(1.35); opacity:1 } }
+
+  @media (max-width: 640px){
+    body{ padding:10px; }
+    .digiy-wrap{ padding:14px; border-radius:20px; }
+    .digiy-topbar{ margin:-14px -14px 10px; width: calc(100% + 28px); padding:10px 12px; height: 58px; }
+    :root{ --topbar-h: 58px; }
+    .digiy-toolbar{ flex-direction:column; padding:12px; margin:0 -14px 14px; width: calc(100% + 28px); }
+    .digiy-brand{ min-width:0; }
+    .digiy-brand-title{ font-size:13px; }
+    .digiy-back{ padding:8px 10px; font-size:12px; }
+  }
+</style>
+</head>
+
+<body>
+<section class="digiy-wrap" aria-label="Partenaires DIGIYLYFE — catalogue">
+
+  <div class="digiy-topbar" role="region" aria-label="Navigation catalogue">
+    <div class="digiy-brand">
+      <div class="digiy-inf">∞</div>
+      <div>
+        <p class="digiy-brand-title">DIGIYLYFE — Catalogue → NDIMBAL</p>
+        <p class="digiy-brand-sub">clic carte = fiche NDIMBAL</p>
+      </div>
+    </div>
+
+    <a class="digiy-back" href="https://beauville.github.io/digiy-hub/" rel="noopener">← Retour DIGIY HUB</a>
+  </div>
+
+  <div class="digiy-toolbar" role="region" aria-label="Filtres catalogue">
+    <input id="q-search" type="search" placeholder="🔍 Rechercher (Saly, resto, chauffeur, villa...)" aria-label="Recherche partenaires" autocomplete="off" inputmode="search" />
+    <select id="cat-filter" aria-label="Filtrer par catégorie">
+      <option value="all">🌟 Toutes catégories</option>
+      <option value="hebergement">🏨 Hébergement</option>
+      <option value="market">🛒 Market & Style</option>
+      <option value="driver">🚗 Driver</option>
+      <option value="construction">🏗️ Bâtisseur</option>
+      <option value="explore">🌴 Explore</option>
+    </select>
+  </div>
+
+  <p id="count" class="digiy-count" aria-live="polite">—</p>
+
+  <div id="status" class="loader" aria-live="polite">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span>Chargement des partenaires…</span>
+  </div>
+
+  <div class="digiy-row" id="cards-container" style="margin-top:14px;"></div>
+
+  <div id="empty-state" class="empty-state-box" hidden>
+    <p>😕 Oups ! Aucun partenaire trouvé.</p>
+    <p>Vérifiez l'orthographe ou choisissez “Toutes catégories”.</p>
+  </div>
+</section>
+
+<script>
+/* 🔐 SUPABASE — DÉJÀ POSÉ */
+const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* 🔥 NDIMBAL BASE (CHANGE ICI) */
+const NDIMBAL_BASE = "https://beauville.github.io/digiy-ndimbal-map/"; 
+// exemple attendu : NDIMBAL lit le slug via ?pro=xxx  (ou #pro=xxx)
+function ndimbalUrlFromSlug(slug){
+  if(!slug) return NDIMBAL_BASE;
+  const clean = String(slug).trim();
+  return NDIMBAL_BASE + "?pro=" + encodeURIComponent(clean);
+}
+
+/* helpers */
+const $  = (s,p=document)=>p.querySelector(s);
+const $$ = (s,p=document)=>Array.from(p.querySelectorAll(s));
+const fold = (s) => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const tokenize = (s) => fold(s).split(/\s+/).filter(t => t.length > 1);
+const escapeRegex = (s)=> s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+
+function setCount(n){
+  $('#count').textContent = `${n} partenaire${n>1?'s':''} trouvé${n>1?'s':''}`;
+}
+
+function safeHighlight(el, terms){
+  if(!el) return;
+  const raw = el.textContent;
+  if(!terms.length){ el.textContent = raw; return; }
+  const escaped = terms.map(escapeRegex).filter(Boolean);
+  if(!escaped.length){ el.textContent = raw; return; }
+  const rx = new RegExp('(' + escaped.join('|') + ')', 'gi');
+  const parts = raw.split(rx);
+  el.innerHTML = '';
+  for(const part of parts){
+    if(!part) continue;
+    if(rx.test(part)){
+      const m=document.createElement('mark'); m.textContent=part; el.appendChild(m);
+    }else{
+      el.appendChild(document.createTextNode(part));
+    }
+  }
+}
+
+function normalizeWhatsApp(val){
+  if(!val) return null;
+  const s = String(val).trim();
+  if(s.includes("wa.me/")){
+    const m = s.match(/wa\.me\/(\d+)/);
+    return m ? m[1] : null;
+  }
+  return s.replace(/\D/g,'');
+}
+
+function buildCard(pro){
+  const slug = pro.slug || "";
+  const name = pro.name || "Partenaire";
+  const meta = [pro.city, pro.region].filter(Boolean).join(" • ");
+  const desc = pro.description || "";
+  const badge = pro.badge || "";
+  const img = pro.image_url || "https://digiylyfe.com/wp-content/uploads/2025/09/IMG_0918-e1760705584582.png";
+  const price = pro.price_label ? `💰 <strong>${pro.price_label}</strong>` : "";
+  const booking = pro.booking_url || pro.website_url || "";
+  const wa = normalizeWhatsApp(pro.whatsapp);
+  const phone = pro.phone || "";
+
+  const keywords = [pro.keywords, name, meta, desc, slug].filter(Boolean).join(" ");
+  const article = document.createElement("article");
+  article.className = "digiy-card";
+  article.dataset.cat = (pro.category || "all");
+  article.dataset.keywords = keywords;
+  article.id = slug || pro.id;
+
+  // URL NDIMBAL générée
+  const ndimbalLink = ndimbalUrlFromSlug(slug);
+
+  article.innerHTML = `
+    <div class="digiy-thumb">
+      ${badge ? `<div class="digiy-badge">${badge}</div>` : ``}
+      <img width="1200" height="800" src="${img}" alt="${name}" loading="lazy" decoding="async" />
+    </div>
+    <div class="digiy-body">
+      <h3 class="digiy-title">${name}</h3>
+      <p class="digiy-meta">${meta || ""}</p>
+      <p class="digiy-desc">${desc}</p>
+      <div class="digiy-footer">
+        ${price ? `<p class="digiy-price">${price}</p>` : ``}
+        <div class="digiy-cta">
+          <a class="digiy-btn ndimbal" href="${ndimbalLink}" target="_blank" rel="noopener">♾️ NDIMBAL</a>
+          ${wa ? `<a class="digiy-btn whatsapp" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>` : ``}
+          ${phone ? `<a class="digiy-btn call" href="tel:${phone}">📞 Appeler</a>` : ``}
+          ${booking ? `<a class="digiy-btn ndimbal" href="${booking}" target="_blank" rel="noopener">🔎 Voir</a>` : ``}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // 🔥 CLIC SUR LA CARTE => NDIMBAL (mais pas quand on clique sur un bouton/lien)
+  article.addEventListener("click", (e)=>{
+    const isLinkOrButton = e.target.closest("a,button");
+    if(isLinkOrButton) return;
+    window.open(ndimbalLink, "_blank");
+  });
+
+  return article;
+}
+
+/* state */
+let index = [];
+
+/* load */
+async function loadProfessionals(){
+  const status = $('#status');
+  status.style.display = "inline-flex";
+
+  // ✅ si ta colonne is_active existe, garde le filtre
+  // ✅ sinon, enlève la ligne .eq("is_active", true)
+  let q = SB
+    .from("professionals")
+    .select("*");
+
+  // essaie avec is_active, sinon fallback automatique
+  try{
+    q = q.eq("is_active", true);
+  }catch(e){}
+
+  const { data, error } = await q
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error("Supabase error:", error);
+    status.querySelector("span:last-child").textContent = "Erreur de chargement (table/policy).";
+    return;
+  }
+
+  const allPros = data || [];
+  const container = $('#cards-container');
+  container.innerHTML = "";
+
+  allPros.forEach(pro => container.appendChild(buildCard(pro)));
+
+  // build index
+  const cards = $$('.digiy-card');
+  index = cards.map(card => {
+    const titleEl = card.querySelector('.digiy-title');
+    const descEl  = card.querySelector('.digiy-desc');
+    const metaEl  = card.querySelector('.digiy-meta');
+    const rawText = (titleEl?.textContent||'')+' '+(metaEl?.textContent||'')+' '+(descEl?.textContent||'')+' '+(card.dataset.keywords||'');
+    return {
+      card,
+      category: card.dataset.cat || 'all',
+      foldedText: fold(rawText),
+      titleEl,
+      descEl,
+      titleRaw: titleEl?.textContent || '',
+      descRaw: descEl?.textContent || ''
+    };
+  });
+
+  status.style.display = "none";
+  setCount(cards.length);
+  updateFilter();
+}
+
+/* filter */
+let timeoutId;
+
+function updateFilter(){
+  const query = $('#q-search').value.trim();
+  const category = $('#cat-filter').value;
+  const terms = tokenize(query);
+
+  const emptyState = $('#empty-state');
+  const container = $('#cards-container');
+
+  let visibleCount = 0;
+  const results = [];
+
+  index.forEach(item => {
+    const card = item.card;
+    let score = 0;
+    let ok = true;
+
+    if(category !== 'all' && item.category !== category) ok = false;
+
+    if(terms.length && ok){
+      ok = terms.every(t => {
+        const hit = item.foldedText.includes(t);
+        if(hit) score++;
+        return hit;
+      });
+    }
+
+    card.style.display = 'none';
+    if(item.titleEl) item.titleEl.textContent = item.titleRaw;
+    if(item.descEl)  item.descEl.textContent  = item.descRaw;
+
+    if(ok){
+      visibleCount++;
+      results.push({ item, score });
+    }
+  });
+
+  if(terms.length) results.sort((a,b)=> b.score - a.score);
+
+  const frag = document.createDocumentFragment();
+
+  results.forEach(({ item }) => {
+    const card = item.card;
+    card.style.display = (window.innerWidth <= 640) ? 'grid' : 'flex';
+    frag.appendChild(card);
+
+    const searchTerms = query.split(/\s+/).filter(t => t.length > 1);
+    safeHighlight(item.titleEl, searchTerms);
+    safeHighlight(item.descEl,  searchTerms);
+  });
+
+  container.appendChild(frag);
+
+  setCount(visibleCount);
+  emptyState.hidden = visibleCount > 0;
+}
+
+const debounced = () => { clearTimeout(timeoutId); timeoutId = setTimeout(updateFilter, 80); };
+
+/* listeners */
+document.addEventListener('DOMContentLoaded', async ()=>{
+  $('#q-search').addEventListener('input', debounced);
+  $('#q-search').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); updateFilter(); }});
+  $('#cat-filter').addEventListener('change', updateFilter);
+
+  let resizeTimer;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(updateFilter, 150);
+  }, { passive:true });
+
+  await loadProfessionals();
+});
+</script>
+
+</body>
+</html>
