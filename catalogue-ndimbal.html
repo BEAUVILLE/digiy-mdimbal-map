@@ -256,27 +256,38 @@
 </section>
 
 <script>
-/* 🔐 SUPABASE — DÉJÀ POSÉ */
+/* ================================
+   SUPABASE (SAFE / UNIQUE)
+================================ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* 🔥 NDIMBAL BASE (CHANGE ICI) */
-const NDIMBAL_BASE = "https://beauville.github.io/digiy-ndimbal-map/"; 
-// exemple attendu : NDIMBAL lit le slug via ?pro=xxx  (ou #pro=xxx)
+window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SB = window.SB;
+
+/* ================================
+   NDIMBAL MAP URL (IMPORTANT)
+   ✅ Mets ici la VRAIE map
+================================ */
+const NDIMBAL_BASE = "https://beauville.github.io/digiy-mdimbal-map/"; // ✅ mdimbal-map
+
 function ndimbalUrlFromSlug(slug){
   if(!slug) return NDIMBAL_BASE;
   const clean = String(slug).trim();
   return NDIMBAL_BASE + "?pro=" + encodeURIComponent(clean);
 }
 
-/* helpers */
+/* ================================
+   HELPERS
+================================ */
 const $  = (s,p=document)=>p.querySelector(s);
 const $$ = (s,p=document)=>Array.from(p.querySelectorAll(s));
 const fold = (s) => (s || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const tokenize = (s) => fold(s).split(/\s+/).filter(t => t.length > 1);
 const escapeRegex = (s)=> s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+
+const FALLBACK_IMG = "https://digiylyfe.com/wp-content/uploads/2025/09/IMG_0918-e1760705584582.png";
 
 function setCount(n){
   $('#count').textContent = `${n} partenaire${n>1?'s':''} trouvé${n>1?'s':''}`;
@@ -284,17 +295,25 @@ function setCount(n){
 
 function safeHighlight(el, terms){
   if(!el) return;
-  const raw = el.textContent;
+  const raw = el.dataset.raw || el.textContent || "";
+  el.dataset.raw = raw;
+
   if(!terms.length){ el.textContent = raw; return; }
+
   const escaped = terms.map(escapeRegex).filter(Boolean);
   if(!escaped.length){ el.textContent = raw; return; }
-  const rx = new RegExp('(' + escaped.join('|') + ')', 'gi');
+
+  const rx = new RegExp("(" + escaped.join("|") + ")", "gi");
   const parts = raw.split(rx);
-  el.innerHTML = '';
+
+  el.innerHTML = "";
   for(const part of parts){
-    if(!part) continue;
-    if(rx.test(part)){
-      const m=document.createElement('mark'); m.textContent=part; el.appendChild(m);
+    if(part == null || part === "") continue;
+    // ✅ pas de rx.test() (évite le bug stateful)
+    if(escaped.some(t => fold(part) === fold(t))){
+      const m = document.createElement("mark");
+      m.textContent = part;
+      el.appendChild(m);
     }else{
       el.appendChild(document.createTextNode(part));
     }
@@ -311,92 +330,124 @@ function normalizeWhatsApp(val){
   return s.replace(/\D/g,'');
 }
 
+function normalizeCat(raw){
+  const c = fold(raw || "");
+  if(!c) return "market";
+  if(c.includes("heberg") || c.includes("héberg") || c.includes("logement") || c.includes("villa") || c.includes("hotel") || c.includes("hôtel")) return "hebergement";
+  if(c.includes("driver") || c.includes("taxi") || c.includes("vtc") || c.includes("chauffeur")) return "driver";
+  if(c.includes("construction") || c.includes("batiment") || c.includes("bâtiment") || c.includes("artisan")) return "construction";
+  if(c.includes("explore") || c.includes("voyage") || c.includes("guide") || c.includes("tour")) return "explore";
+  if(c.includes("market") || c.includes("commerce") || c.includes("boutique") || c.includes("style")) return "market";
+  return "market";
+}
+
+/* ================================
+   CARD BUILDER
+================================ */
 function buildCard(pro){
-  const slug = pro.slug || "";
+  const slug = (pro.slug || "").trim();
   const name = pro.name || "Partenaire";
   const meta = [pro.city, pro.region].filter(Boolean).join(" • ");
   const desc = pro.description || "";
-  const badge = pro.badge || "";
-  const img = pro.image_url || "https://digiylyfe.com/wp-content/uploads/2025/09/IMG_0918-e1760705584582.png";
-  const price = pro.price_label ? `💰 <strong>${pro.price_label}</strong>` : "";
-  const booking = pro.booking_url || pro.website_url || "";
-  const wa = normalizeWhatsApp(pro.whatsapp);
-  const phone = pro.phone || "";
+  const badge = pro.badge_text || pro.badge || "";
+  const img = pro.cover_url || pro.image_url || pro.photo_url || FALLBACK_IMG;
+  const priceLabel = pro.price_text || pro.price_label || "";
+  const booking = pro.cta_secondary_url || pro.page_url || pro.website_url || pro.website || pro.url || "";
+  const wa = normalizeWhatsApp(pro.cta_primary_url || pro.whatsapp || "");
+  const phone = (pro.phone || "").trim();
 
-  const keywords = [pro.keywords, name, meta, desc, slug].filter(Boolean).join(" ");
+  const category = normalizeCat(pro.category || pro.cat || pro.type || "");
+  const keywords = [pro.keywords, pro.tags, name, meta, desc, slug].filter(Boolean).join(" ");
+  const ndimbalLink = ndimbalUrlFromSlug(slug);
+
   const article = document.createElement("article");
   article.className = "digiy-card";
-  article.dataset.cat = (pro.category || "all");
+  article.dataset.cat = category;
   article.dataset.keywords = keywords;
-  article.id = slug || pro.id;
-
-  // URL NDIMBAL générée
-  const ndimbalLink = ndimbalUrlFromSlug(slug);
+  article.id = slug || pro.id || "";
 
   article.innerHTML = `
     <div class="digiy-thumb">
       ${badge ? `<div class="digiy-badge">${badge}</div>` : ``}
-      <img width="1200" height="800" src="${img}" alt="${name}" loading="lazy" decoding="async" />
+      <img
+        width="1200" height="800"
+        src="${img}"
+        alt="${name}"
+        loading="lazy" decoding="async"
+        onerror="this.onerror=null;this.src='${FALLBACK_IMG}';"
+      />
     </div>
     <div class="digiy-body">
       <h3 class="digiy-title">${name}</h3>
       <p class="digiy-meta">${meta || ""}</p>
       <p class="digiy-desc">${desc}</p>
       <div class="digiy-footer">
-        ${price ? `<p class="digiy-price">${price}</p>` : ``}
+        ${priceLabel ? `<p class="digiy-price">💰 <strong>${priceLabel}</strong></p>` : ``}
         <div class="digiy-cta">
           <a class="digiy-btn ndimbal" href="${ndimbalLink}" target="_blank" rel="noopener">♾️ NDIMBAL</a>
           ${wa ? `<a class="digiy-btn whatsapp" href="https://wa.me/${wa}" target="_blank" rel="noopener">💬 WhatsApp</a>` : ``}
-          ${phone ? `<a class="digiy-btn call" href="tel:${phone}">📞 Appeler</a>` : ``}
+          ${phone ? `<a class="digiy-btn call" href="tel:${phone.replace(/\s+/g,'')}">📞 Appeler</a>` : ``}
           ${booking ? `<a class="digiy-btn ndimbal" href="${booking}" target="_blank" rel="noopener">🔎 Voir</a>` : ``}
         </div>
       </div>
     </div>
   `;
 
-  // 🔥 CLIC SUR LA CARTE => NDIMBAL (mais pas quand on clique sur un bouton/lien)
+  // clic carte => NDIMBAL (sauf si clic sur bouton)
   article.addEventListener("click", (e)=>{
-    const isLinkOrButton = e.target.closest("a,button");
-    if(isLinkOrButton) return;
-    window.open(ndimbalLink, "_blank");
+    if(e.target.closest("a,button")) return;
+    window.open(ndimbalLink, "_blank", "noopener");
   });
 
   return article;
 }
 
-/* state */
+/* ================================
+   STATE
+================================ */
 let index = [];
 
-/* load */
-async function loadProfessionals(){
-  const status = $('#status');
-  status.style.display = "inline-flex";
-
-  // ✅ si ta colonne is_active existe, garde le filtre
-  // ✅ sinon, enlève la ligne .eq("is_active", true)
-  let q = SB
+/* ================================
+   LOAD (is_active SAFE)
+================================ */
+async function fetchProsSmart(){
+  // 1) tentative avec is_active
+  let res = await SB
     .from("professionals")
-    .select("*");
-
-  // essaie avec is_active, sinon fallback automatique
-  try{
-    q = q.eq("is_active", true);
-  }catch(e){}
-
-  const { data, error } = await q
+    .select("*")
+    .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
+  // si colonne n’existe pas -> code 42703 => relance sans filtre
+  if(res.error && (res.error.code === "42703" || /is_active/i.test(res.error.message || ""))){
+    res = await SB
+      .from("professionals")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+  }
+
+  return res;
+}
+
+async function loadProfessionals(){
+  const status = $('#status');
+  status.style.display = "inline-flex";
+  status.querySelector("span:last-child").textContent = "Chargement des partenaires…";
+
+  const { data, error } = await fetchProsSmart();
+
   if(error){
     console.error("Supabase error:", error);
-    status.querySelector("span:last-child").textContent = "Erreur de chargement (table/policy).";
+    status.querySelector("span:last-child").textContent = "Erreur Supabase (table/policy).";
     return;
   }
 
-  const allPros = data || [];
   const container = $('#cards-container');
   container.innerHTML = "";
 
+  const allPros = data || [];
   allPros.forEach(pro => container.appendChild(buildCard(pro)));
 
   // build index
@@ -405,15 +456,19 @@ async function loadProfessionals(){
     const titleEl = card.querySelector('.digiy-title');
     const descEl  = card.querySelector('.digiy-desc');
     const metaEl  = card.querySelector('.digiy-meta');
-    const rawText = (titleEl?.textContent||'')+' '+(metaEl?.textContent||'')+' '+(descEl?.textContent||'')+' '+(card.dataset.keywords||'');
+
+    const rawText =
+      (titleEl?.textContent||'')+' '+
+      (metaEl?.textContent||'')+' '+
+      (descEl?.textContent||'')+' '+
+      (card.dataset.keywords||'');
+
     return {
       card,
       category: card.dataset.cat || 'all',
       foldedText: fold(rawText),
       titleEl,
-      descEl,
-      titleRaw: titleEl?.textContent || '',
-      descRaw: descEl?.textContent || ''
+      descEl
     };
   });
 
@@ -422,7 +477,9 @@ async function loadProfessionals(){
   updateFilter();
 }
 
-/* filter */
+/* ================================
+   FILTER
+================================ */
 let timeoutId;
 
 function updateFilter(){
@@ -436,54 +493,46 @@ function updateFilter(){
   let visibleCount = 0;
   const results = [];
 
-  index.forEach(item => {
-    const card = item.card;
-    let score = 0;
+  for(const item of index){
     let ok = true;
-
     if(category !== 'all' && item.category !== category) ok = false;
 
-    if(terms.length && ok){
-      ok = terms.every(t => {
-        const hit = item.foldedText.includes(t);
-        if(hit) score++;
-        return hit;
-      });
+    if(ok && terms.length){
+      ok = terms.every(t => item.foldedText.includes(t));
     }
 
-    card.style.display = 'none';
-    if(item.titleEl) item.titleEl.textContent = item.titleRaw;
-    if(item.descEl)  item.descEl.textContent  = item.descRaw;
+    item.card.style.display = 'none';
 
     if(ok){
       visibleCount++;
+      // scoring simple (priorise ceux qui matchent plus de termes)
+      const score = terms.reduce((acc,t)=> acc + (item.foldedText.includes(t)?1:0), 0);
       results.push({ item, score });
     }
-  });
+  }
 
   if(terms.length) results.sort((a,b)=> b.score - a.score);
 
   const frag = document.createDocumentFragment();
+  for(const { item } of results){
+    item.card.style.display = (window.innerWidth <= 640) ? 'grid' : 'flex';
+    frag.appendChild(item.card);
 
-  results.forEach(({ item }) => {
-    const card = item.card;
-    card.style.display = (window.innerWidth <= 640) ? 'grid' : 'flex';
-    frag.appendChild(card);
-
-    const searchTerms = query.split(/\s+/).filter(t => t.length > 1);
-    safeHighlight(item.titleEl, searchTerms);
-    safeHighlight(item.descEl,  searchTerms);
-  });
-
+    const highlightTerms = query.split(/\s+/).filter(t=>t.length>1);
+    safeHighlight(item.titleEl, highlightTerms);
+    safeHighlight(item.descEl, highlightTerms);
+  }
   container.appendChild(frag);
 
   setCount(visibleCount);
   emptyState.hidden = visibleCount > 0;
 }
 
-const debounced = () => { clearTimeout(timeoutId); timeoutId = setTimeout(updateFilter, 80); };
+const debounced = () => { clearTimeout(timeoutId); timeoutId = setTimeout(updateFilter, 90); };
 
-/* listeners */
+/* ================================
+   INIT
+================================ */
 document.addEventListener('DOMContentLoaded', async ()=>{
   $('#q-search').addEventListener('input', debounced);
   $('#q-search').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); updateFilter(); }});
