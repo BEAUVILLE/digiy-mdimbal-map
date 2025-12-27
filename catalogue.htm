@@ -70,12 +70,13 @@
     flex:0 0 auto;
     padding:11px 14px; border-radius:12px; border:1px solid var(--line);
     background: rgba(255,255,255,.9);
-    font-weight:900; cursor:pointer;
+    font-weight:1000; cursor:pointer;
     transition: transform .15s ease, box-shadow .15s ease;
+    white-space:nowrap;
   }
   .btn-hub:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,.10); }
 
-  .count{ margin: 10px 0 8px; font-weight:900; color:var(--muted); }
+  .count{ margin: 10px 0 8px; font-weight:1000; color:var(--muted); }
   .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 22px; }
 
   .card{
@@ -95,7 +96,7 @@
   .badge{
     position:absolute; top:12px; right:12px; z-index:2;
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-    color:#111; border-radius:10px; font-size:11px; font-weight:900; padding:6px 10px;
+    color:#111; border-radius:10px; font-size:11px; font-weight:1000; padding:6px 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35) inset;
     max-width: 80%;
     white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
@@ -103,7 +104,7 @@
 
   .body{ padding:16px; display:flex; flex-direction:column; gap:6px; }
   .title{ margin:0; font-size:18px; font-weight:1000; letter-spacing:.2px; }
-  .meta{ margin:0; font-size:13px; color:var(--muted); font-weight:700; }
+  .meta{ margin:0; font-size:13px; color:var(--muted); font-weight:800; }
   .desc{ margin:0; font-size:13px; color:#4b5563; }
   .price{ margin:6px 0 10px; font-weight:1000; font-size:17px; }
 
@@ -192,14 +193,21 @@
 </section>
 
 <script>
-/* 🔐 SUPABASE — intégré */
+/* ================================
+   SUPABASE (SAFE / UNIQUE)
+================================ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ✅ 1 seul client global (anti double déclaration)
+window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SB = window.SB;
+
+/* ================================
+   DOM HELPERS
+================================ */
 const $ = (s, p=document)=> p.querySelector(s);
-const $$ = (s, p=document)=> Array.from(p.querySelectorAll(s));
 
 const grid = $("#grid");
 const countEl = $("#count");
@@ -210,22 +218,12 @@ const catEl = $("#cat");
 let all = [];
 let view = [];
 
+const FALLBACK_COVER = "https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png";
+
 const fold = (s) => (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-const safe = (s) => (s??"").toString().replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-
-function normalizeCat(p){
-  // on accepte plusieurs noms possibles
-  const c = (p.category || p.cat || p.type || "").toString().toLowerCase().trim();
-  if(!c) return "market";
-  return c;
-}
-
-function computeKeywords(p){
-  return fold([
-    p.name, p.title, p.slug, p.city, p.region, p.description,
-    p.keywords, p.tags
-  ].filter(Boolean).join(" "));
-}
+const safe = (s) => (s??"").toString()
+  .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 
 function pick(p, ...keys){
   for(const k of keys){
@@ -234,11 +232,50 @@ function pick(p, ...keys){
   return "";
 }
 
+/* ================================
+   CATEGORY NORMALIZATION
+   (match select values)
+================================ */
+function normalizeCat(p){
+  const raw = fold(p.category || p.cat || p.type || "");
+  if(!raw) return "market";
+
+  // hebergement
+  if(raw.includes("heberg") || raw.includes("héberg") || raw.includes("logement") || raw.includes("villa") || raw.includes("hotel") || raw.includes("hôtel")) return "hebergement";
+
+  // driver / taxi
+  if(raw.includes("driver") || raw.includes("taxi") || raw.includes("vtc") || raw.includes("chauffeur")) return "driver";
+
+  // construction / batiment
+  if(raw.includes("construction") || raw.includes("batiment") || raw.includes("bâtiment") || raw.includes("artisan") || raw.includes("batie") || raw.includes("bâtie")) return "construction";
+
+  // explore / voyage
+  if(raw.includes("explore") || raw.includes("voyage") || raw.includes("guide") || raw.includes("tour")) return "explore";
+
+  // restaurant
+  if(raw.includes("resto") || raw.includes("restaurant") || raw.includes("food")) return "restaurant";
+
+  // market (default)
+  if(raw.includes("market") || raw.includes("boutique") || raw.includes("commerce") || raw.includes("style") || raw.includes("shop")) return "market";
+
+  return "market";
+}
+
+function computeKeywords(p){
+  return fold([
+    p.name, p.title, p.slug, p.city, p.region, p.description,
+    p.keywords, p.tags, p.badge_text, p.price_text
+  ].filter(Boolean).join(" "));
+}
+
+/* ================================
+   CARD
+================================ */
 function cardHTML(p){
   const name = pick(p, "name", "title", "label") || "Partenaire";
   const meta = [pick(p,"city"), pick(p,"region")].filter(Boolean).join(" — ");
   const desc = pick(p, "description") || "Service local — DIGIYLYFE";
-  const cover = pick(p, "cover_url", "photo_url", "image_url") || "https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png";
+  const cover = pick(p, "cover_url", "photo_url", "image_url") || FALLBACK_COVER;
   const badge = pick(p, "badge_text") || "✨ Partenaire";
   const price = pick(p, "price_text") || "💰 Sur demande";
 
@@ -247,24 +284,30 @@ function cardHTML(p){
   const cta2Label = pick(p, "cta_secondary_label") || "🔎 Voir";
   const cta2Url   = pick(p, "cta_secondary_url", "page_url", "website", "url", "link");
 
-  const cat = normalizeCat(p);
-
   // fallback contact si on a un phone
   const phone = pick(p, "phone");
   const telUrl = phone ? `tel:${phone.replace(/\s+/g,"")}` : "";
   const waAuto = phone ? `https://wa.me/${phone.replace(/[^\d]/g,"")}?text=${encodeURIComponent("Salam je viens de DIGIYLYFE 🙏")}` : "";
 
-  const primaryHref = cta1Url || waAuto || telUrl || "#";
-  const secondaryHref = cta2Url || (p.slug ? (`https://digiylyfe.com/partenaires-${encodeURIComponent(p.slug)}/`) : "#");
+  const primaryHref = cta1Url || waAuto || telUrl || "";
+  const secondaryHref = cta2Url || (p.slug ? (`https://digiylyfe.com/partenaires-${encodeURIComponent(p.slug)}/`) : "");
 
   const primaryOk = primaryHref.startsWith("http") || primaryHref.startsWith("tel:");
   const secondaryOk = secondaryHref.startsWith("http");
+
+  const cat = p.__cat || "market";
 
   return `
     <article class="card" data-cat="${safe(cat)}" data-key="${safe(p.__kw)}">
       <div class="thumb">
         <div class="badge">${safe(badge)}</div>
-        <img src="${safe(cover)}" alt="${safe(name)}" loading="lazy" decoding="async" />
+        <img
+          src="${safe(cover)}"
+          alt="${safe(name)}"
+          loading="lazy"
+          decoding="async"
+          onerror="this.onerror=null;this.src='${safe(FALLBACK_COVER)}';"
+        />
       </div>
       <div class="body">
         <h3 class="title">${safe(name)}</h3>
@@ -282,6 +325,9 @@ function cardHTML(p){
   `;
 }
 
+/* ================================
+   RENDER
+================================ */
 function render(list){
   grid.innerHTML = list.map(cardHTML).join("");
   const n = list.length;
@@ -289,6 +335,9 @@ function render(list){
   emptyEl.hidden = n > 0;
 }
 
+/* ================================
+   FILTERS (debounced)
+================================ */
 function applyFilters(){
   const q = fold(qEl.value.trim());
   const cat = catEl.value;
@@ -305,11 +354,26 @@ function applyFilters(){
   render(view);
 }
 
+function debounce(fn, ms=140){
+  let t=null;
+  return (...args)=>{
+    clearTimeout(t);
+    t=setTimeout(()=>fn(...args), ms);
+  };
+}
+const applyFiltersDebounced = debounce(applyFilters, 140);
+
+/* ================================
+   LOAD
+================================ */
 async function load(){
   countEl.textContent = "Chargement…";
+
   const { data, error } = await SB
     .from("professionals")
-    .select("id, created_at, name, title, slug, category, cat, type, city, region, description, keywords, tags, phone, cover_url, badge_text, price_text, cta_primary_label, cta_primary_url, cta_secondary_label, cta_secondary_url, page_url, website, url, link");
+    .select("id, created_at, name, title, slug, category, cat, type, city, region, description, keywords, tags, phone, cover_url, badge_text, price_text, cta_primary_label, cta_primary_url, cta_secondary_label, cta_secondary_url, page_url, website, url, link")
+    .order("created_at", { ascending:false })
+    .limit(500);
 
   if(error){
     console.error("Supabase error:", error);
@@ -327,11 +391,28 @@ async function load(){
   applyFilters();
 }
 
+/* ================================
+   NAV
+================================ */
 $("#btnHub").addEventListener("click", ()=>{ window.location.href = "https://beauville.github.io/digiy-hub/"; });
-$("#btnMap").addEventListener("click", ()=>{ window.location.href = "https://beauville.github.io/digiy-mdimbal-map/"; });
 
-qEl.addEventListener("input", ()=>{ applyFilters(); });
-catEl.addEventListener("change", ()=>{ applyFilters(); });
+// ✅ Carte NDIMBAL intelligente : si 1 résultat avec slug -> focus direct
+$("#btnMap").addEventListener("click", ()=>{
+  if(view.length === 1){
+    const slug = (view[0]?.slug || "").trim();
+    if(slug){
+      window.location.href = `https://beauville.github.io/digiy-mdimbal-map/?pro=${encodeURIComponent(slug)}`;
+      return;
+    }
+  }
+  window.location.href = "https://beauville.github.io/digiy-mdimbal-map/";
+});
+
+/* ================================
+   EVENTS
+================================ */
+qEl.addEventListener("input", applyFiltersDebounced);
+catEl.addEventListener("change", applyFilters);
 
 load();
 </script>
