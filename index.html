@@ -1,32 +1,26 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="utf-8">
-<title>DIGIY • NDIMBAL — Search PRO (TOTAL MONOBLOC)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0A0E1A">
-<meta name="description" content="DIGIY NDIMBAL — Recherche PRO (carte + liste), zones Sénégal, fallback local, Supabase prêt.">
+import os
 
-<!-- Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+base_dir="/mnt/data"
+def read(p):
+    with open(p,"r",encoding="utf-8") as f:
+        return f.read()
 
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+modal_html = read(os.path.join(base_dir,"snippet-modal-searchpro.html")).strip()
+css = read(os.path.join(base_dir,"snippet-styles-searchpro.css")).strip()
+zones = read(os.path.join(base_dir,"zones-senegal.js")).strip()
+db = read(os.path.join(base_dir,"digiy-business-database-senegal.js")).strip()
+engine = read(os.path.join(base_dir,"search-pro-map.js")).strip()
 
-<style>
+global_css = """
 :root{
-  --bg:#020617; --bg2:#0B1120;
-  --line:rgba(148,163,184,.22);
+  --bg:#020617; --bg2:#0B1120; --line:rgba(148,163,184,.22);
   --text:#e5e7eb; --muted:rgba(229,231,235,.72);
   --gold:#facc15; --orange:#f97316; --cyan:#22d3ee;
-  --ok:#22c55e; --danger:#ef4444;
   --shadow:0 14px 40px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box}
 body{
-  margin:0;color:var(--text);
+  margin:0; color:var(--text);
   font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:
     radial-gradient(1000px 520px at 18% -10%, rgba(249,115,22,.22), transparent 60%),
@@ -41,7 +35,7 @@ header{
   background:rgba(2,6,23,.55);
   border-radius:24px;
   box-shadow:var(--shadow);
-  padding:14px 14px;
+  padding:14px;
   position:sticky; top:10px; z-index:10;
   backdrop-filter: blur(10px);
 }
@@ -58,7 +52,6 @@ header{
 .titles .t1{font-family:Outfit,sans-serif;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
 .titles .t2{font-size:12px;color:var(--muted);font-weight:800;margin-top:2px}
 .right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
-
 .btn{
   border:1px solid rgba(148,163,184,.28);
   background:rgba(2,6,23,.35);
@@ -81,7 +74,6 @@ header{
 }
 .btn-primary:hover{background:linear-gradient(135deg, rgba(250,204,21,1), rgba(249,115,22,1))}
 .btn-secondary{background:rgba(2,6,23,.35)}
-
 .card{
   margin-top:16px;
   border:1px solid var(--line);
@@ -99,598 +91,117 @@ header{
   font-size:1.05rem;
 }
 .card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+@keyframes spin{to{transform:rotate(360deg)}}
+"""
 
-@keyframes spin { to { transform: rotate(360deg); } }
+SUPABASE_URL="https://wesqmwjjtsefyjnluosj.supabase.co"
+SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA"
 
-/* ===== Modal overlay + card ===== */
-.digiy-modal-overlay{
-  display:none;
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.55);
-  z-index:9999;
-  padding:16px;
-}
-.digiy-modal{max-width:1040px;margin:0 auto;}
-.digiy-modal-card{
-  border:1px solid rgba(148,163,184,.28);
-  background:rgba(2,6,23,.92);
-  border-radius:24px;
-  box-shadow:0 24px 70px rgba(0,0,0,.65);
-  padding:16px;
-  backdrop-filter: blur(10px);
-}
+template = """<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>DIGIY • NDIMBAL — Search PRO (FULL DB • Monobloc)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="description" content="NDIMBAL — Search PRO V3 (carte + liste) • FULL DB Sénégal inline • GitHub Pages OK.">
 
-.digiy-input, .digiy-select{
-  width:100%;
-  padding:12px 12px;
-  border-radius:14px;
-  border:1px solid rgba(148,163,184,.28);
-  background:rgba(15,23,42,.55);
-  color:var(--text);
-  outline:none;
-  font-weight:800;
-  font-family:Manrope,sans-serif;
-}
-.digiy-input:focus, .digiy-select:focus{
-  border-color:rgba(249,115,22,.65);
-  box-shadow:0 0 0 3px rgba(249,115,22,.18);
-}
-.search-tab{
-  border:none;
-  background:transparent;
-  color:#cbd5e1;
-  padding:10px 12px;
-  font-weight:950;
-  cursor:pointer;
-  border-bottom:3px solid transparent;
-}
-.search-tab.active{color:#fff;border-bottom-color:rgba(249,115,22,.95)}
-.search-panel{display:none}
-.search-panel.active{display:block}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-.digiy-results-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-@media(max-width:900px){.digiy-results-grid{grid-template-columns:1fr} header{position:static}}
-.digiy-result{
-  border:1px solid rgba(148,163,184,.22);
-  background:rgba(15,23,42,.55);
-  border-radius:18px;
-  padding:12px;
-  cursor:pointer;
-  transition:transform .12s ease, border-color .12s ease, background .12s ease;
-}
-.digiy-result:hover{
-  transform:translateY(-1px);
-  border-color:rgba(249,115,22,.55);
-  background:rgba(249,115,22,.10);
-}
-.badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 10px;border-radius:999px;
-  background:rgba(2,6,23,.35);
-  border:1px solid rgba(148,163,184,.22);
-  font-weight:900;
-  color:rgba(229,231,235,.92);
-  font-size:.85rem;
-}
-.small{font-size:.85rem;color:rgba(229,231,235,.8);font-weight:750}
-hr{border:none;border-top:1px solid rgba(148,163,184,.16);margin:12px 0}
-</style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <style>
+__GLOBAL_CSS__
+
+__SEARCHPRO_CSS__
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-
-<header>
-  <div class="header-content">
-    <div class="brand">
-      <div class="logo">♾️</div>
-      <div class="titles">
-        <div class="t1">DIGIY • NDIMBAL</div>
-        <div class="t2">Recherche PRO — Carte + Liste • 0% commission</div>
+  <div class="wrap">
+    <header>
+      <div class="header-content">
+        <div class="brand">
+          <div class="logo">♾️</div>
+          <div class="titles">
+            <div class="t1">DIGIY • NDIMBAL</div>
+            <div class="t2">Recherche PRO — Carte + Liste • FULL DB Sénégal</div>
+          </div>
+        </div>
+        <div class="right">
+          <button id="openSearchPro" class="btn btn-primary" type="button">🔎 Rechercher un PRO</button>
+        </div>
       </div>
-    </div>
+    </header>
 
-    <div class="right">
-      <button id="openSearchPro" class="btn btn-primary" type="button">🔎 Rechercher un PRO</button>
+    <div class="card">
+      <h1>FULL DB prêt à poser</h1>
+      <p>
+        1 fichier = <b>index.html</b> • Tout est inline (styles + zones + base Sénégal + moteur Search PRO).<br>
+        Si tu n’as pas encore la RPC Supabase, le moteur utilise le fallback prévu (table/view <b>pros_public</b> si disponible).
+      </p>
     </div>
   </div>
-</header>
 
-<div class="card">
-  <h1>Total monobloc (prêt)</h1>
-  <p>
-    Clique sur <b>🔎 Rechercher un PRO</b>. Tu testes d’abord en fallback local (zéro Supabase).<br>
-    Ensuite tu actives Supabase en un switch.
-  </p>
-</div>
-
-</div>
-
-<!-- =========================
+  <!-- =========================
      MODAL SEARCH PRO V3
-========================= -->
-<div id="searchProModal" class="digiy-modal-overlay" aria-hidden="true">
-  <div class="digiy-modal" role="dialog" aria-modal="true" aria-label="Recherche PRO DIGIY">
-    <div class="digiy-modal-card">
+  ========================== -->
+__MODAL_HTML__
 
-      <!-- Header -->
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;">
-        <div style="font-family:Outfit,sans-serif; font-weight:950; letter-spacing:.06em; text-transform:uppercase; font-size:1.1rem;">
-          🔎 Recherche PRO — Métiers DIGIY
-        </div>
-        <button id="closeSearchPro" class="btn btn-secondary" type="button" style="padding:.6rem 1.1rem;font-size:.85rem;">
-          ✖ Fermer
-        </button>
-      </div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-      <!-- Zone de recherche principale -->
-      <div style="background:rgba(249,115,22,0.08); border:1px solid rgba(249,115,22,0.35); border-radius:16px; padding:14px; margin-bottom:14px;">
-        <div style="position:relative; margin-bottom:10px;">
-          <input id="sp_q" class="digiy-input" placeholder='🔍 Nom, ville, quartier, métier... (ex: "fatou plateau resto")'
-                 style="padding-left:40px; font-size:1rem; font-weight:700;" autocomplete="off"/>
-          <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1.3rem;">🔍</div>
-        </div>
+  <script>
+  // 🔐 SUPABASE — DÉJÀ POSÉ (DIGIY)
+  const SB = supabase.createClient("__SUPABASE_URL__", "__SUPABASE_ANON__");
+  </script>
 
-        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
-          <button id="toggleFilters" type="button" style="
-            border:none; background:rgba(15,23,42,0.5); color:#cbd5e1;
-            padding:6px 12px; border-radius:999px; font-size:0.8rem; font-weight:800;
-            cursor:pointer; display:flex; align-items:center; gap:6px;">
-            <span id="filterIcon">▼</span> Filtres avancés
-          </button>
-          <div id="geoStatus" style="font-size:0.75rem; color:#cbd5e1; font-weight:650;"></div>
-          <div style="margin-left:auto" class="small" id="modeStatus"></div>
-        </div>
+  <script>
+/* =========================
+   ZONES SÉNÉGAL — INLINE
+========================= */
+__ZONES_JS__
+  </script>
 
-        <div id="advancedFilters" style="display:none; margin-top:10px;">
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-            <select id="sp_zone" class="digiy-select" style="font-size:0.9rem;">
-              <option value="" selected>📍 Toutes les zones</option>
-              <option value="aeroports">✈️ Aéroports</option>
-              <option value="saly_petite_cote">🏖️ Saly & Petite Côte</option>
-              <option value="mbour_joal">🐟 Mbour & Joal</option>
-              <option value="dakar_centre">🏙️ Dakar Centre</option>
-              <option value="dakar_banlieue">🏘️ Dakar Banlieue</option>
-              <option value="thies">🏭 Thiès</option>
-              <option value="saint_louis">🏛️ Saint-Louis</option>
-              <option value="autres_villes">🏙️ Autres villes</option>
-            </select>
-            <input id="sp_city" class="digiy-input" placeholder="🏙️ Ville précise" style="font-size:0.9rem;"/>
-          </div>
+  <script>
+/* =========================
+   DIGIY BUSINESS DB — SÉNÉGAL (FULL) — INLINE
+========================= */
+__DB_JS__
+  </script>
 
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-            <input id="sp_quartier" class="digiy-input" placeholder="📍 Quartier" style="font-size:0.9rem;"/>
-            <select id="sp_module" class="digiy-select" style="font-size:0.9rem;">
-              <option value="all" selected>🦅 Tous métiers</option>
-              <option value="resto">🍽️ Resto</option>
-              <option value="loc">🏠 Loc</option>
-              <option value="chauffeur">🚗 Chauffeur</option>
-              <option value="market">🛍️ Boutique</option>
-              <option value="build">🏗️ Artisan</option>
-              <option value="job">💼 Jobs</option>
-              <option value="fret">🚚 Fret</option>
-            </select>
-            <select id="sp_radius" class="digiy-select" style="font-size:0.9rem;">
-              <option value="5">📍 5 km</option>
-              <option value="10">📍 10 km</option>
-              <option value="25" selected>📍 25 km</option>
-              <option value="50">📍 50 km</option>
-              <option value="999">🌍 Partout</option>
-            </select>
-          </div>
-        </div>
-      </div>
+  <script>
+/* =========================
+   SEARCH PRO MAP ENGINE — INLINE
+========================= */
+__ENGINE_JS__
+  </script>
 
-      <button id="sp_btn" class="btn btn-primary" type="button" style="width:100%; padding:1rem; font-size:1rem; margin-bottom:12px;">
-        🔍 CHERCHER
-      </button>
-
-      <div id="quickSuggestions" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;"></div>
-
-      <div style="display:flex; gap:6px; margin-bottom:14px; border-bottom:2px solid rgba(148,163,184,0.2);">
-        <button id="tabCarte" class="search-tab active" type="button">🗺️ CARTE</button>
-        <button id="tabListe" class="search-tab" type="button">📋 LISTE</button>
-      </div>
-
-      <div id="sp_status" style="color:#cbd5e1; font-weight:700; margin:10px 2px 14px; display:flex; justify-content:space-between; align-items:center;">
-        <span>—</span>
-        <div id="sp_loader" style="display:none;">
-          <div style="width:20px; height:20px; border:3px solid rgba(249,115,22,0.3); border-top-color:#f97316; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
-        </div>
-      </div>
-
-      <div id="panelCarte" class="search-panel active">
-        <div id="mapContainer" style="height:500px; border-radius:18px; overflow:hidden; border:1px solid rgba(148,163,184,0.45); position:relative;">
-          <div id="map" style="height:100%; width:100%;"></div>
-
-          <button id="recenterMap" type="button" style="
-            position:absolute; top:14px; right:14px; z-index:1000;
-            background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.6);
-            color:#fff; padding:10px 14px; border-radius:12px; cursor:pointer;
-            font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;
-            box-shadow:0 6px 20px rgba(0,0,0,0.5);">
-            📍 Recentrer
-          </button>
-
-          <div id="mapLegend" style="
-            position:absolute; bottom:14px; left:14px; z-index:1000;
-            background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.6);
-            padding:10px 12px; border-radius:12px; color:#cbd5e1; font-size:0.75rem;
-            max-width:220px; box-shadow:0 6px 20px rgba(0,0,0,0.5);">
-            <div style="font-weight:800; margin-bottom:4px;">📍 Légende</div>
-            <div>🟢 En ligne • 🔴 Hors ligne</div>
-            <div>📍 Clique marker → Fiche PRO</div>
-          </div>
-        </div>
-      </div>
-
-      <div id="panelListe" class="search-panel">
-        <div id="sp_results" class="digiy-results-grid"></div>
-
-        <div id="sp_empty" style="display:none; margin-top:12px; padding:24px; border-radius:16px; border:1px dashed rgba(148,163,184,.45); color:#cbd5e1; text-align:center;">
-          <div style="font-size:2.5rem; margin-bottom:8px;">🤔</div>
-          <div style="font-weight:800; margin-bottom:6px;">Aucun résultat</div>
-          <div style="font-size:0.9rem; opacity:0.8;">Essaie "Dakar", "Plateau", "chauffeur", ou un nom</div>
-        </div>
-
-        <div id="sp_pagination" style="display:none; margin-top:16px; text-align:center;">
-          <button id="sp_loadMore" class="btn btn-secondary" type="button" style="padding:0.7rem 1.5rem;">
-            Charger plus de résultats →
-          </button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<!-- Supabase JS (chargé mais optionnel via switch) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<script>
-/* ======================================================
-   DIGIY NDIMBAL — TOTAL MONOBLOC
-   - Fallback local (test direct)
-   - Zones Sénégal intégrées
-   - Supabase prêt (switch)
-====================================================== */
-
-// ====== SWITCH MODE ======
-const USE_SUPABASE = false; // ✅ mets TRUE quand tu as la table/view ou RPC côté Supabase
-
-// ✅ tes clés (déjà posées)
-const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-
-const SB = USE_SUPABASE ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
-
-// ====== ZONES SÉNÉGAL (intégré) ======
-const ZONES_SENEGAL = {
-  saly_petite_cote: {
-    name:'🏖️ SALY & PETITE CÔTE', icon:'🏖️', color:'#22d3ee',
-    locations:{
-      'Saly Centre':{lat:14.4500,lng:-16.9833,type:'city'},
-      'Ngaparou':{lat:14.4634,lng:-17.0089,type:'city'},
-      'Somone':{lat:14.4823,lng:-17.0678,type:'city'},
-      'Nianing':{lat:14.4289,lng:-16.9534,type:'city'}
-    }
-  },
-  dakar_centre:{
-    name:'🏙️ DAKAR CENTRE', icon:'🏙️', color:'#f97316',
-    locations:{
-      'Plateau':{lat:14.6695,lng:-17.4390,type:'district'},
-      'Médina':{lat:14.6907,lng:-17.4559,type:'district'},
-      'Point E':{lat:14.6923,lng:-17.4634,type:'district'},
-      'Fann':{lat:14.6845,lng:-17.4656,type:'district'},
-      'Mermoz':{lat:14.7012,lng:-17.4712,type:'district'}
-    }
-  }
-};
-
-function getAllZones(){
-  return Object.keys(ZONES_SENEGAL).map(k=>({key:k,...ZONES_SENEGAL[k]}));
-}
-function getAllLocations(){
-  const all={};
-  for(const z of Object.values(ZONES_SENEGAL)) Object.assign(all,z.locations);
-  return all;
-}
-function calculateDistance(lat1, lon1, lat2, lon2){
-  const toRad = x => (x*Math.PI)/180;
-  const R=6371;
-  const dLat=toRad(lat2-lat1), dLon=toRad(lon2-lon1);
-  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
-  const c = 2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-  return R*c;
-}
-
-// ====== BASE BUSINESS (fallback local – mini) ======
-const LOCAL_PROS = [
-  { id:"p1", business_name:"Fatou Resto", module:"resto", modules:["resto"], city:"Dakar", quartier:"Plateau", lat:14.6695, lon:-17.4390, is_online:true, phone:"+221770000000" },
-  { id:"p2", business_name:"Lamine Chauffeur", module:"chauffeur", modules:["chauffeur"], city:"Dakar", quartier:"Point E", lat:14.6923, lon:-17.4634, is_online:true, phone:"+221771234567" },
-  { id:"p3", business_name:"Chez Astou Boutique", module:"market", modules:["market"], city:"Saly", quartier:"Saly Centre", lat:14.4500, lon:-16.9833, is_online:false, phone:"+221780000000" },
-  { id:"p4", business_name:"Baptiste Loc", module:"loc", modules:["loc"], city:"Saly", quartier:"Ngaparou", lat:14.4634, lon:-17.0089, is_online:true, phone:"+221760000000" }
-];
-
-// ====== UI refs ======
-const $ = (id)=>document.getElementById(id);
-const modal = $("searchProModal");
-
-const modeStatus = $("modeStatus");
-modeStatus.textContent = USE_SUPABASE ? "Mode: Supabase ✅" : "Mode: Fallback local ✅";
-
-function openModal(){
-  modal.style.display="block";
-  modal.setAttribute("aria-hidden","false");
-  setTimeout(()=>initMapIfNeeded(), 120);
-}
-function closeModal(){
-  modal.style.display="none";
-  modal.setAttribute("aria-hidden","true");
-}
-$("openSearchPro").addEventListener("click", openModal);
-$("closeSearchPro").addEventListener("click", closeModal);
-modal.addEventListener("click",(e)=>{ if(e.target===modal) closeModal(); });
-document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeModal(); });
-
-// ====== Filters toggle ======
-$("toggleFilters").addEventListener("click", ()=>{
-  const box=$("advancedFilters");
-  const open = box.style.display !== "none";
-  box.style.display = open ? "none" : "block";
-  $("filterIcon").textContent = open ? "▼" : "▲";
-});
-
-// ====== Tabs ======
-function setTab(which){
-  $("tabCarte").classList.toggle("active", which==="carte");
-  $("tabListe").classList.toggle("active", which==="liste");
-  $("panelCarte").classList.toggle("active", which==="carte");
-  $("panelListe").classList.toggle("active", which==="liste");
-  if(which==="carte") setTimeout(()=>{ if(_map) _map.invalidateSize(true); }, 120);
-}
-$("tabCarte").addEventListener("click", ()=>setTab("carte"));
-$("tabListe").addEventListener("click", ()=>setTab("liste"));
-
-// ====== Suggestions ======
-function renderSuggestions(){
-  const sug = [
-    {label:"Dakar Chauffeur", q:"dakar chauffeur"},
-    {label:"Plateau Resto", q:"plateau resto"},
-    {label:"Saly Loc", q:"saly loc"},
-    {label:"Ngaparou Boutique", q:"ngaparou market"}
-  ];
-  const box=$("quickSuggestions");
-  box.innerHTML="";
-  for(const s of sug){
-    const b=document.createElement("button");
-    b.className="badge";
-    b.type="button";
-    b.textContent="⚡ "+s.label;
-    b.addEventListener("click", ()=>{
-      $("sp_q").value = s.q;
-      doSearch();
-    });
-    box.appendChild(b);
-  }
-}
-renderSuggestions();
-
-// ====== Geo ======
-let userPos = null;
-function setGeoStatus(txt){ $("geoStatus").textContent = txt || ""; }
-
-function requestGeo(){
-  if(!navigator.geolocation){ setGeoStatus("📍 Géoloc indisponible"); return; }
-  setGeoStatus("📍 Localisation…");
-  navigator.geolocation.getCurrentPosition(
-    (pos)=>{
-      userPos = { lat:pos.coords.latitude, lng:pos.coords.longitude };
-      setGeoStatus("📍 Autour de moi ✅");
-      if(_map){ _map.setView([userPos.lat,userPos.lng], 13); }
-    },
-    ()=>setGeoStatus("📍 Autorisation refusée"),
-    { enableHighAccuracy:true, timeout:8000 }
-  );
-}
-
-// ====== Leaflet Map ======
-let _map=null;
-let _markers=[];
-function clearMarkers(){
-  _markers.forEach(m=>m.remove());
-  _markers=[];
-}
-function initMapIfNeeded(){
-  if(_map) { _map.invalidateSize(true); return; }
-  _map = L.map("map").setView([14.6928,-17.4467], 12);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
-    attribution:"© OpenStreetMap"
-  }).addTo(_map);
-
-  // default: ask geo quietly
-  requestGeo();
-
-  $("recenterMap").addEventListener("click", ()=>{
-    if(userPos){ _map.setView([userPos.lat,userPos.lng], 13); }
-    else _map.setView([14.6928,-17.4467], 12);
-  });
-}
-
-// ====== Results rendering ======
-function showLoader(on){
-  $("sp_loader").style.display = on ? "block" : "none";
-}
-function setStatus(txt){
-  $("sp_status").querySelector("span").textContent = txt;
-}
-function setEmpty(on){
-  $("sp_empty").style.display = on ? "block" : "none";
-}
-
-function makeCard(p){
-  const div=document.createElement("div");
-  div.className="digiy-result";
-  const online = p.is_online ? "🟢 En ligne" : "🔴 Hors ligne";
-  const mods = (p.modules||[p.module]).map(m=>`<span class="badge">${m}</span>`).join(" ");
-  div.innerHTML = `
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-      <div style="font-weight:950">${p.business_name || p.full_name || "PRO"}</div>
-      <div class="small">${online}</div>
-    </div>
-    <div class="small" style="margin-top:6px">📍 ${p.city || "—"} • ${p.quartier || "—"}</div>
-    <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">${mods}</div>
-  `;
-  div.addEventListener("click", ()=>{
-    setTab("carte");
-    if(_map && p.lat && p.lon){
-      _map.setView([p.lat,p.lon], 15);
-    }
-  });
-  return div;
-}
-
-function renderResults(list){
-  const box=$("sp_results");
-  box.innerHTML="";
-  clearMarkers();
-
-  if(!list || list.length===0){
-    setEmpty(true);
-    setStatus("0 résultat");
-    return;
-  }
-  setEmpty(false);
-  setStatus(`${list.length} résultat(s)`);
-
-  for(const p of list){
-    box.appendChild(makeCard(p));
-    if(_map && p.lat && p.lon){
-      const color = p.is_online ? "#22c55e" : "#ef4444";
-      const marker = L.circleMarker([p.lat,p.lon], {
-        radius:8, color, weight:3, fillColor:color, fillOpacity:0.85
-      }).addTo(_map);
-      marker.bindPopup(`<b>${p.business_name||"PRO"}</b><br>${p.city||""} ${p.quartier||""}`);
-      _markers.push(marker);
-    }
-  }
-}
-
-// ====== Search logic (Fallback + Supabase optional) ======
-function normalize(s){ return (s||"").toString().trim().toLowerCase(); }
-
-async function fetchSupabaseResults({q, zone, city, quartier, module, radiusKm}){
-  // 1) RPC si existante
-  // 2) fallback table/view pros_public
-  // Ici on laisse une base simple: tu actives USE_SUPABASE plus tard.
-  try{
-    const payload = { q, zone, city, quartier, module, radius_km: radiusKm, lat: userPos?.lat || null, lng: userPos?.lng || null };
-    const { data, error } = await SB.rpc("search_pros_v3", payload);
-    if(!error && Array.isArray(data)) return data;
-  }catch(e){}
-
-  // fallback table/view
-  try{
-    let query = SB.from("pros_public").select("*").limit(50);
-    if(module && module!=="all") query = query.contains("modules", [module]);
-    if(city) query = query.ilike("city", `%${city}%`);
-    if(quartier) query = query.ilike("quartier", `%${quartier}%`);
-    const { data } = await query;
-    return Array.isArray(data) ? data : [];
-  }catch(e){
-    return [];
-  }
-}
-
-function searchFallbackLocal({q, zone, city, quartier, module, radiusKm}){
-  const qq = normalize(q);
-  const cc = normalize(city);
-  const qu = normalize(quartier);
-  const mm = normalize(module);
-
-  let list = LOCAL_PROS.slice();
-
-  // zone -> zoom map + soft filter city/quartier if empty
-  if(zone && ZONES_SENEGAL[zone]){
-    const z = ZONES_SENEGAL[zone];
-    const names = Object.keys(z.locations).map(normalize);
-    // if user typed nothing, keep all; else we filter by matching zone loc names
-    if(!qq && !cc && !qu){
-      // no filter
-    }else{
-      list = list.filter(p=>{
-        const hay = normalize(p.city)+" "+normalize(p.quartier);
-        return names.some(n=>hay.includes(n));
-      });
-    }
-  }
-
-  if(mm && mm!=="all") list = list.filter(p => (p.modules||[]).includes(mm) || normalize(p.module)===mm);
-  if(cc) list = list.filter(p => normalize(p.city).includes(cc));
-  if(qu) list = list.filter(p => normalize(p.quartier).includes(qu));
-  if(qq){
-    list = list.filter(p=>{
-      const hay = normalize(p.business_name)+" "+normalize(p.city)+" "+normalize(p.quartier)+" "+(p.modules||[]).join(" ");
-      return hay.includes(qq) || qq.split(/\s+/).some(tok=>hay.includes(tok));
-    });
-  }
-
-  // distance filter
-  if(userPos && radiusKm && radiusKm<999){
-    list = list.map(p=>{
-      const d = calculateDistance(userPos.lat,userPos.lng,p.lat,p.lon);
-      return {...p, distance_km:d};
-    }).filter(p=>p.distance_km<=radiusKm)
-      .sort((a,b)=>(a.distance_km||999)-(b.distance_km||999));
-  }
-
-  return list;
-}
-
-async function doSearch(){
-  initMapIfNeeded();
-  showLoader(true);
-  setStatus("Recherche…");
-  setEmpty(false);
-
-  const q = $("sp_q").value || "";
-  const zone = $("sp_zone").value || "";
-  const city = $("sp_city").value || "";
-  const quartier = $("sp_quartier").value || "";
-  const module = $("sp_module").value || "all";
-  const radiusKm = parseInt($("sp_radius").value||"25",10);
-
-  // zone -> fit bounds
-  if(zone && ZONES_SENEGAL[zone] && _map){
-    const locs = Object.values(ZONES_SENEGAL[zone].locations);
-    const bounds = locs.map(l=>[l.lat,l.lng]);
-    if(bounds.length>0) _map.fitBounds(bounds, {padding:[20,20]});
-  }
-
-  let results=[];
-  if(USE_SUPABASE && SB){
-    results = await fetchSupabaseResults({q, zone, city, quartier, module, radiusKm});
-  }else{
-    results = searchFallbackLocal({q, zone, city, quartier, module, radiusKm});
-  }
-
-  renderResults(results);
-  showLoader(false);
-}
-
-$("sp_btn").addEventListener("click", doSearch);
-$("sp_q").addEventListener("keydown",(e)=>{ if(e.key==="Enter") doSearch(); });
-
-// Default state
-$("advancedFilters").style.display="none";
-</script>
-
+  <script>
+  // Boot safe
+  (function(){
+    var m = document.getElementById("searchProModal");
+    if(m) m.style.display = "none";
+  })();
+  </script>
 </body>
 </html>
+"""
+
+index_html = (template
+              .replace("__GLOBAL_CSS__", global_css.strip())
+              .replace("__SEARCHPRO_CSS__", css.strip())
+              .replace("__MODAL_HTML__", modal_html)
+              .replace("__SUPABASE_URL__", SUPABASE_URL)
+              .replace("__SUPABASE_ANON__", SUPABASE_ANON)
+              .replace("__ZONES_JS__", zones)
+              .replace("__DB_JS__", db)
+              .replace("__ENGINE_JS__", engine))
+
+out_path = os.path.join(base_dir, "index-full-db-ndimbal.html")
+with open(out_path, "w", encoding="utf-8") as f:
+    f.write(index_html)
+
+out_path
