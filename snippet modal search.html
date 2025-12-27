@@ -1,0 +1,179 @@
+<!-- =========================
+   MODAL SEARCH PRO V3 — CARTE INTERACTIVE
+========================= -->
+<div id="searchProModal" class="digiy-modal-overlay" aria-hidden="true">
+  <div class="digiy-modal" role="dialog" aria-modal="true" aria-label="Recherche PRO DIGIY">
+    <div class="digiy-modal-card">
+
+      <!-- Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;">
+        <div style="font-family:Outfit,sans-serif; font-weight:950; letter-spacing:.06em; text-transform:uppercase; font-size:1.1rem;">
+          🔎 Recherche PRO — Métiers DIGIY
+        </div>
+        <button id="closeSearchPro" class="btn btn-secondary" type="button" style="padding:.6rem 1.1rem;font-size:.85rem;">
+          ✖ Fermer
+        </button>
+      </div>
+
+      <!-- Zone de recherche principale -->
+      <div style="background:rgba(249,115,22,0.08); border:1px solid rgba(249,115,22,0.35); border-radius:16px; padding:14px; margin-bottom:14px;">
+        
+        <!-- Barre de recherche unifiée -->
+        <div style="position:relative; margin-bottom:10px;">
+          <input 
+            id="sp_q" 
+            class="digiy-input" 
+            placeholder='🔍 Nom, ville, quartier, métier... (ex: "fatou plateau resto")' 
+            style="padding-left:40px; font-size:1rem; font-weight:700;"
+            autocomplete="off"
+          />
+          <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1.3rem;">
+            🔍
+          </div>
+        </div>
+
+        <!-- Bouton filtres + Géostatus -->
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+          <button id="toggleFilters" type="button" style="
+            border:none; background:rgba(15,23,42,0.5); color:#cbd5e1;
+            padding:6px 12px; border-radius:999px; font-size:0.8rem; font-weight:800;
+            cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <span id="filterIcon">▼</span> Filtres avancés
+          </button>
+          
+          <div id="geoStatus" style="font-size:0.75rem; color:#cbd5e1; font-weight:650;"></div>
+        </div>
+
+        <!-- Filtres avancés (masqués par défaut) -->
+        <div id="advancedFilters" style="display:none; margin-top:10px;">
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            
+            <!-- Sélecteur de zone -->
+            <select id="sp_zone" class="digiy-select" style="font-size:0.9rem;">
+              <option value="" selected>📍 Toutes les zones</option>
+              <option value="aeroports">✈️ Aéroports</option>
+              <option value="saly_petite_cote">🏖️ Saly & Petite Côte</option>
+              <option value="mbour_joal">🐟 Mbour & Joal</option>
+              <option value="dakar_centre">🏙️ Dakar Centre</option>
+              <option value="dakar_banlieue">🏘️ Dakar Banlieue</option>
+              <option value="thies">🏭 Thiès</option>
+              <option value="saint_louis">🏛️ Saint-Louis</option>
+              <option value="autres_villes">🏙️ Autres villes</option>
+            </select>
+
+            <!-- Ville spécifique -->
+            <input id="sp_city" class="digiy-input" placeholder="🏙️ Ville précise" style="font-size:0.9rem;"/>
+            
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+            
+            <!-- Quartier -->
+            <input id="sp_quartier" class="digiy-input" placeholder="📍 Quartier" style="font-size:0.9rem;"/>
+            
+            <!-- Module -->
+            <select id="sp_module" class="digiy-select" style="font-size:0.9rem;">
+              <option value="all" selected>🦅 Tous métiers</option>
+              <option value="resto">🍽️ Resto</option>
+              <option value="loc">🏠 Loc</option>
+              <option value="chauffeur">🚗 Chauffeur</option>
+              <option value="market">🛍️ Boutique</option>
+              <option value="build">🏗️ Artisan</option>
+              <option value="job">💼 Jobs</option>
+              <option value="fret">🚚 Fret</option>
+            </select>
+
+            <!-- Rayon -->
+            <select id="sp_radius" class="digiy-select" style="font-size:0.9rem;">
+              <option value="5">📍 5 km</option>
+              <option value="10">📍 10 km</option>
+              <option value="25" selected>📍 25 km</option>
+              <option value="50">📍 50 km</option>
+              <option value="999">🌍 Partout</option>
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Bouton recherche -->
+      <button id="sp_btn" class="btn btn-primary" type="button" style="width:100%; padding:1rem; font-size:1rem; margin-bottom:12px;">
+        🔍 CHERCHER
+      </button>
+
+      <!-- Suggestions rapides -->
+      <div id="quickSuggestions" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;">
+        <!-- Généré dynamiquement -->
+      </div>
+
+      <!-- TABS CARTE / LISTE -->
+      <div style="display:flex; gap:6px; margin-bottom:14px; border-bottom:2px solid rgba(148,163,184,0.2);">
+        <button id="tabCarte" class="search-tab active" type="button">
+          🗺️ CARTE
+        </button>
+        <button id="tabListe" class="search-tab" type="button">
+          📋 LISTE
+        </button>
+      </div>
+
+      <!-- Status + Loader -->
+      <div id="sp_status" style="color:#cbd5e1; font-weight:700; margin:10px 2px 14px; display:flex; justify-content:space-between; align-items:center;">
+        <span>—</span>
+        <div id="sp_loader" style="display:none;">
+          <div style="width:20px; height:20px; border:3px solid rgba(249,115,22,0.3); border-top-color:#f97316; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+        </div>
+      </div>
+
+      <!-- PANEL CARTE -->
+      <div id="panelCarte" class="search-panel active">
+        <div id="mapContainer" style="height:500px; border-radius:18px; overflow:hidden; border:1px solid rgba(148,163,184,0.45); position:relative;">
+          <div id="map" style="height:100%; width:100%;"></div>
+          
+          <!-- Bouton recentrer -->
+          <button id="recenterMap" type="button" style="
+            position:absolute; top:14px; right:14px; z-index:1000;
+            background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.6);
+            color:#fff; padding:10px 14px; border-radius:12px; cursor:pointer;
+            font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;
+            box-shadow:0 6px 20px rgba(0,0,0,0.5);">
+            📍 Recentrer
+          </button>
+
+          <!-- Légende -->
+          <div id="mapLegend" style="
+            position:absolute; bottom:14px; left:14px; z-index:1000;
+            background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.6);
+            padding:10px 12px; border-radius:12px; color:#cbd5e1; font-size:0.75rem;
+            max-width:200px; box-shadow:0 6px 20px rgba(0,0,0,0.5);">
+            <div style="font-weight:800; margin-bottom:4px;">📍 Légende</div>
+            <div>🟢 En ligne • 🔴 Hors ligne</div>
+            <div>📍 Click marker → Fiche PRO</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL LISTE -->
+      <div id="panelListe" class="search-panel">
+        <div id="sp_results" class="digiy-results-grid"></div>
+
+        <!-- Message vide -->
+        <div id="sp_empty" style="display:none; margin-top:12px; padding:24px; border-radius:16px; border:1px dashed rgba(148,163,184,.45); color:#cbd5e1; text-align:center;">
+          <div style="font-size:2.5rem; margin-bottom:8px;">🤔</div>
+          <div style="font-weight:800; margin-bottom:6px;">Aucun résultat</div>
+          <div style="font-size:0.9rem; opacity:0.8;">Essaie "Dakar", "Plateau", "chauffeur", ou un nom de pro</div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="sp_pagination" style="display:none; margin-top:16px; text-align:center;">
+          <button id="sp_loadMore" class="btn btn-secondary" type="button" style="padding:0.7rem 1.5rem;">
+            Charger plus de résultats →
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
