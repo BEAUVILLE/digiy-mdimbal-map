@@ -48,7 +48,6 @@
       display:flex; gap:.45rem; align-items:center; cursor:pointer; transition:var(--t)
     }
     .chip:hover{transform:translateY(-1px);border-color:rgba(255,107,53,.45)}
-    .chip small{opacity:.8;font-weight:800}
 
     .main-container{display:flex;height:calc(100vh - 76px)}
     .sidebar{
@@ -81,54 +80,6 @@
     }
     .region-btn:hover{background:rgba(78,205,196,.2); border-color:var(--secondary)}
     .region-btn.active{background:var(--secondary); color:var(--dark); font-weight:900; border-color:var(--secondary)}
-
-    /* ✅ LISTE DES PROS (cohérente avec filtres, même sans GPS) */
-    .pro-list{
-      padding:1rem;
-      display:flex;
-      flex-direction:column;
-      gap:.65rem;
-      border-top:1px solid rgba(255,255,255,.08);
-    }
-    .pro-card{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:16px;
-      padding:.9rem;
-      cursor:pointer;
-      transition:var(--t);
-    }
-    .pro-card:hover{transform:translateY(-1px); background:rgba(255,255,255,.07); border-color:rgba(78,205,196,.35)}
-    .pro-top{display:flex;justify-content:space-between;gap:.6rem;align-items:flex-start}
-    .pro-name{font-weight:900;color:#fff;font-size:.98rem;line-height:1.1}
-    .pro-badges{display:flex;gap:.35rem;flex-wrap:wrap;justify-content:flex-end}
-    .pill{
-      background:rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:999px;
-      padding:.25rem .55rem;
-      font-size:.78rem;
-      font-weight:900;
-      color:#fff;
-      white-space:nowrap;
-    }
-    .pill-gps{border-color:rgba(149,225,211,.45); background:rgba(149,225,211,.12)}
-    .pill-nogps{border-color:rgba(255,217,61,.35); background:rgba(255,217,61,.10)}
-    .pro-meta{margin-top:.5rem;color:var(--muted);font-size:.83rem;display:flex;gap:.45rem;flex-wrap:wrap}
-    .pro-actions{margin-top:.7rem;display:flex;gap:.5rem}
-    .mini-btn{
-      flex:1;
-      border:none;
-      border-radius:12px;
-      padding:.6rem .7rem;
-      font-weight:900;
-      cursor:pointer;
-      transition:var(--t);
-      font-size:.82rem;
-    }
-    .mini-primary{background:var(--primary); color:#fff}
-    .mini-secondary{background:rgba(78,205,196,.95); color:var(--dark)}
-    .mini-btn:hover{transform:translateY(-1px)}
 
     .map-container{flex:1; position:relative}
     #map{width:100%; height:100%}
@@ -208,11 +159,11 @@
     @keyframes spin{0%{transform:translate(-50%,-50%) rotate(0deg)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
     .hidden{display:none !important;}
 
-    @media (max-width:1024px){ .sidebar{width:300px} }
+    @media (max-width:1024px){ .sidebar{width:280px} }
     @media (max-width:768px){
       .header{flex-direction:column; align-items:stretch}
       .header-search{max-width:100%}
-      .sidebar{position:absolute; left:-340px; height:calc(100vh - 140px); transition:left .3s ease; z-index:1000; width:340px}
+      .sidebar{position:absolute; left:-320px; height:calc(100vh - 140px); transition:left .3s ease; z-index:1000}
       .sidebar.open{left:0}
       .region-grid{grid-template-columns:1fr}
       .modal-info-grid{grid-template-columns:1fr}
@@ -241,10 +192,7 @@
   </div>
 
   <div class="header-right">
-    <!-- ✅ Total / GPS pour cohérence -->
-    <div class="chip" id="chipTotal" title="Total filtré / Avec GPS">
-      👥 <span id="totalPros">0</span> <small>/ 🧭 <span id="totalGps">0</span></small>
-    </div>
+    <div class="chip" id="chipTotal" title="Total affiché">👥 <span id="totalPros">0</span></div>
     <div class="chip" onclick="goBackHub()" title="Retour HUB">🏠 HUB</div>
   </div>
 </header>
@@ -301,15 +249,6 @@
         <button class="region-btn" data-region="ziguinchor">Ziguinchor</button>
       </div>
     </div>
-
-    <!-- ✅ LISTE PROS -->
-    <div class="category-section" style="padding-top:.3rem;">
-      <div class="category-title">Résultats</div>
-      <div class="pro-list" id="proList"></div>
-      <div id="emptyState" style="padding:1rem; color:var(--muted); display:none;">
-        Aucun résultat. Essaie une autre recherche 👀
-      </div>
-    </div>
   </aside>
 
   <div class="map-container">
@@ -342,13 +281,12 @@
 
 <script>
 /* ================================
-   CONFIG SUPABASE (SAFE / UNIQUE)
+   CONFIG SUPABASE (UNIQUE)
 ================================ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 
-// ✅ 1 seul client global (anti "SB already declared")
 window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const SB = window.SB;
 
@@ -361,12 +299,13 @@ let filteredProfessionals = [];
 let currentCategory = 'all';
 let currentRegion = 'all';
 
-// ✅ anti spam marker GPS
-let userMarker = null;
-
 const categoryIcons = {
   restaurant:'🍽️', commerce:'🏪', logement:'🏠', taxi:'🚕', notable:'👔',
   batiment:'🔨', voiture:'🚗', voyage:'✈️', loisir:'🎭', hotel:'🏨'
+};
+const categoryColors = {
+  restaurant:'#FF6B35', commerce:'#4ECDC4', logement:'#FFD93D', taxi:'#95E1D3',
+  notable:'#9B59B6', batiment:'#E67E22', voiture:'#3498DB', voyage:'#1ABC9C', loisir:'#E91E63', hotel:'#FF9800'
 };
 
 /* ================================
@@ -387,12 +326,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   setupEventListeners();
   document.getElementById('loader').classList.add('hidden');
 
-  // ✅ si slug demandé => focus direct
+  // ✅ Focus si slug demandé (y compris demo-xx)
   if(slugWanted){
     await focusBySlug(slugWanted);
-  } else {
-    // rendu liste initial
-    renderProList(filteredProfessionals);
   }
 });
 
@@ -415,7 +351,6 @@ function initMap(){
 
   if(window.innerWidth<=768) document.getElementById('menuBtn').style.display='block';
 }
-
 function centerMap(){ map.setView([14.4974,-14.4524], 7); }
 
 function locateUser(){
@@ -424,16 +359,11 @@ function locateUser(){
     (pos)=>{
       const { latitude, longitude } = pos.coords;
       map.setView([latitude, longitude], 13);
-
-      if(userMarker) map.removeLayer(userMarker);
-      userMarker = L.marker([latitude, longitude]).addTo(map).bindPopup("📍 Vous êtes ici");
-      userMarker.openPopup();
+      L.marker([latitude, longitude]).addTo(map).bindPopup("📍 Vous êtes ici").openPopup();
     },
-    ()=> alert("Impossible de récupérer votre position"),
-    { enableHighAccuracy:true, timeout:8000, maximumAge:15000 }
+    ()=> alert("Impossible de récupérer votre position")
   );
 }
-
 function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
 function goBackHub(){ window.location.href = "https://beauville.github.io/digiy-hub/"; }
 
@@ -474,34 +404,23 @@ function normCategory(cat){
 }
 
 /* ================================
-   COORDS HELPERS (SAFE)
-================================ */
-function getLatLng(pro){
-  const lat = pro?.latitude ?? pro?.lat ?? pro?.gps_lat;
-  const lng = pro?.longitude ?? pro?.lng ?? pro?.gps_lng;
-  const latNum = Number(lat);
-  const lngNum = Number(lng);
-  if(!Number.isFinite(latNum) || !Number.isFinite(lngNum)) return null;
-  return { lat: latNum, lng: lngNum };
-}
-function hasGps(pro){ return !!getLatLng(pro); }
-
-/* ================================
    DATA LOAD
+   ✅ zero fetch manuel => plus jamais "No API key found"
+   ✅ demo only si erreur ou vide
 ================================ */
 async function loadProfessionals(){
   try{
-    // ✅ évite select('*') trop lourd
     const { data, error } = await SB
       .from('professionals')
-      .select('id,slug,name,category,cat,type,region,city,description,phone,rating,email,hours,services,latitude,longitude,lat,lng,gps_lat,gps_lng,created_at')
+      .select('*')
       .order('created_at', { ascending:false });
 
     if(error){
-      console.warn("Supabase error (fallback demo):", error);
-      allProfessionals = generateDemoData();
+      console.warn("Supabase error => fallback demo:", error);
+      allProfessionals = generateDemoData(60);
     }else{
-      allProfessionals = (data || []).map(p => ({
+      const arr = data || [];
+      allProfessionals = (arr.length ? arr : generateDemoData(60)).map(p => ({
         ...p,
         region: normRegion(p.region, p.city),
         category: normCategory(p.category || p.cat || p.type || ''),
@@ -510,26 +429,24 @@ async function loadProfessionals(){
 
     filteredProfessionals = [...allProfessionals];
     displayMarkers(filteredProfessionals);
-    renderProList(filteredProfessionals);
     updateCounts();
   }catch(err){
     console.warn("Load error => fallback demo:", err);
-    allProfessionals = generateDemoData();
+    allProfessionals = generateDemoData(60);
     filteredProfessionals = [...allProfessionals];
     displayMarkers(filteredProfessionals);
-    renderProList(filteredProfessionals);
     updateCounts();
   }
 }
 
 /* ================================
-   DEMO DATA
+   DEMO DATA (presence map)
 ================================ */
-function generateDemoData(){
+function generateDemoData(total=60){
   const categories = Object.keys(categoryIcons);
   const regions = ['dakar','thies','diourbel','saint-louis','kaolack','ziguinchor','louga','tambacounda','fatick','matam'];
   const demo=[];
-  for(let i=0;i<60;i++){
+  for(let i=0;i<total;i++){
     const cat = categories[i % categories.length];
     const reg = regions[Math.floor(Math.random()*regions.length)];
     demo.push({
@@ -539,13 +456,14 @@ function generateDemoData(){
       category:cat,
       region:reg,
       city: reg.charAt(0).toUpperCase()+reg.slice(1),
-      description:"Service de qualité — NDIMBAL démo",
+      description:"🧪 Démo NDIMBAL — exemple de fiche (à remplacer par vrais partenaires).",
       phone:"+221770000000",
       rating:(4+Math.random()).toFixed(1),
       latitude: 14.4974 + (Math.random()-0.5)*2.2,
       longitude:-14.4524 + (Math.random()-0.5)*3.0,
       hours:"Lun-Sam 8h-20h",
-      services:["Service 1","Service 2"]
+      services:["Service 1","Service 2"],
+      badge_text:"🧪 Démo"
     });
   }
   return demo;
@@ -558,8 +476,10 @@ function displayMarkers(pros){
   markerCluster.clearLayers();
 
   pros.forEach(pro=>{
-    const ll = getLatLng(pro);
-    if(!ll) return;
+    const lat = pro.latitude ?? pro.lat ?? pro.gps_lat;
+    const lng = pro.longitude ?? pro.lng ?? pro.gps_lng;
+
+    if(lat == null || lng == null) return;
 
     const cat = pro.category || 'commerce';
     const icon = L.divIcon({
@@ -569,9 +489,9 @@ function displayMarkers(pros){
       iconAnchor:[17,17]
     });
 
-    const marker = L.marker([ll.lat, ll.lng], { icon });
-    marker._digiy_pro_id = pro.id;
-    marker._digiy_slug = pro.slug;
+    const marker = L.marker([Number(lat), Number(lng)], { icon });
+    marker._digiy_pro_id = String(pro.id);
+    marker._digiy_slug = String(pro.slug || "");
 
     marker.bindPopup(createPopupContent(pro));
     markerCluster.addLayer(marker);
@@ -579,81 +499,21 @@ function displayMarkers(pros){
 }
 
 function createPopupContent(pro){
-  const idSafe = encodeURIComponent(String(pro.id ?? ""));
-  const cat = pro.category || "commerce";
   return `
     <div class="popup-header">
       <div class="popup-title">${escapeHTML(pro.name || "Professionnel")}</div>
-      <div class="popup-category">${getCategoryLabel(cat)}</div>
+      <div class="popup-category">${getCategoryLabel(pro.category)}</div>
     </div>
     <div class="popup-body">
       <div class="popup-info">📍 ${escapeHTML(pro.city || "")} ${pro.region ? "• " + escapeHTML(getRegionLabel(pro.region)) : ""}</div>
       <div class="popup-info">⭐ ${escapeHTML(pro.rating || "5.0")} • 📞 ${escapeHTML(pro.phone || "N/A")}</div>
       <div class="popup-description">${escapeHTML((pro.description || "Service professionnel").slice(0,110))}${(pro.description||"").length>110?'…':''}</div>
       <div class="popup-actions">
-        <button class="popup-btn popup-btn-primary" onclick='openDetailsModal(decodeURIComponent("${idSafe}"))'>👁️ Détails</button>
-        <button class="popup-btn popup-btn-secondary" onclick='contactPro(decodeURIComponent("${idSafe}"))'>📞 Contact</button>
+        <button class="popup-btn popup-btn-primary" onclick='openDetailsModal("${escapeAttr(String(pro.slug || pro.id))}")'>👁️ Détails</button>
+        <button class="popup-btn popup-btn-secondary" onclick='contactPro("${escapeAttr(String(pro.slug || pro.id))}")'>📞 Contact</button>
       </div>
     </div>
   `;
-}
-
-/* ================================
-   LIST RENDER (LEFT)
-================================ */
-function renderProList(pros){
-  const box = document.getElementById("proList");
-  const empty = document.getElementById("emptyState");
-  if(!box) return;
-
-  if(!pros.length){
-    box.innerHTML = "";
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-
-  box.innerHTML = pros.slice(0, 200).map(p=>{
-    const gps = hasGps(p);
-    const idSafe = encodeURIComponent(String(p.id ?? ""));
-    const catLabel = getCategoryLabel(p.category || "commerce");
-    const place = `${escapeHTML(p.city||"")}${p.region? " • "+escapeHTML(getRegionLabel(p.region)):""}`;
-    const phone = escapeHTML(p.phone || "N/A");
-    return `
-      <div class="pro-card" onclick='openDetailsModal(decodeURIComponent("${idSafe}"))'>
-        <div class="pro-top">
-          <div class="pro-name">${escapeHTML(p.name || "Professionnel")}</div>
-          <div class="pro-badges">
-            <span class="pill">${escapeHTML(catLabel)}</span>
-            ${gps ? `<span class="pill pill-gps">🧭 GPS</span>` : `<span class="pill pill-nogps">⚠️ pas GPS</span>`}
-          </div>
-        </div>
-        <div class="pro-meta">📍 ${place} • ⭐ ${escapeHTML(p.rating || "5.0")} • 📞 ${phone}</div>
-        <div class="pro-actions" onclick="event.stopPropagation()">
-          <button class="mini-btn mini-primary" onclick='openDetailsModal(decodeURIComponent("${idSafe}"))'>👁️ Détails</button>
-          <button class="mini-btn mini-secondary" onclick='quickViewOnMap(decodeURIComponent("${idSafe}"))' ${gps ? "" : "disabled"} style="${gps?"":"opacity:.5;cursor:not-allowed;"}">🗺️ Carte</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function quickViewOnMap(proId){
-  const pro = allProfessionals.find(p => String(p.id) === String(proId));
-  const ll = getLatLng(pro);
-  if(!pro || !ll) return alert("Coordonnées GPS manquantes pour ce pro.");
-  map.setView([ll.lat, ll.lng], 15);
-
-  // essayer d'ouvrir le popup du marker correspondant
-  let targetMarker = null;
-  markerCluster.eachLayer(layer=>{
-    if(layer && String(layer._digiy_pro_id) === String(proId)) targetMarker = layer;
-  });
-  if(targetMarker){
-    markerCluster.zoomToShowLayer(targetMarker, ()=>{
-      targetMarker.openPopup();
-    });
-  }
 }
 
 /* ================================
@@ -675,36 +535,62 @@ function filterProfessionals(){
 
   filteredProfessionals = res;
   displayMarkers(res);
-  renderProList(res);
   updateCounts();
 }
 
 function updateCounts(){
-  const total = filteredProfessionals.length;
-  const gpsCount = filteredProfessionals.filter(hasGps).length;
-
-  document.getElementById('totalPros').textContent = String(total);
-  document.getElementById('totalGps').textContent = String(gpsCount);
-
-  document.getElementById('count-all').textContent = `${total} résultats • ${gpsCount} sur carte`;
+  document.getElementById('totalPros').textContent = String(filteredProfessionals.length);
+  document.getElementById('count-all').textContent = `${filteredProfessionals.length} résultats`;
 
   Object.keys(categoryIcons).forEach(cat=>{
-    const sub = filteredProfessionals.filter(p=>(p.category||'')===cat);
-    const c = sub.length;
-    const cgps = sub.filter(hasGps).length;
+    const c = filteredProfessionals.filter(p=>(p.category||'')===cat).length;
     const el = document.getElementById(`count-${cat}`);
-    if(el) el.textContent = `${c} résultats • ${cgps} carte`;
+    if(el) el.textContent = `${c} résultats`;
   });
 }
 
 /* ================================
    MODAL + ACTIONS
+   ✅ no fetch manual
+   ✅ slug/id accepted
 ================================ */
-function openDetailsModal(proId){
-  const pro = allProfessionals.find(p => String(p.id) === String(proId));
-  if(!pro) return;
+function findLocalProBySlugOrId(key){
+  const k = String(key || "").trim();
+  if(!k) return null;
+  return allProfessionals.find(p => String(p.slug||"") === k) ||
+         allProfessionals.find(p => String(p.id||"") === k) ||
+         null;
+}
 
-  const ll = getLatLng(pro);
+async function openDetailsModal(slugOrId){
+  const key = decodeURIComponent(String(slugOrId || ""));
+  let pro = findLocalProBySlugOrId(key);
+
+  // si pas dans le cache, on tente Supabase (via SB) — SAFE
+  if(!pro){
+    const { data, error } = await SB
+      .from("professionals")
+      .select("*")
+      .eq("slug", key)
+      .maybeSingle();
+
+    if(!error && data){
+      pro = {
+        ...data,
+        region: normRegion(data.region, data.city),
+        category: normCategory(data.category || data.cat || data.type || '')
+      };
+      allProfessionals.push(pro);
+    }
+  }
+
+  if(!pro){
+    alert("Pro introuvable : " + key);
+    return;
+  }
+
+  const lat = pro.latitude ?? pro.lat ?? pro.gps_lat;
+  const lng = pro.longitude ?? pro.lng ?? pro.gps_lng;
 
   const modalBody = document.getElementById('modalBody');
   modalBody.innerHTML = `
@@ -733,15 +619,15 @@ function openDetailsModal(proId){
     </div>
 
     <div style="display:flex; gap:1rem;">
-      <button onclick="contactPro('${escapeHTML(String(pro.id))}')" style="flex:1; padding:1rem; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:900; cursor:pointer;">
+      <button onclick="contactPro('${escapeAttr(String(pro.slug||pro.id))}')" style="flex:1; padding:1rem; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:900; cursor:pointer;">
         📞 Contacter
       </button>
-      <button onclick="viewOnMap('${escapeHTML(String(pro.id))}')" style="flex:1; padding:1rem; background:var(--secondary); color:var(--dark); border:none; border-radius:12px; font-weight:900; cursor:pointer; ${ll? "":"opacity:.5;cursor:not-allowed;"}" ${ll? "":"disabled"}>
+      <button onclick="viewOnMap('${escapeAttr(String(pro.slug||pro.id))}')" style="flex:1; padding:1rem; background:var(--secondary); color:var(--dark); border:none; border-radius:12px; font-weight:900; cursor:pointer;">
         🗺️ Voir sur la carte
       </button>
     </div>
 
-    ${(!ll) ? `<div style="margin-top:1rem; color:#ffd93d; font-weight:900;">⚠️ Ce pro n’a pas encore de coordonnées GPS, donc pas de marqueur sur la carte.</div>` : ``}
+    ${(lat==null || lng==null) ? `<div style="margin-top:1rem; color:#ffd93d; font-weight:900;">⚠️ Ce pro n’a pas encore de coordonnées GPS, donc pas de marqueur sur la carte.</div>` : ``}
   `;
 
   document.getElementById('detailsModal').style.display = 'block';
@@ -749,43 +635,38 @@ function openDetailsModal(proId){
 
 function closeModal(){ document.getElementById('detailsModal').style.display = 'none'; }
 
-function contactPro(proId){
-  const pro = allProfessionals.find(p => String(p.id) === String(proId));
+function contactPro(slugOrId){
+  const key = decodeURIComponent(String(slugOrId||""));
+  const pro = findLocalProBySlugOrId(key);
   if(!pro || !pro.phone) return alert("Numéro non disponible");
   window.location.href = `tel:${pro.phone}`;
 }
 
-function viewOnMap(proId){
-  const pro = allProfessionals.find(p => String(p.id) === String(proId));
-  const ll = getLatLng(pro);
-  if(!pro || !ll) return alert("Coordonnées GPS manquantes pour ce pro.");
+function viewOnMap(slugOrId){
+  const key = decodeURIComponent(String(slugOrId||""));
+  const pro = findLocalProBySlugOrId(key);
+  const lat = pro?.latitude ?? pro?.lat ?? pro?.gps_lat;
+  const lng = pro?.longitude ?? pro?.lng ?? pro?.gps_lng;
+  if(!pro || lat==null || lng==null) return alert("Coordonnées GPS manquantes pour ce pro.");
   closeModal();
-  map.setView([ll.lat, ll.lng], 15);
-
-  let targetMarker = null;
-  markerCluster.eachLayer(layer=>{
-    if(layer && String(layer._digiy_pro_id) === String(proId)) targetMarker = layer;
-  });
-  if(targetMarker){
-    markerCluster.zoomToShowLayer(targetMarker, ()=>{
-      targetMarker.openPopup();
-    });
-  }
+  map.setView([Number(lat), Number(lng)], 15);
 }
 
 /* ================================
-   SLUG FOCUS
+   SLUG FOCUS (stable)
 ================================ */
 async function focusBySlug(slug){
-  let pro = allProfessionals.find(p => (p.slug||'') === slug);
+  const s = decodeURIComponent(String(slug||"")).trim();
+  if(!s) return;
 
-  const isDemoMode = allProfessionals.some(p => String(p.id).startsWith("demo-"));
+  let pro = findLocalProBySlugOrId(s);
 
-  if(!pro && !isDemoMode){
+  // si pas dans cache et pas demo, tente SB
+  if(!pro && !s.startsWith("demo-")){
     const { data, error } = await SB
       .from("professionals")
-      .select('id,slug,name,category,cat,type,region,city,description,phone,rating,email,hours,services,latitude,longitude,lat,lng,gps_lat,gps_lng,created_at')
-      .eq("slug", slug)
+      .select("*")
+      .eq("slug", s)
       .maybeSingle();
 
     if(!error && data){
@@ -796,37 +677,28 @@ async function focusBySlug(slug){
       };
       allProfessionals.push(pro);
       filteredProfessionals = [...allProfessionals];
+      displayMarkers(filteredProfessionals);
+      updateCounts();
     }
   }
 
   if(!pro){
-    document.getElementById('searchInput').value = slug;
+    document.getElementById('searchInput').value = s;
     filterProfessionals();
-    alert("Pro introuvable via ce slug : " + slug);
+    alert("Pro introuvable via ce slug : " + s);
     return;
   }
 
-  // remettre filtres "all" pour éviter confusion
-  currentCategory = 'all';
-  currentRegion = 'all';
-  document.querySelectorAll('.category-item').forEach(i=>i.classList.remove('active'));
-  document.querySelector('.category-item[data-category="all"]').classList.add('active');
-  document.querySelectorAll('.region-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelector('.region-btn[data-region="all"]').classList.add('active');
+  const lat = pro.latitude ?? pro.lat ?? pro.gps_lat;
+  const lng = pro.longitude ?? pro.lng ?? pro.gps_lng;
 
-  filteredProfessionals = [...allProfessionals];
-  displayMarkers(filteredProfessionals);
-  renderProList(filteredProfessionals);
-  updateCounts();
-
-  const ll = getLatLng(pro);
-  if(ll){
-    map.setView([ll.lat, ll.lng], 15);
+  if(lat!=null && lng!=null){
+    map.setView([Number(lat), Number(lng)], 15);
   }
 
   let targetMarker = null;
   markerCluster.eachLayer(layer=>{
-    if(layer && layer._digiy_slug === slug) targetMarker = layer;
+    if(layer && String(layer._digiy_slug||"") === String(pro.slug||"")) targetMarker = layer;
   });
 
   if(targetMarker){
@@ -835,7 +707,7 @@ async function focusBySlug(slug){
     });
   }
 
-  setTimeout(()=> openDetailsModal(String(pro.id)), 350);
+  setTimeout(()=> openDetailsModal(String(pro.slug || pro.id)), 350);
 }
 
 /* ================================
@@ -856,6 +728,9 @@ function escapeHTML(str){
   return (str ?? "").toString()
     .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
     .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+function escapeAttr(str){
+  return escapeHTML(String(str||"")).replaceAll("`","&#096;");
 }
 
 /* ================================
