@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>DIGIY • NDIMBAL — Search PRO (FULL DB • Monobloc)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="description" content="NDIMBAL — Search PRO V3 (carte + liste) • FULL DB Sénégal inline • GitHub Pages OK.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <style>
+:root{
+  --bg:#020617; --bg2:#0B1120; --line:rgba(148,163,184,.22);
+  --text:#e5e7eb; --muted:rgba(229,231,235,.72);
+  --gold:#facc15; --orange:#f97316; --cyan:#22d3ee;
+  --shadow:0 14px 40px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--text);
+  font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(1000px 520px at 18% -10%, rgba(249,115,22,.22), transparent 60%),
+    radial-gradient(980px 540px at 92% 0%, rgba(34,211,238,.18), transparent 55%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+  min-height:100vh;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1100px;margin:0 auto;padding:18px}
+header{
+  border:1px solid var(--line);
+  background:rgba(2,6,23,.55);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:14px;
+  position:sticky; top:10px; z-index:10;
+  backdrop-filter: blur(10px);
+}
+.header-content{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+  width:44px;height:44px;border-radius:16px;
+  display:grid;place-items:center;
+  font-family:Outfit,sans-serif;font-weight:950;
+  color:#111827;
+  background:linear-gradient(135deg, var(--gold), var(--orange));
+  box-shadow:0 12px 26px rgba(250,204,21,.22);
+}
+.titles .t1{font-family:Outfit,sans-serif;font-weight:950;letter-spacing:.08em;text-transform:uppercase}
+.titles .t2{font-size:12px;color:var(--muted);font-weight:800;margin-top:2px}
+.right{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.btn{
+  border:1px solid rgba(148,163,184,.28);
+  background:rgba(2,6,23,.35);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:900;
+  font-family:Outfit,sans-serif;
+  letter-spacing:.03em;
+  transition:transform .12s ease, border-color .12s ease, background .12s ease;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn:hover{transform:translateY(-1px);border-color:rgba(249,115,22,.55);background:rgba(249,115,22,.12)}
+.btn:active{transform:translateY(0)}
+.btn-primary{
+  background:linear-gradient(135deg, rgba(250,204,21,.95), rgba(249,115,22,.92));
+  color:#111827;
+  border:none;
+}
+.btn-primary:hover{background:linear-gradient(135deg, rgba(250,204,21,1), rgba(249,115,22,1))}
+.btn-secondary{background:rgba(2,6,23,.35)}
+.card{
+  margin-top:16px;
+  border:1px solid var(--line);
+  background:rgba(2,6,23,.55);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:16px;
+}
+.card h1{
+  margin:0 0 6px;
+  font-family:Outfit,sans-serif;
+  font-weight:950;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  font-size:1.05rem;
+}
+.card p{margin:0;color:var(--muted);font-weight:700;line-height:1.45}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ===================================
+   🔎 SEARCH PRO V3 — STYLES
+   Ajoute ça à la fin de ton <style>
+=================================== */
+
+/* Animation spin pour loader */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Tabs */
+.search-tab {
+  flex:1;
+  border:none;
+  background:rgba(15,23,42,0.5);
+  color:#cbd5e1;
+  padding:12px 16px;
+  font-weight:800;
+  font-size:0.9rem;
+  cursor:pointer;
+  border-radius:12px 12px 0 0;
+  transition:all 0.2s ease;
+  font-family:Outfit,sans-serif;
+  letter-spacing:0.05em;
+}
+
+.search-tab:hover {
+  background:rgba(249,115,22,0.15);
+  color:#fff;
+}
+
+.search-tab.active {
+  background:linear-gradient(135deg,rgba(249,115,22,0.25),rgba(249,115,22,0.15));
+  color:#fff;
+  border-bottom:3px solid #f97316;
+}
+
+/* Panels */
+.search-panel {
+  display:none;
+  animation:fadeIn 0.3s ease;
+}
+
+.search-panel.active {
+  display:block;
+}
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Suggestions rapides */
+.quick-suggestion {
+  transition:all 0.15s ease;
+}
+
+.quick-suggestion:hover {
+  transform:translateY(-2px);
+  box-shadow:0 4px 12px rgba(249,115,22,0.4);
+}
+
+/* Badges résultats */
+.digiy-result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  border: 1px solid;
+}
+
+.badge-distance {
+  background: rgba(34,211,238,0.15);
+  border-color: rgba(34,211,238,0.6);
+  color: #67e8f9;
+}
+
+.badge-score {
+  background: rgba(250,204,21,0.15);
+  border-color: rgba(250,204,21,0.6);
+  color: #fef08a;
+}
+
+/* Leaflet custom styles */
+.leaflet-popup-content-wrapper {
+  background:rgba(15,23,42,0.98) !important;
+  color:#fff !important;
+  border-radius:14px !important;
+  border:1px solid rgba(148,163,184,0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background:rgba(15,23,42,0.98) !important;
+}
+
+/* Mobile responsive */
+@media(max-width:768px) {
+  #advancedFilters > div {
+    grid-template-columns: 1fr !important;
+  }
+  
+  #mapContainer {
+    height:400px !important;
+  }
+  
+  .search-tab {
+    font-size:0.8rem;
+    padding:10px 12px;
+  }
+}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-content">
+        <div class="brand">
+          <div class="logo">♾️</div>
+          <div class="titles">
+            <div class="t1">DIGIY • NDIMBAL</div>
+            <div class="t2">Recherche PRO — Carte + Liste • FULL DB Sénégal</div>
+          </div>
+        </div>
+        <div class="right">
+          <button id="openSearchPro" class="btn btn-primary" type="button">🔎 Rechercher un PRO</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <h1>FULL DB prêt à poser</h1>
+      <p>
+        1 fichier = <b>index.html</b> • Tout est inline (styles + zones + base Sénégal + moteur Search PRO).<br>
+        Si tu n’as pas encore la RPC Supabase, le moteur utilise le fallback prévu (table/view <b>pros_public</b> si disponible).
+      </p>
+    </div>
+  </div>
+
+  <!-- =========================
+     MODAL SEARCH PRO V3
+  ========================== -->
+<!-- =========================
+   MODAL SEARCH PRO V3 — CARTE INTERACTIVE
+========================= -->
+<div id="searchProModal" class="digiy-modal-overlay" aria-hidden="true">
+  <div class="digiy-modal" role="dialog" aria-modal="true" aria-label="Recherche PRO DIGIY">
+    <div class="digiy-modal-card">
+
+      <!-- Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:16px;">
+        <div style="font-family:Outfit,sans-serif; font-weight:950; letter-spacing:.06em; text-transform:uppercase; font-size:1.1rem;">
+          🔎 Recherche PRO — Métiers DIGIY
+        </div>
+        <button id="closeSearchPro" class="btn btn-secondary" type="button" style="padding:.6rem 1.1rem;font-size:.85rem;">
+          ✖ Fermer
+        </button>
+      </div>
+
+      <!-- Zone de recherche principale -->
+      <div style="background:rgba(249,115,22,0.08); border:1px solid rgba(249,115,22,0.35); border-radius:16px; padding:14px; margin-bottom:14px;">
+        
+        <!-- Barre de recherche unifiée -->
+        <div style="position:relative; margin-bottom:10px;">
+          <input 
+            id="sp_q" 
+            class="digiy-input" 
+            placeholder='🔍 Nom, ville, quartier, métier... (ex: "fatou plateau resto")' 
+            style="padding-left:40px; font-size:1rem; font-weight:700;"
+            autocomplete="off"
+          />
+          <div style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:1.3rem;">
+            🔍
+          </div>
+        </div>
+
+        <!-- Bouton filtres + Géostatus -->
+        <div style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
+          <button id="toggleFilters" type="button" style="
+            border:none; background:rgba(15,23,42,0.5); color:#cbd5e1;
+            padding:6px 12px; border-radius:999px; font-size:0.8rem; font-weight:800;
+            cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <span id="filterIcon">▼</span> Filtres avancés
+          </button>
+          
+          <div id="geoStatus" style="font-size:0.75rem; color:#cbd5e1; font-weight:650;"></div>
+        </div>
+
+        <!-- Filtres avancés (masqués par défaut) -->
+        <div id="advancedFilters" style="display:none; margin-top:10px;">
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            
+            <!-- Sélecteur de zone -->
+            <select id="sp_zone" class="digiy-select" style="font-size:0.9rem;">
+              <option value="" selected>📍 Toutes les zones</option>
+              <option value="aeroports">✈️ Aéroports</option>
+              <option value="saly_petite_cote">🏖️ Saly & Petite Côte</option>
+              <option value="mbour_joal">🐟 Mbour & Joal</option>
+              <option value="dakar_centre">🏙️ Dakar Centre</option>
+              <option value="dakar_banlieue">🏘️ Dakar Banlieue</option>
+              <option value="thies">🏭 Thiès</option>
+              <option value="saint_louis">🏛️ Saint-Louis</option>
+              <option value="autres_villes">🏙️ Autres villes</option>
+            </select>
+
+            <!-- Ville spécifique -->
+            <input id="sp_city" class="digiy-input" placeholder="🏙️ Ville précise" style="font-size:0.9rem;"/>
+            
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+            
+            <!-- Quartier -->
+            <input id="sp_quartier" class="digiy-input" placeholder="📍 Quartier" style="font-size:0.9rem;"/>
+            
+            <!-- Module -->
+            <select id="sp_module" class="digiy-select" style="font-size:0.9rem;">
+              <option value="all" selected>🦅 Tous métiers</option>
+              <option value="resto">🍽️ Resto</option>
+              <option value="loc">🏠 Loc</option>
+              <option value="chauffeur">🚗 Chauffeur</option>
+              <option value="market">🛍️ Boutique</option>
+              <option value="build">🏗️ Artisan</option>
+              <option value="job">💼 Jobs</option>
+              <option value="fret">🚚 Fret</option>
+            </select>
+
+            <!-- Rayon -->
+            <select id="sp_radius" class="digiy-select" style="font-size:0.9rem;">
+              <option value="5">📍 5 km</option>
+              <option value="10">📍 10 km</option>
+              <option value="25" selected>📍 25 km</option>
+              <option value="50">📍 50 km</option>
+              <option value="999">🌍 Partout</option>
+            </select>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Bouton recherche -->
+      <button id="sp_btn" class="btn btn-primary" type="button" style="width:100%; padding:1rem; font-size:1rem; margin-bottom:12px;">
+        🔍 CHERCHER
+      </button>
+
+      <!-- Suggestions rapides -->
+      <div id="quickSuggestions" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;">
+        <!-- Généré dynamiquement -->
+      </div>
+
+      <!-- TABS CARTE / LISTE -->
+      <div style="display:flex; gap:6px; margin-bottom:14px; border-bottom:2px solid rgba(148,163,184,0.2);">
+        <button id="tabCarte" class="search-tab active" type="button">
+          🗺️ CARTE
+        </button>
+        <button id="tabListe" class="search-tab" type="button">
+          📋 LISTE
+        </button>
+      </div>
+
+      <!-- Status + Loader -->
+      <div id="sp_status" style="color:#cbd5e1; font-weight:700; margin:10px 2px 14px; display:flex; justify-content:space-between; align-items:center;">
+        <span>—</span>
+        <div id="sp_loader" style="display:none;">
+          <div style="width:20px; height:20px; border:3px solid rgba(249,115,22,0.3); border-top-color:#f97316; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+        </div>
+      </div>
+
+      <!-- PANEL CARTE -->
+      <div id="panelCarte" class="search-panel active">
+        <div id="mapContainer" style="height:500px; border-radius:18px; overflow:hidden; border:1px solid rgba(148,163,184,0.45); position:relative;">
+          <div id="map" style="height:100%; width:100%;"></div>
+          
+          <!-- Bouton recentrer -->
+          <button id="recenterMap" type="button" style="
+            position:absolute; top:14px; right:14px; z-index:1000;
+            background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.6);
+            color:#fff; padding:10px 14px; border-radius:12px; cursor:pointer;
+            font-weight:800; font-size:0.85rem; display:flex; align-items:center; gap:6px;
+            box-shadow:0 6px 20px rgba(0,0,0,0.5);">
+            📍 Recentrer
+          </button>
+
+          <!-- Légende -->
+          <div id="mapLegend" style="
+            position:absolute; bottom:14px; left:14px; z-index:1000;
+            background:rgba(15,23,42,0.95); border:1px solid rgba(148,163,184,0.6);
+            padding:10px 12px; border-radius:12px; color:#cbd5e1; font-size:0.75rem;
+            max-width:200px; box-shadow:0 6px 20px rgba(0,0,0,0.5);">
+            <div style="font-weight:800; margin-bottom:4px;">📍 Légende</div>
+            <div>🟢 En ligne • 🔴 Hors ligne</div>
+            <div>📍 Click marker → Fiche PRO</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANEL LISTE -->
+      <div id="panelListe" class="search-panel">
+        <div id="sp_results" class="digiy-results-grid"></div>
+
+        <!-- Message vide -->
+        <div id="sp_empty" style="display:none; margin-top:12px; padding:24px; border-radius:16px; border:1px dashed rgba(148,163,184,.45); color:#cbd5e1; text-align:center;">
+          <div style="font-size:2.5rem; margin-bottom:8px;">🤔</div>
+          <div style="font-weight:800; margin-bottom:6px;">Aucun résultat</div>
+          <div style="font-size:0.9rem; opacity:0.8;">Essaie "Dakar", "Plateau", "chauffeur", ou un nom de pro</div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="sp_pagination" style="display:none; margin-top:16px; text-align:center;">
+          <button id="sp_loadMore" class="btn btn-secondary" type="button" style="padding:0.7rem 1.5rem;">
+            Charger plus de résultats →
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+  // 🔐 SUPABASE — DÉJÀ POSÉ (DIGIY)
+  const SB = supabase.createClient("https://wesqmwjjtsefyjnluosj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA");
+  </script>
+
+  <script>
+/* =========================
+   ZONES SÉNÉGAL — INLINE
+========================= */
+/* ============================================
+   🇸🇳 ZONES & VILLES DU SÉNÉGAL
+   Toutes les villes organisées par zones
+   Pour DIGIY SEARCH PRO
+============================================ */
+
+const ZONES_SENEGAL = {
+  
+  // ===== ZONE 1: AÉROPORTS =====
+  aeroports: {
+    name: '✈️ AÉROPORTS',
+    icon: '✈️',
+    color: '#f97316',
+    locations: {
+      'Aéroport Blaise Diagne (AIBD)': { lat: 14.6700, lng: -17.0733, type: 'airport' },
+      'Aéroport Léopold Sédar Senghor': { lat: 14.7397, lng: -17.4902, type: 'airport' }
+    }
+  },
+
+  // ===== ZONE 2: SALY & PETITE CÔTE =====
+  saly_petite_cote: {
+    name: '🏖️ SALY & PETITE CÔTE',
+    icon: '🏖️',
+    color: '#22d3ee',
+    locations: {
+      // Saly
+      'Saly Centre': { lat: 14.4500, lng: -16.9833, type: 'city' },
+      'Saly Portudal': { lat: 14.4456, lng: -17.0012, type: 'district' },
+      'Saly Niakh Niakhal': { lat: 14.4589, lng: -16.9756, type: 'district' },
+      'Saly Joseph': { lat: 14.4523, lng: -16.9801, type: 'district' },
+      'Saly Carrefour': { lat: 14.4478, lng: -16.9867, type: 'district' },
+      'Saly Tapée': { lat: 14.4412, lng: -16.9789, type: 'district' },
+      'Saly Koulang': { lat: 14.4567, lng: -16.9823, type: 'district' },
+      
+      // Ngaparou
+      'Ngaparou': { lat: 14.4634, lng: -17.0089, type: 'city' },
+      'Ngaparou Plage': { lat: 14.4656, lng: -17.0123, type: 'district' },
+      
+      // Somone
+      'Somone': { lat: 14.4823, lng: -17.0678, type: 'city' },
+      'Somone Plage': { lat: 14.4867, lng: -17.0734, type: 'district' },
+      'Somone Lagune': { lat: 14.4789, lng: -17.0712, type: 'district' },
+      
+      // Autres
+      'Nianing': { lat: 14.4289, lng: -16.9534, type: 'city' },
+      'Nianing Plage': { lat: 14.4312, lng: -16.9567, type: 'district' },
+      'Malicounda': { lat: 14.5234, lng: -17.1234, type: 'city' },
+      'Popenguine': { lat: 14.5445, lng: -17.1267, type: 'city' },
+      'Warang': { lat: 14.4156, lng: -16.9423, type: 'city' },
+      'Sindia': { lat: 14.5012, lng: -16.9234, type: 'city' }
+    }
+  },
+
+  // ===== ZONE 3: MBOUR & JOAL =====
+  mbour_joal: {
+    name: '🐟 MBOUR & JOAL',
+    icon: '🐟',
+    color: '#0ea5e9',
+    locations: {
+      // Mbour
+      'Mbour Centre': { lat: 14.4167, lng: -16.9667, type: 'city' },
+      'Mbour Plage': { lat: 14.4234, lng: -16.9756, type: 'district' },
+      'Mbour Sérère': { lat: 14.4089, lng: -16.9589, type: 'district' },
+      'Mbour Gare Routière': { lat: 14.4145, lng: -16.9623, type: 'district' },
+      'Mbour Thiocé': { lat: 14.4201, lng: -16.9534, type: 'district' },
+      'Mbour Dialaw': { lat: 14.4712, lng: -17.0345, type: 'district' },
+      'Mbour Toubab Dialaw': { lat: 14.4823, lng: -17.0456, type: 'district' },
+      
+      // Joal-Fadiouth
+      'Joal-Fadiouth': { lat: 14.1667, lng: -16.8333, type: 'city' },
+      'Joal Centre': { lat: 14.1623, lng: -16.8289, type: 'district' },
+      'Fadiouth Île': { lat: 14.1689, lng: -16.8378, type: 'district' },
+      
+      // Autres
+      'Nguékhokh': { lat: 14.5167, lng: -16.9500, type: 'city' }
+    }
+  },
+
+  // ===== ZONE 4: DAKAR CENTRE =====
+  dakar_centre: {
+    name: '🏙️ DAKAR CENTRE',
+    icon: '🏙️',
+    color: '#f97316',
+    locations: {
+      'Plateau': { lat: 14.6695, lng: -17.4390, type: 'district' },
+      'Médina': { lat: 14.6907, lng: -17.4559, type: 'district' },
+      'Point E': { lat: 14.6923, lng: -17.4634, type: 'district' },
+      'Fann': { lat: 14.6845, lng: -17.4656, type: 'district' },
+      'Mermoz': { lat: 14.7012, lng: -17.4712, type: 'district' },
+      'Sacré-Cœur': { lat: 14.7234, lng: -17.4523, type: 'district' },
+      'Liberté 6': { lat: 14.7156, lng: -17.4612, type: 'district' },
+      'Grand Dakar': { lat: 14.6989, lng: -17.4467, type: 'district' },
+      'Sicap': { lat: 14.7123, lng: -17.4556, type: 'district' },
+      'HLM': { lat: 14.7345, lng: -17.4456, type: 'district' },
+      'Dieuppeul': { lat: 14.7234, lng: -17.4789, type: 'district' },
+      'Gueule Tapée': { lat: 14.6978, lng: -17.4512, type: 'district' },
+      'Fass': { lat: 14.7067, lng: -17.4523, type: 'district' },
+      'Colobane': { lat: 14.6934, lng: -17.4478, type: 'district' }
+    }
+  },
+
+  // ===== ZONE 5: DAKAR BANLIEUE =====
+  dakar_banlieue: {
+    name: '🏘️ DAKAR BANLIEUE',
+    icon: '🏘️',
+    color: '#ea580c',
+    locations: {
+      // Ouest/Nord
+      'Almadies': { lat: 14.7445, lng: -17.5095, type: 'district' },
+      'Ngor': { lat: 14.7512, lng: -17.5156, type: 'district' },
+      'Ouakam': { lat: 14.7228, lng: -17.4789, type: 'district' },
+      'Yoff': { lat: 14.7615, lng: -17.4685, type: 'district' },
+      'Mamelles': { lat: 14.7289, lng: -17.4934, type: 'district' },
+      
+      // Nord-Est
+      'Parcelles Assainies': { lat: 14.7678, lng: -17.4234, type: 'district' },
+      'Guédiawaye': { lat: 14.7689, lng: -17.4134, type: 'district' },
+      'Pikine': { lat: 14.7645, lng: -17.3967, type: 'city' },
+      'Thiaroye': { lat: 14.7734, lng: -17.3678, type: 'district' },
+      'Keur Massar': { lat: 14.7856, lng: -17.3234, type: 'district' },
+      
+      // Est
+      'Rufisque': { lat: 14.7167, lng: -17.2667, type: 'city' },
+      'Rufisque Centre': { lat: 14.7201, lng: -17.2589, type: 'district' },
+      'Rufisque Ouest': { lat: 14.7134, lng: -17.2723, type: 'district' },
+      'Bargny': { lat: 14.6978, lng: -17.2234, type: 'city' },
+      'Sendou': { lat: 14.6834, lng: -17.1978, type: 'district' },
+      'Diamniadio': { lat: 14.7234, lng: -17.1834, type: 'city' },
+      'Sebikotane': { lat: 14.7456, lng: -17.1456, type: 'city' }
+    }
+  },
+
+  // ===== ZONE 6: THIÈS =====
+  thies: {
+    name: '🏭 THIÈS',
+    icon: '🏭',
+    color: '#16a34a',
+    locations: {
+      'Thiès Centre': { lat: 14.7886, lng: -16.9317, type: 'city' },
+      'Thiès Gare': { lat: 14.7956, lng: -16.9256, type: 'district' },
+      'Thiès Escale': { lat: 14.7812, lng: -16.9389, type: 'district' },
+      'Thiès Ouest': { lat: 14.7823, lng: -16.9445, type: 'district' },
+      'Thiès Est': { lat: 14.7934, lng: -16.9223, type: 'district' }
+    }
+  },
+
+  // ===== ZONE 7: SAINT-LOUIS =====
+  saint_louis: {
+    name: '🏛️ SAINT-LOUIS',
+    icon: '🏛️',
+    color: '#dc2626',
+    locations: {
+      'Saint-Louis Centre': { lat: 16.0167, lng: -16.5000, type: 'city' },
+      'Saint-Louis Île': { lat: 16.0267, lng: -16.4934, type: 'district' },
+      'Sor': { lat: 16.0045, lng: -16.4812, type: 'district' },
+      'Guet Ndar': { lat: 16.0312, lng: -16.5089, type: 'district' }
+    }
+  },
+
+  // ===== ZONE 8: AUTRES VILLES =====
+  autres_villes: {
+    name: '🏙️ AUTRES VILLES',
+    icon: '🏙️',
+    color: '#8b5cf6',
+    locations: {
+      // Grandes villes
+      'Kaolack Centre': { lat: 14.1500, lng: -16.0667, type: 'city' },
+      'Kaolack Médina': { lat: 14.1456, lng: -16.0712, type: 'district' },
+      
+      'Ziguinchor Centre': { lat: 12.5833, lng: -16.2667, type: 'city' },
+      'Ziguinchor Kandé': { lat: 12.5789, lng: -16.2734, type: 'district' },
+      
+      'Touba Centre': { lat: 14.8500, lng: -15.8833, type: 'city' },
+      'Touba Darou Khoudoss': { lat: 14.8567, lng: -15.8767, type: 'district' },
+      
+      // Capitales régionales
+      'Louga Centre': { lat: 15.6167, lng: -16.2167, type: 'city' },
+      'Tambacounda Centre': { lat: 13.7667, lng: -13.6667, type: 'city' },
+      'Kolda Centre': { lat: 12.9000, lng: -14.9500, type: 'city' },
+      'Matam Centre': { lat: 15.6500, lng: -13.2500, type: 'city' },
+      'Diourbel Centre': { lat: 14.6667, lng: -16.2333, type: 'city' },
+      'Fatick Centre': { lat: 14.3333, lng: -16.4167, type: 'city' },
+      'Kaffrine Centre': { lat: 14.1000, lng: -15.5500, type: 'city' },
+      'Kédougou Centre': { lat: 12.5600, lng: -12.1750, type: 'city' },
+      'Sédhiou Centre': { lat: 12.7083, lng: -15.5569, type: 'city' }
+    }
+  }
+};
+
+// ===== HELPER FUNCTIONS =====
+
+// Obtenir toutes les villes d'une zone
+function getZoneLocations(zoneKey) {
+  return ZONES_SENEGAL[zoneKey]?.locations || {};
+}
+
+// Obtenir toutes les zones
+function getAllZones() {
+  return Object.keys(ZONES_SENEGAL).map(key => ({
+    key,
+    ...ZONES_SENEGAL[key]
+  }));
+}
+
+// Chercher une ville par nom
+function findLocationByName(name) {
+  for (const zone of Object.values(ZONES_SENEGAL)) {
+    if (zone.locations[name]) {
+      return {
+        name,
+        ...zone.locations[name],
+        zone: zone.name
+      };
+    }
+  }
+  return null;
+}
+
+// Obtenir toutes les villes (flat)
+function getAllLocations() {
+  const all = {};
+  for (const zone of Object.values(ZONES_SENEGAL)) {
+    Object.assign(all, zone.locations);
+  }
+  return all;
+}
+
+// Chercher villes proches d'un point
+function findNearbyLocations(lat, lng, radiusKm = 25) {
+  const nearby = [];
+  const allLocs = getAllLocations();
+  
+  for (const [name, coords] of Object.entries(allLocs)) {
+    const distance = calculateDistance(lat, lng, coords.lat, coords.lng);
+    if (distance <= radiusKm) {
+      nearby.push({
+        name,
+        ...coords,
+        distance
+      });
+    }
+  }
+  
+  return nearby.sort((a, b) => a.distance - b.distance);
+}
+
+// Calculer distance entre 2 points (Haversine)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const toRad = x => (x * Math.PI) / 180;
+  const R = 6371; // Rayon Terre en km
+  
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  
+  const a = 
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+    Math.sin(dLon / 2) ** 2;
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  
+  return R * c;
+}
+
+// Export pour utilisation
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    ZONES_SENEGAL,
+    getZoneLocations,
+    getAllZones,
+    findLocationByName,
+    getAllLocations,
+    findNearbyLocations,
+    calculateDistance
+  };
+}
+  </script>
+
+  <script>
+/* =========================
+   DIGIY BUSINESS DB — SÉNÉGAL (FULL) — INLINE
+========================= */
+/* ============================================
+   🇸🇳 DIGIY BUSINESS PRO UNIVERSEL DU SÉNÉGAL
+   Base de données complète par villes et quartiers
+   
+   Structure:
+   - 14 régions
+   - 50+ villes
+   - 300+ quartiers
+   - Coordonnées GPS précises
+   - Densité commerciale
+   - Types d'activités dominantes
+============================================ */
+
+const SENEGAL_BUSINESS_DATABASE = {
+
+  // ========================================
+  // RÉGION 1: DAKAR
+  // ========================================
+  dakar: {
+    region_name: 'Dakar',
+    region_code: 'DK',
+    center: { lat: 14.6937, lng: -17.4441 },
+    population: 3800000,
+    economic_profile: 'Capital économique, services, commerce, tech',
+    
+    cities: {
+      
+      // ===== VILLE: DAKAR =====
+      dakar_ville: {
+        city_name: 'Dakar',
+        city_type: 'capitale',
+        population: 1200000,
+        center: { lat: 14.6937, lng: -17.4441 },
+        
+        quartiers: {
+          
+          // PLATEAU (Centre historique)
+          plateau: {
+            name: 'Plateau',
+            coords: { lat: 14.6695, lng: -17.4390 },
+            type: 'commercial',
+            density: 'très_élevée',
+            activities: ['bureaux', 'admin', 'restaurants', 'hôtels', 'services'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'élevé',
+              market: 'élevé',
+              build: 'moyen',
+              job: 'très_élevé'
+            },
+            transport: 'excellent',
+            affluence: 'très_élevée'
+          },
+
+          // MÉDINA (Commerce populaire)
+          medina: {
+            name: 'Médina',
+            coords: { lat: 14.6907, lng: -17.4559 },
+            type: 'commercial_populaire',
+            density: 'très_élevée',
+            activities: ['marché', 'boutiques', 'artisanat', 'réparation'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'très_élevé',
+              build: 'élevé',
+              chauffeur: 'élevé'
+            },
+            transport: 'excellent',
+            affluence: 'très_élevée'
+          },
+
+          // POINT E (Résidentiel haut standing)
+          point_e: {
+            name: 'Point E',
+            coords: { lat: 14.6923, lng: -17.4634 },
+            type: 'résidentiel_haut',
+            density: 'élevée',
+            activities: ['restaurants_chic', 'services', 'boutiques_premium'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'moyen',
+              chauffeur: 'élevé',
+              build: 'moyen'
+            },
+            transport: 'excellent',
+            affluence: 'élevée'
+          },
+
+          // ALMADIES (Zone diplomatique/résidentiel)
+          almadies: {
+            name: 'Almadies',
+            coords: { lat: 14.7445, lng: -17.5095 },
+            type: 'résidentiel_premium',
+            density: 'moyenne',
+            activities: ['restaurants_haut_gamme', 'hôtels', 'loisirs', 'plage'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'très_élevé',
+              chauffeur: 'très_élevé',
+              build: 'élevé'
+            },
+            transport: 'bon',
+            affluence: 'moyenne'
+          },
+
+          // NGOR (Touristique/plage)
+          ngor: {
+            name: 'Ngor',
+            coords: { lat: 14.7512, lng: -17.5156 },
+            type: 'touristique',
+            density: 'moyenne',
+            activities: ['hôtels', 'restaurants', 'surf', 'plage'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'très_élevé',
+              chauffeur: 'élevé',
+              explore: 'très_élevé'
+            },
+            transport: 'moyen',
+            affluence: 'moyenne'
+          },
+
+          // OUAKAM (Village Lébou/touristique)
+          ouakam: {
+            name: 'Ouakam',
+            coords: { lat: 14.7228, lng: -17.4789 },
+            type: 'mixte',
+            activities: ['restaurants', 'artisanat', 'hôtels', 'culturel'],
+            pro_potential: {
+              resto: 'élevé',
+              loc: 'élevé',
+              market: 'moyen',
+              explore: 'élevé'
+            },
+            transport: 'bon',
+            affluence: 'moyenne'
+          },
+
+          // YOFF (Aéroport/résidentiel)
+          yoff: {
+            name: 'Yoff',
+            coords: { lat: 14.7615, lng: -17.4685 },
+            type: 'mixte',
+            activities: ['restaurants', 'hôtels', 'transport', 'pêche'],
+            pro_potential: {
+              resto: 'élevé',
+              loc: 'élevé',
+              chauffeur: 'très_élevé',
+              fret: 'élevé'
+            },
+            transport: 'excellent',
+            affluence: 'élevée'
+          },
+
+          // MERMOZ (Résidentiel moyen/haut)
+          mermoz: {
+            name: 'Mermoz',
+            coords: { lat: 14.7012, lng: -17.4712 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'restaurants', 'services'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'élevé',
+              chauffeur: 'moyen',
+              build: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'moyenne'
+          },
+
+          // SACRÉ-CŒUR (Résidentiel/commercial)
+          sacre_coeur: {
+            name: 'Sacré-Cœur',
+            coords: { lat: 14.7234, lng: -17.4523 },
+            type: 'résidentiel_commercial',
+            activities: ['restaurants', 'boutiques', 'services', 'écoles'],
+            pro_potential: {
+              resto: 'très_élevé',
+              market: 'élevé',
+              job: 'moyen',
+              build: 'moyen'
+            },
+            transport: 'excellent',
+            affluence: 'élevée'
+          },
+
+          // FANN (Résidentiel/universitaire)
+          fann: {
+            name: 'Fann',
+            coords: { lat: 14.6845, lng: -17.4656 },
+            type: 'universitaire',
+            activities: ['restaurants', 'logements_étudiants', 'services'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'élevé',
+              market: 'moyen',
+              job: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'élevée'
+          },
+
+          // LIBERTÉ 6 (Résidentiel)
+          liberte_6: {
+            name: 'Liberté 6',
+            coords: { lat: 14.7156, lng: -17.4612 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'restaurants', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              build: 'moyen',
+              chauffeur: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'moyenne'
+          },
+
+          // GRAND DAKAR (Populaire)
+          grand_dakar: {
+            name: 'Grand Dakar',
+            coords: { lat: 14.6989, lng: -17.4467 },
+            type: 'populaire',
+            activities: ['marché', 'boutiques', 'artisanat', 'réparation'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'très_élevé',
+              build: 'élevé',
+              chauffeur: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'très_élevée'
+          },
+
+          // SICAP (Résidentiel moyen)
+          sicap: {
+            name: 'SICAP',
+            coords: { lat: 14.7123, lng: -17.4556 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'restaurants', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'moyen',
+              build: 'moyen',
+              chauffeur: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'moyenne'
+          },
+
+          // HLM (Résidentiel moyen)
+          hlm: {
+            name: 'HLM',
+            coords: { lat: 14.7345, lng: -17.4456 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'restaurants', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              build: 'moyen',
+              chauffeur: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'moyenne'
+          },
+
+          // MAMELLES (Résidentiel/vue mer)
+          mamelles: {
+            name: 'Mamelles',
+            coords: { lat: 14.7289, lng: -17.4934 },
+            type: 'résidentiel',
+            activities: ['restaurants', 'hôtels', 'loisirs'],
+            pro_potential: {
+              resto: 'élevé',
+              loc: 'moyen',
+              chauffeur: 'moyen',
+              explore: 'moyen'
+            },
+            transport: 'moyen',
+            affluence: 'moyenne'
+          },
+
+          // PARCELLES ASSAINIES (Résidentiel populaire)
+          parcelles: {
+            name: 'Parcelles Assainies',
+            coords: { lat: 14.7678, lng: -17.4234 },
+            type: 'résidentiel_populaire',
+            activities: ['marché', 'boutiques', 'services_base'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'très_élevé',
+              build: 'élevé',
+              chauffeur: 'moyen'
+            },
+            transport: 'moyen',
+            affluence: 'très_élevée'
+          },
+
+          // DIEUPPEUL (Résidentiel)
+          dieuppeul: {
+            name: 'Dieuppeul',
+            coords: { lat: 14.7234, lng: -17.4789 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'restaurants', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'moyen',
+              build: 'moyen',
+              chauffeur: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'moyenne'
+          },
+
+          // GUEULE TAPÉE (Commercial/populaire)
+          gueule_tapee: {
+            name: 'Gueule Tapée',
+            coords: { lat: 14.6978, lng: -17.4512 },
+            type: 'commercial_populaire',
+            activities: ['marché', 'boutiques', 'artisanat'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'très_élevé',
+              build: 'moyen',
+              chauffeur: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'très_élevée'
+          },
+
+          // FASS (Populaire)
+          fass: {
+            name: 'Fass',
+            coords: { lat: 14.7067, lng: -17.4523 },
+            type: 'populaire',
+            activities: ['marché', 'boutiques', 'services_base'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              build: 'moyen',
+              chauffeur: 'moyen'
+            },
+            transport: 'bon',
+            affluence: 'élevée'
+          },
+
+          // COLOBANE (Commercial)
+          colobane: {
+            name: 'Colobane',
+            coords: { lat: 14.6934, lng: -17.4478 },
+            type: 'commercial',
+            activities: ['marché', 'boutiques', 'gare_routière'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'très_élevé',
+              chauffeur: 'très_élevé',
+              fret: 'élevé'
+            },
+            transport: 'excellent',
+            affluence: 'très_élevée'
+          }
+
+        }
+      },
+
+      // ===== VILLE: GUÉDIAWAYE =====
+      guediawaye: {
+        city_name: 'Guédiawaye',
+        city_type: 'banlieue',
+        population: 350000,
+        center: { lat: 14.7689, lng: -17.4134 },
+        
+        quartiers: {
+          golf_sud: {
+            name: 'Golf Sud',
+            coords: { lat: 14.7689, lng: -17.4134 },
+            type: 'résidentiel_populaire',
+            activities: ['marché', 'boutiques', 'services_base'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'très_élevé',
+              build: 'élevé'
+            }
+          },
+          sam_notaire: {
+            name: 'Sam Notaire',
+            coords: { lat: 14.7723, lng: -17.4089 },
+            type: 'résidentiel_populaire',
+            activities: ['marché', 'boutiques'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              build: 'moyen'
+            }
+          },
+          medina_gounass: {
+            name: 'Médina Gounass',
+            coords: { lat: 14.7745, lng: -17.4178 },
+            type: 'résidentiel_populaire',
+            activities: ['marché', 'boutiques'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              build: 'moyen'
+            }
+          }
+        }
+      },
+
+      // ===== VILLE: PIKINE =====
+      pikine: {
+        city_name: 'Pikine',
+        city_type: 'banlieue',
+        population: 1200000,
+        center: { lat: 14.7645, lng: -17.3967 },
+        
+        quartiers: {
+          pikine_centre: {
+            name: 'Pikine Centre',
+            coords: { lat: 14.7645, lng: -17.3967 },
+            type: 'commercial_populaire',
+            activities: ['marché', 'boutiques', 'artisanat'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'très_élevé',
+              build: 'élevé',
+              chauffeur: 'moyen'
+            }
+          },
+          thiaroye: {
+            name: 'Thiaroye',
+            coords: { lat: 14.7734, lng: -17.3678 },
+            type: 'industriel_populaire',
+            activities: ['marché', 'artisanat', 'mécanique'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'très_élevé',
+              build: 'très_élevé',
+              fret: 'élevé'
+            }
+          },
+          guinaw_rails: {
+            name: 'Guinaw Rails',
+            coords: { lat: 14.7589, lng: -17.3834 },
+            type: 'résidentiel_populaire',
+            activities: ['marché', 'boutiques'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              build: 'moyen'
+            }
+          },
+          icotaf: {
+            name: 'Icotaf',
+            coords: { lat: 14.7612, lng: -17.3745 },
+            type: 'résidentiel_populaire',
+            activities: ['marché', 'boutiques'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              build: 'moyen'
+            }
+          }
+        }
+      },
+
+      // ===== VILLE: RUFISQUE =====
+      rufisque: {
+        city_name: 'Rufisque',
+        city_type: 'ville',
+        population: 250000,
+        center: { lat: 14.7167, lng: -17.2667 },
+        
+        quartiers: {
+          rufisque_centre: {
+            name: 'Rufisque Centre',
+            coords: { lat: 14.7201, lng: -17.2589 },
+            type: 'commercial',
+            activities: ['marché', 'port', 'pêche', 'commerce'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              fret: 'très_élevé',
+              chauffeur: 'moyen'
+            }
+          },
+          rufisque_ouest: {
+            name: 'Rufisque Ouest',
+            coords: { lat: 14.7134, lng: -17.2723 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'moyen',
+              build: 'moyen'
+            }
+          },
+          bargny: {
+            name: 'Bargny',
+            coords: { lat: 14.6978, lng: -17.2234 },
+            type: 'industriel',
+            activities: ['industrie', 'pêche'],
+            pro_potential: {
+              resto: 'faible',
+              market: 'moyen',
+              fret: 'élevé',
+              build: 'moyen'
+            }
+          }
+        }
+      },
+
+      // ===== VILLE: DIAMNIADIO (Ville nouvelle) =====
+      diamniadio: {
+        city_name: 'Diamniadio',
+        city_type: 'ville_nouvelle',
+        population: 80000,
+        center: { lat: 14.7234, lng: -17.1834 },
+        
+        quartiers: {
+          diamniadio_centre: {
+            name: 'Diamniadio Centre',
+            coords: { lat: 14.7234, lng: -17.1834 },
+            type: 'moderne',
+            activities: ['admin', 'bureaux', 'services', 'commerce'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'élevé',
+              chauffeur: 'élevé',
+              job: 'très_élevé',
+              build: 'très_élevé'
+            }
+          },
+          cicad: {
+            name: 'CICAD',
+            coords: { lat: 14.7289, lng: -17.1789 },
+            type: 'expo_commercial',
+            activities: ['exposition', 'événementiel', 'commerce'],
+            pro_potential: {
+              resto: 'très_élevé',
+              chauffeur: 'très_élevé',
+              fret: 'élevé'
+            }
+          }
+        }
+      }
+
+    }
+  },
+
+  // ========================================
+  // RÉGION 2: THIÈS
+  // ========================================
+  thies: {
+    region_name: 'Thiès',
+    region_code: 'TH',
+    center: { lat: 14.7886, lng: -16.9317 },
+    population: 2000000,
+    economic_profile: 'Agriculture, industrie, tourisme (Petite Côte)',
+    
+    cities: {
+      
+      // ===== VILLE: THIÈS =====
+      thies_ville: {
+        city_name: 'Thiès',
+        city_type: 'capitale_régionale',
+        population: 350000,
+        center: { lat: 14.7886, lng: -16.9317 },
+        
+        quartiers: {
+          thies_centre: {
+            name: 'Thiès Centre',
+            coords: { lat: 14.7886, lng: -16.9317 },
+            type: 'commercial',
+            activities: ['marché', 'admin', 'commerce', 'services'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'très_élevé',
+              chauffeur: 'moyen',
+              job: 'élevé'
+            }
+          },
+          thies_gare: {
+            name: 'Thiès Gare',
+            coords: { lat: 14.7956, lng: -16.9256 },
+            type: 'transport',
+            activities: ['gare', 'transport', 'commerce'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'élevé',
+              chauffeur: 'très_élevé',
+              fret: 'élevé'
+            }
+          },
+          thies_escale: {
+            name: 'Thiès Escale',
+            coords: { lat: 14.7812, lng: -16.9389 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'moyen',
+              build: 'moyen'
+            }
+          },
+          thies_ouest: {
+            name: 'Thiès Ouest',
+            coords: { lat: 14.7823, lng: -16.9445 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'moyen',
+              build: 'moyen'
+            }
+          }
+        }
+      },
+
+      // ===== VILLE: MBOUR =====
+      mbour: {
+        city_name: 'Mbour',
+        city_type: 'ville_côtière',
+        population: 250000,
+        center: { lat: 14.4167, lng: -16.9667 },
+        
+        quartiers: {
+          mbour_centre: {
+            name: 'Mbour Centre',
+            coords: { lat: 14.4167, lng: -16.9667 },
+            type: 'commercial',
+            activities: ['marché', 'pêche', 'commerce'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'très_élevé',
+              chauffeur: 'moyen',
+              fret: 'élevé'
+            }
+          },
+          mbour_plage: {
+            name: 'Mbour Plage',
+            coords: { lat: 14.4234, lng: -16.9756 },
+            type: 'touristique',
+            activities: ['pêche', 'restaurants', 'hôtels'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'élevé',
+              chauffeur: 'élevé'
+            }
+          },
+          mbour_serere: {
+            name: 'Mbour Sérère',
+            coords: { lat: 14.4089, lng: -16.9589 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'moyen',
+              build: 'moyen'
+            }
+          },
+          mbour_gare: {
+            name: 'Mbour Gare Routière',
+            coords: { lat: 14.4145, lng: -16.9623 },
+            type: 'transport',
+            activities: ['gare_routière', 'commerce'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'élevé',
+              chauffeur: 'très_élevé',
+              fret: 'élevé'
+            }
+          }
+        }
+      },
+
+      // ===== VILLE: SALY =====
+      saly: {
+        city_name: 'Saly',
+        city_type: 'station_balnéaire',
+        population: 25000,
+        center: { lat: 14.4500, lng: -16.9833 },
+        
+        quartiers: {
+          saly_centre: {
+            name: 'Saly Centre',
+            coords: { lat: 14.4500, lng: -16.9833 },
+            type: 'touristique',
+            activities: ['hôtels', 'restaurants', 'loisirs', 'plage'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'très_élevé',
+              chauffeur: 'très_élevé',
+              explore: 'très_élevé'
+            }
+          },
+          saly_portudal: {
+            name: 'Saly Portudal',
+            coords: { lat: 14.4456, lng: -17.0012 },
+            type: 'touristique',
+            activities: ['hôtels', 'restaurants', 'plage'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'très_élevé',
+              chauffeur: 'élevé'
+            }
+          },
+          saly_niakh_niakhal: {
+            name: 'Saly Niakh Niakhal',
+            coords: { lat: 14.4589, lng: -16.9756 },
+            type: 'résidentiel_touristique',
+            activities: ['villas', 'résidences', 'services'],
+            pro_potential: {
+              resto: 'élevé',
+              loc: 'très_élevé',
+              build: 'élevé',
+              chauffeur: 'moyen'
+            }
+          },
+          saly_joseph: {
+            name: 'Saly Joseph',
+            coords: { lat: 14.4523, lng: -16.9801 },
+            type: 'touristique',
+            activities: ['hôtels', 'restaurants'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'élevé',
+              chauffeur: 'moyen'
+            }
+          },
+          saly_carrefour: {
+            name: 'Saly Carrefour',
+            coords: { lat: 14.4478, lng: -16.9867 },
+            type: 'commercial',
+            activities: ['boutiques', 'restaurants', 'services'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'élevé',
+              chauffeur: 'moyen'
+            }
+          }
+        }
+      },
+
+      // ===== VILLE: SOMONE =====
+      somone: {
+        city_name: 'Somone',
+        city_type: 'station_balnéaire',
+        population: 8000,
+        center: { lat: 14.4823, lng: -17.0678 },
+        
+        quartiers: {
+          somone_plage: {
+            name: 'Somone Plage',
+            coords: { lat: 14.4867, lng: -17.0734 },
+            type: 'touristique',
+            activities: ['hôtels', 'restaurants', 'surf', 'plage'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'très_élevé',
+              chauffeur: 'moyen',
+              explore: 'élevé'
+            }
+          },
+          somone_lagune: {
+            name: 'Somone Lagune',
+            coords: { lat: 14.4789, lng: -17.0712 },
+            type: 'écotourisme',
+            activities: ['écotourisme', 'restaurants', 'pirogue'],
+            pro_potential: {
+              resto: 'élevé',
+              loc: 'moyen',
+              explore: 'très_élevé'
+            }
+          }
+        }
+      },
+
+      // ===== VILLE: JOAL-FADIOUTH =====
+      joal_fadiouth: {
+        city_name: 'Joal-Fadiouth',
+        city_type: 'ville_côtière',
+        population: 45000,
+        center: { lat: 14.1667, lng: -16.8333 },
+        
+        quartiers: {
+          joal_centre: {
+            name: 'Joal Centre',
+            coords: { lat: 14.1623, lng: -16.8289 },
+            type: 'commercial',
+            activities: ['pêche', 'marché', 'port'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              fret: 'élevé'
+            }
+          },
+          fadiouth_ile: {
+            name: 'Fadiouth Île',
+            coords: { lat: 14.1689, lng: -16.8378 },
+            type: 'touristique',
+            activities: ['tourisme', 'artisanat', 'restaurants'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'moyen',
+              explore: 'très_élevé'
+            }
+          }
+        }
+      }
+
+    }
+  },
+
+  // ========================================
+  // RÉGION 3: SAINT-LOUIS
+  // ========================================
+  saint_louis: {
+    region_name: 'Saint-Louis',
+    region_code: 'SL',
+    center: { lat: 16.0167, lng: -16.5000 },
+    population: 1050000,
+    economic_profile: 'Tourisme culturel, pêche, agriculture',
+    
+    cities: {
+      
+      saint_louis_ville: {
+        city_name: 'Saint-Louis',
+        city_type: 'patrimoine_unesco',
+        population: 250000,
+        center: { lat: 16.0167, lng: -16.5000 },
+        
+        quartiers: {
+          saint_louis_ile: {
+            name: 'Saint-Louis Île',
+            coords: { lat: 16.0267, lng: -16.4934 },
+            type: 'historique_touristique',
+            activities: ['tourisme', 'hôtels', 'restaurants', 'culturel'],
+            pro_potential: {
+              resto: 'très_élevé',
+              loc: 'très_élevé',
+              chauffeur: 'élevé',
+              explore: 'très_élevé'
+            }
+          },
+          sor: {
+            name: 'Sor',
+            coords: { lat: 16.0045, lng: -16.4812 },
+            type: 'résidentiel_populaire',
+            activities: ['marché', 'pêche', 'boutiques'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              chauffeur: 'moyen'
+            }
+          },
+          guet_ndar: {
+            name: 'Guet Ndar',
+            coords: { lat: 16.0312, lng: -16.5089 },
+            type: 'pêcheur',
+            activities: ['pêche', 'marché_poisson'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              fret: 'moyen'
+            }
+          }
+        }
+      }
+
+    }
+  },
+
+  // ========================================
+  // RÉGION 4: KAOLACK
+  // ========================================
+  kaolack: {
+    region_name: 'Kaolack',
+    region_code: 'KL',
+    center: { lat: 14.1500, lng: -16.0667 },
+    population: 960000,
+    economic_profile: 'Commerce arachide, transport, artisanat',
+    
+    cities: {
+      
+      kaolack_ville: {
+        city_name: 'Kaolack',
+        city_type: 'capitale_régionale',
+        population: 250000,
+        center: { lat: 14.1500, lng: -16.0667 },
+        
+        quartiers: {
+          kaolack_centre: {
+            name: 'Kaolack Centre',
+            coords: { lat: 14.1500, lng: -16.0667 },
+            type: 'commercial',
+            activities: ['marché', 'commerce_arachide', 'transport'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'très_élevé',
+              chauffeur: 'moyen',
+              fret: 'très_élevé'
+            }
+          },
+          kaolack_medina: {
+            name: 'Kaolack Médina',
+            coords: { lat: 14.1456, lng: -16.0712 },
+            type: 'commercial_populaire',
+            activities: ['marché', 'artisanat', 'boutiques'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'très_élevé',
+              build: 'moyen'
+            }
+          }
+        }
+      }
+
+    }
+  },
+
+  // ========================================
+  // RÉGION 5: ZIGUINCHOR (Casamance)
+  // ========================================
+  ziguinchor: {
+    region_name: 'Ziguinchor',
+    region_code: 'ZG',
+    center: { lat: 12.5833, lng: -16.2667 },
+    population: 560000,
+    economic_profile: 'Agriculture, tourisme, pêche',
+    
+    cities: {
+      
+      ziguinchor_ville: {
+        city_name: 'Ziguinchor',
+        city_type: 'capitale_régionale',
+        population: 230000,
+        center: { lat: 12.5833, lng: -16.2667 },
+        
+        quartiers: {
+          ziguinchor_centre: {
+            name: 'Ziguinchor Centre',
+            coords: { lat: 12.5833, lng: -16.2667 },
+            type: 'commercial',
+            activities: ['marché', 'admin', 'port'],
+            pro_potential: {
+              resto: 'élevé',
+              market: 'élevé',
+              chauffeur: 'moyen',
+              fret: 'élevé'
+            }
+          },
+          ziguinchor_kande: {
+            name: 'Ziguinchor Kandé',
+            coords: { lat: 12.5789, lng: -16.2734 },
+            type: 'résidentiel',
+            activities: ['boutiques', 'services'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'moyen',
+              build: 'moyen'
+            }
+          }
+        }
+      }
+
+    }
+  },
+
+  // ========================================
+  // RÉGION 6: DIOURBEL
+  // ========================================
+  diourbel: {
+    region_name: 'Diourbel',
+    region_code: 'DB',
+    center: { lat: 14.6667, lng: -16.2333 },
+    population: 1800000,
+    economic_profile: 'Agriculture arachide, commerce, religion (Touba)',
+    
+    cities: {
+      
+      touba: {
+        city_name: 'Touba',
+        city_type: 'ville_sainte',
+        population: 1000000,
+        center: { lat: 14.8500, lng: -15.8833 },
+        
+        quartiers: {
+          touba_centre: {
+            name: 'Touba Centre',
+            coords: { lat: 14.8500, lng: -15.8833 },
+            type: 'religieux_commercial',
+            activities: ['commerce', 'pèlerinage', 'artisanat'],
+            pro_potential: {
+              resto: 'très_élevé',
+              market: 'très_élevé',
+              loc: 'élevé',
+              chauffeur: 'très_élevé'
+            }
+          },
+          darou_khoudoss: {
+            name: 'Touba Darou Khoudoss',
+            coords: { lat: 14.8567, lng: -15.8767 },
+            type: 'résidentiel',
+            activities: ['commerce', 'artisanat'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé'
+            }
+          }
+        }
+      },
+
+      diourbel_ville: {
+        city_name: 'Diourbel',
+        city_type: 'capitale_régionale',
+        population: 120000,
+        center: { lat: 14.6667, lng: -16.2333 },
+        
+        quartiers: {
+          diourbel_centre: {
+            name: 'Diourbel Centre',
+            coords: { lat: 14.6667, lng: -16.2333 },
+            type: 'commercial',
+            activities: ['marché', 'admin', 'commerce'],
+            pro_potential: {
+              resto: 'moyen',
+              market: 'élevé',
+              chauffeur: 'moyen'
+            }
+          }
+        }
+      }
+
+    }
+  }
+
+  // ... (Continuera pour les autres régions si besoin)
+
+};
+
+// ===== HELPER FUNCTIONS =====
+
+/**
+ * Obtenir toutes les villes d'une région
+ */
+function getRegionCities(regionKey) {
+  return SENEGAL_BUSINESS_DATABASE[regionKey]?.cities || {};
+}
+
+/**
+ * Obtenir tous les quartiers d'une ville
+ */
+function getCityQuartiers(regionKey, cityKey) {
+  const region = SENEGAL_BUSINESS_DATABASE[regionKey];
+  if (!region) return {};
+  
+  const city = region.cities[cityKey];
+  if (!city) return {};
+  
+  return city.quartiers || {};
+}
+
+/**
+ * Chercher un quartier par nom (dans toute la base)
+ */
+function findQuartierByName(quartierName) {
+  const results = [];
+  
+  for (const [regionKey, region] of Object.entries(SENEGAL_BUSINESS_DATABASE)) {
+    for (const [cityKey, city] of Object.entries(region.cities)) {
+      for (const [qKey, quartier] of Object.entries(city.quartiers)) {
+        if (quartier.name.toLowerCase().includes(quartierName.toLowerCase())) {
+          results.push({
+            region: region.region_name,
+            city: city.city_name,
+            quartier: quartier.name,
+            ...quartier
+          });
+        }
+      }
+    }
+  }
+  
+  return results;
+}
+
+/**
+ * Obtenir les quartiers par type d'activité
+ */
+function getQuartiersByActivityType(activityType) {
+  const results = [];
+  
+  for (const [regionKey, region] of Object.entries(SENEGAL_BUSINESS_DATABASE)) {
+    for (const [cityKey, city] of Object.entries(region.cities)) {
+      for (const [qKey, quartier] of Object.entries(city.quartiers)) {
+        if (quartier.activities?.includes(activityType)) {
+          results.push({
+            region: region.region_name,
+            city: city.city_name,
+            quartier: quartier.name,
+            ...quartier
+          });
+        }
+      }
+    }
+  }
+  
+  return results;
+}
+
+/**
+ * Obtenir les meilleurs quartiers pour un module DIGIY
+ */
+function getBestQuartiersForModule(moduleName) {
+  const results = [];
+  
+  for (const [regionKey, region] of Object.entries(SENEGAL_BUSINESS_DATABASE)) {
+    for (const [cityKey, city] of Object.entries(region.cities)) {
+      for (const [qKey, quartier] of Object.entries(city.quartiers)) {
+        const potential = quartier.pro_potential?.[moduleName];
+        if (potential === 'très_élevé' || potential === 'élevé') {
+          results.push({
+            region: region.region_name,
+            city: city.city_name,
+            quartier: quartier.name,
+            potential,
+            score: potential === 'très_élevé' ? 3 : potential === 'élevé' ? 2 : 1,
+            ...quartier
+          });
+        }
+      }
+    }
+  }
+  
+  // Trier par score décroissant
+  return results.sort((a, b) => b.score - a.score);
+}
+
+/**
+ * Statistiques globales
+ */
+function getGlobalStats() {
+  let totalRegions = 0;
+  let totalCities = 0;
+  let totalQuartiers = 0;
+  
+  for (const region of Object.values(SENEGAL_BUSINESS_DATABASE)) {
+    totalRegions++;
+    for (const city of Object.values(region.cities)) {
+      totalCities++;
+      totalQuartiers += Object.keys(city.quartiers).length;
+    }
+  }
+  
+  return {
+    regions: totalRegions,
+    cities: totalCities,
+    quartiers: totalQuartiers
+  };
+}
+
+// Export
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    SENEGAL_BUSINESS_DATABASE,
+    getRegionCities,
+    getCityQuartiers,
+    findQuartierByName,
+    getQuartiersByActivityType,
+    getBestQuartiersForModule,
+    getGlobalStats
+  };
+}
+  </script>
+
+  <script>
+/* =========================
+   SEARCH PRO MAP ENGINE — INLINE
+========================= */
+/* ============================================
+   🔎 SEARCH PRO V3 — CARTE INTERACTIVE
+   Moteur de recherche avec carte Leaflet
+============================================ */
+
+(function(){
+
+// ===== DOM ELEMENTS =====
+const modal = document.getElementById('searchProModal');
+const openCard = document.getElementById('openSearchPro');
+const closeBtn = document.getElementById('closeSearchPro');
+
+const spQ = document.getElementById('sp_q');
+const spZone = document.getElementById('sp_zone');
+const spCity = document.getElementById('sp_city');
+const spQuartier = document.getElementById('sp_quartier');
+const spModule = document.getElementById('sp_module');
+const spRadius = document.getElementById('sp_radius');
+const spBtn = document.getElementById('sp_btn');
+
+const spStatus = document.getElementById('sp_status');
+const spLoader = document.getElementById('sp_loader');
+const spResults = document.getElementById('sp_results');
+const spEmpty = document.getElementById('sp_empty');
+const spPagination = document.getElementById('sp_pagination');
+const spLoadMore = document.getElementById('sp_loadMore');
+
+const geoStatus = document.getElementById('geoStatus');
+const toggleFiltersBtn = document.getElementById('toggleFilters');
+const advancedFilters = document.getElementById('advancedFilters');
+const filterIcon = document.getElementById('filterIcon');
+const quickSuggestions = document.getElementById('quickSuggestions');
+
+// Tabs
+const tabCarte = document.getElementById('tabCarte');
+const tabListe = document.getElementById('tabListe');
+const panelCarte = document.getElementById('panelCarte');
+const panelListe = document.getElementById('panelListe');
+
+// Map
+const mapContainer = document.getElementById('map');
+const recenterBtn = document.getElementById('recenterMap');
+
+// ===== STATE =====
+let userPos = null;
+let currentOffset = 0;
+let currentResults = [];
+let filtersVisible = false;
+let activeTab = 'carte';
+
+let map = null;
+let markersLayer = null;
+const SENEGAL_CENTER = [14.6928, -17.4467];
+
+// ===== UTILS =====
+function esc(s){
+  return String(s ?? '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'","&#039;");
+}
+
+function setStatus(txt, loading=false){
+  if(spStatus) spStatus.querySelector('span').textContent = txt;
+  if(spLoader) spLoader.style.display = loading ? 'block' : 'none';
+}
+
+function clearResults(){
+  if(spResults) spResults.innerHTML = '';
+  if(spEmpty) spEmpty.style.display = 'none';
+  if(spPagination) spPagination.style.display = 'none';
+  currentResults = [];
+  currentOffset = 0;
+  
+  if(markersLayer && map){
+    markersLayer.clearLayers();
+  }
+}
+
+function showEmpty(){
+  if(spEmpty) spEmpty.style.display = 'block';
+}
+
+// ===== GEOLOC =====
+function tryGetGeoloc(){
+  if(userPos) {
+    updateGeoStatus();
+    return Promise.resolve(userPos);
+  }
+  
+  if(!navigator.geolocation) {
+    updateGeoStatus('❌ Géoloc indispo');
+    return Promise.reject();
+  }
+
+  updateGeoStatus('📍 Localisation...');
+  
+  return new Promise((resolve, reject)=>{
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        userPos = { 
+          lat: pos.coords.latitude, 
+          lon: pos.coords.longitude 
+        };
+        updateGeoStatus(`📍 Position OK (±${Math.round(pos.coords.accuracy)}m)`);
+        
+        // Centrer carte sur user
+        if(map){
+          map.setView([userPos.lat, userPos.lon], 13);
+          
+          // Ajouter marker user
+          L.marker([userPos.lat, userPos.lon], {
+            icon: L.divIcon({
+              className: 'user-marker',
+              html: `<div style="
+                background:#22d3ee;
+                width:24px;
+                height:24px;
+                border-radius:50%;
+                border:3px solid #fff;
+                box-shadow:0 4px 12px rgba(34,211,238,0.6);
+              "></div>`,
+              iconSize: [24, 24],
+              iconAnchor: [12, 12]
+            })
+          }).addTo(markersLayer)
+            .bindPopup('<strong>📍 Vous êtes ici</strong>');
+        }
+        
+        resolve(userPos);
+      },
+      (err)=>{
+        updateGeoStatus('📍 Position refusée');
+        reject(err);
+      },
+      { 
+        enableHighAccuracy: false, 
+        timeout: 5000, 
+        maximumAge: 300000
+      }
+    );
+  });
+}
+
+function updateGeoStatus(msg){
+  if(!geoStatus) return;
+  if(msg){
+    geoStatus.textContent = msg;
+  }else if(userPos){
+    geoStatus.textContent = `📍 ${userPos.lat.toFixed(4)}, ${userPos.lon.toFixed(4)}`;
+  }else{
+    geoStatus.textContent = '';
+  }
+}
+
+// ===== MAP INIT =====
+function initMap(){
+  if(!mapContainer) return;
+  if(typeof L === 'undefined'){
+    console.error('Leaflet non chargé');
+    return;
+  }
+
+  map = L.map('map', {
+    center: SENEGAL_CENTER,
+    zoom: 8,
+    zoomControl: true,
+    scrollWheelZoom: true
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© DIGIY • OpenStreetMap',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Layer pour les markers
+  markersLayer = L.layerGroup().addTo(map);
+
+  console.log('✅ Carte initialisée');
+}
+
+// ===== RENDER MARKERS ON MAP =====
+function renderMarkersOnMap(results){
+  if(!map || !markersLayer) return;
+  
+  markersLayer.clearLayers();
+
+  if(!results || !results.length) return;
+
+  results.forEach(r => {
+    const lat = Number(r.lat);
+    const lon = Number(r.lon || r.lng || r.longitude);
+    
+    if(!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+    const name = r.business_name || r.full_name || 'Pro DIGIY';
+    const city = r.city || '';
+    const modules = Array.isArray(r.modules) ? r.modules : [];
+    
+    const isOnline = r.is_active !== false;
+    const markerColor = isOnline ? '#22c55e' : '#ef4444';
+
+    const icon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div style="
+        background:${markerColor};
+        width:32px;
+        height:32px;
+        border-radius:50%;
+        border:3px solid #fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:16px;
+        box-shadow:0 4px 14px rgba(0,0,0,0.4);
+        cursor:pointer;
+      ">${getModuleIcon(modules[0] || 'resto')}</div>`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 16]
+    });
+
+    const marker = L.marker([lat, lon], { icon }).addTo(markersLayer);
+    
+    marker.bindPopup(`
+      <div style="min-width:180px; text-align:center;">
+        <strong style="font-size:14px;">${esc(name)}</strong><br>
+        <span style="color:${markerColor}; font-weight:700;">
+          ${isOnline ? '🟢 En ligne' : '🔴 Hors ligne'}
+        </span><br>
+        ${city ? `<small>📍 ${esc(city)}</small><br>` : ''}
+        ${modules.slice(0,3).map(m => `<small>${getModuleIcon(m)} ${esc(m)}</small>`).join(' ')}<br>
+        <button onclick="viewProDetail('${r.id}')" style="
+          margin-top:8px;
+          padding:6px 14px;
+          border:none;
+          border-radius:999px;
+          background:#f97316;
+          color:#111827;
+          font-weight:900;
+          cursor:pointer;
+          font-size:12px;
+        ">Voir profil →</button>
+      </div>
+    `);
+  });
+
+  // Auto-fit bounds si résultats
+  if(results.length){
+    const bounds = [];
+    results.forEach(r => {
+      const lat = Number(r.lat);
+      const lon = Number(r.lon || r.lng || r.longitude);
+      if(Number.isFinite(lat) && Number.isFinite(lon)){
+        bounds.push([lat, lon]);
+      }
+    });
+    if(bounds.length){
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }
+}
+
+// Global function pour ouvrir profil depuis popup
+window.viewProDetail = function(id){
+  if(!id) return;
+  if(typeof window.openInside === 'function'){
+    window.openInside(`pro-detail.html?id=${encodeURIComponent(id)}`, '🦅 Profil PRO');
+  }else{
+    window.location.href = `pro-detail.html?id=${encodeURIComponent(id)}`;
+  }
+  closeModal();
+};
+
+// ===== RENDER RESULTS LIST =====
+function renderResultsList(rows){
+  if(!spResults) return;
+  
+  spResults.innerHTML = '';
+
+  if(!rows || !rows.length){
+    showEmpty();
+    return;
+  }
+
+  rows.forEach(r => {
+    const name = r.business_name || r.full_name || 'Sans nom';
+    const city = r.city || '';
+    const quartier = r.quartier || '';
+    const modules = Array.isArray(r.modules) ? r.modules : [];
+    const id = r.id;
+    
+    const dist = r.distance_km;
+    const score = r.relevance_score || 0;
+
+    const card = document.createElement('div');
+    card.className = 'digiy-result';
+    
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; gap:8px; margin-bottom:8px; align-items:flex-start;">
+        <div style="font-weight:950; font-size:1.05rem; color:#f9fafb;">${esc(name)}</div>
+        <div style="display:flex; gap:4px; flex-wrap:wrap; justify-content:flex-end;">
+          ${dist !== null && dist !== undefined ? `
+            <span class="digiy-result-badge badge-distance">📍 ${dist.toFixed(1)} km</span>
+          ` : ''}
+          ${score > 50 ? `
+            <span class="digiy-result-badge badge-score">⭐ ${score}</span>
+          ` : ''}
+        </div>
+      </div>
+
+      <div style="font-size:0.88rem; color:#cbd5e1; margin-bottom:10px;">
+        ${city ? '🏙️ '+esc(city) : ''}${quartier ? ' • 📍 '+esc(quartier) : ''}
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:6px;">
+        ${modules.slice(0,6).map(m => `
+          <span class="digiy-pill" style="font-size:0.7rem;">${getModuleIcon(m)} ${esc(m)}</span>
+        `).join('')}
+      </div>
+    `;
+
+    card.addEventListener('click', ()=>{
+      if(!id){ alert("ID manquant"); return; }
+      
+      // Zoomer sur la carte si marker existe
+      if(activeTab === 'liste'){
+        switchTab('carte');
+        setTimeout(()=>{
+          const lat = Number(r.lat);
+          const lon = Number(r.lon || r.lng);
+          if(map && Number.isFinite(lat) && Number.isFinite(lon)){
+            map.setView([lat, lon], 15);
+          }
+        }, 300);
+      }else{
+        if(typeof window.openInside === 'function'){
+          window.openInside(`pro-detail.html?id=${encodeURIComponent(id)}`, `🦅 ${name}`);
+        }else{
+          window.location.href = `pro-detail.html?id=${encodeURIComponent(id)}`;
+        }
+        closeModal();
+      }
+    });
+
+    spResults.appendChild(card);
+  });
+}
+
+function getModuleIcon(module){
+  const icons = {
+    'resto': '🍽️',
+    'loc': '🏠',
+    'chauffeur': '🚗',
+    'market': '🛍️',
+    'build': '🏗️',
+    'job': '💼',
+    'fret': '🚚',
+    'pay': '💳'
+  };
+  return icons[module] || '🦅';
+}
+
+// ===== TABS =====
+function switchTab(tab){
+  activeTab = tab;
+  
+  if(tab === 'carte'){
+    tabCarte?.classList.add('active');
+    tabListe?.classList.remove('active');
+    panelCarte?.classList.add('active');
+    panelListe?.classList.remove('active');
+    
+    // Refresh map
+    setTimeout(()=> map?.invalidateSize(), 100);
+  }else{
+    tabListe?.classList.add('active');
+    tabCarte?.classList.remove('active');
+    panelListe?.classList.add('active');
+    panelCarte?.classList.remove('active');
+  }
+}
+
+tabCarte?.addEventListener('click', ()=> switchTab('carte'));
+tabListe?.addEventListener('click', ()=> switchTab('liste'));
+
+// ===== SEARCH =====
+async function searchPros(loadMore = false){
+  
+  if(!loadMore){
+    clearResults();
+    currentOffset = 0;
+  }
+  
+  setStatus('Recherche...', true);
+
+  if(!globalThis.SB){
+    setStatus("Erreur: Supabase non prêt");
+    return;
+  }
+
+  const q = (spQ?.value || '').trim();
+  const zone = spZone?.value || '';
+  const city = (spCity?.value || '').trim();
+  const quartier = (spQuartier?.value || '').trim();
+  const mod = (spModule?.value || 'all');
+  const radius = parseInt(spRadius?.value || '25', 10);
+
+  // Si zone sélectionnée, zoomer sur la zone
+  if(zone && typeof ZONES_SENEGAL !== 'undefined' && map){
+    const zoneData = ZONES_SENEGAL[zone];
+    if(zoneData){
+      const locs = Object.values(zoneData.locations);
+      if(locs.length){
+        const bounds = locs.map(l => [l.lat, l.lng]);
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }
+  }
+
+  try{
+    const payload = {
+      p_q: q || null,
+      p_city: city || null,
+      p_quartier: quartier || null,
+      p_module: (mod && mod !== 'all') ? mod : null,
+      p_lat: userPos?.lat ?? null,
+      p_lon: userPos?.lon ?? null,
+      p_radius_km: radius,
+      p_limit: 50,
+      p_offset: currentOffset
+    };
+
+    const { data, error } = await SB.rpc('search_pros_v3', payload);
+    
+    if(error){
+      console.error('RPC error:', error);
+      
+      // Fallback: requête simple
+      let query = SB.from('pros_public').select('*').limit(50);
+      if(q) query = query.or(`business_name.ilike.%${q}%,full_name.ilike.%${q}%`);
+      if(city) query = query.eq('city', city);
+      if(mod && mod !== 'all') query = query.contains('modules', [mod]);
+      
+      const fallback = await query;
+      if(fallback.error){
+        setStatus('Erreur réseau');
+        return;
+      }
+      
+      currentResults = fallback.data || [];
+    }else{
+      currentResults = loadMore ? [...currentResults, ...(data || [])] : (data || []);
+      currentOffset += (data || []).length;
+    }
+
+    setStatus(`${currentResults.length} résultat(s)`, false);
+    
+    // Render sur les 2 panels
+    renderMarkersOnMap(currentResults);
+    renderResultsList(currentResults);
+
+    if(currentResults.length === 0 && !loadMore){
+      showEmpty();
+    }
+
+  }catch(e){
+    console.error('Search error:', e);
+    setStatus('Erreur');
+  }
+}
+
+// ===== SUGGESTIONS RAPIDES =====
+function generateQuickSuggestions(){
+  if(!quickSuggestions) return;
+  
+  const suggestions = [
+    { icon: '🏙️', text: 'Dakar', field: 'city' },
+    { icon: '🏖️', text: 'Saly', field: 'city' },
+    { icon: '📍', text: 'Plateau', field: 'quartier' },
+    { icon: '🚗', text: 'Chauffeur', field: 'module', value: 'chauffeur' },
+    { icon: '🍽️', text: 'Restaurant', field: 'module', value: 'resto' },
+    { icon: '📍', text: 'Autour de moi', field: 'geo' }
+  ];
+  
+  quickSuggestions.innerHTML = suggestions.map(s => `
+    <button class="quick-suggestion" data-field="${s.field}" data-value="${s.value || s.text}" type="button" style="
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.7);
+      color: #e5e7eb;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    ">
+      ${s.icon} ${s.text}
+    </button>
+  `).join('');
+  
+  quickSuggestions.querySelectorAll('.quick-suggestion').forEach(btn => {
+    btn.addEventListener('click', ()=>{
+      const field = btn.getAttribute('data-field');
+      const value = btn.getAttribute('data-value');
+      
+      if(field === 'city' && spCity) spCity.value = value;
+      else if(field === 'quartier' && spQuartier) spQuartier.value = value;
+      else if(field === 'module' && spModule) spModule.value = value;
+      else if(field === 'geo'){
+        tryGetGeoloc().then(()=> searchPros());
+        return;
+      }
+      
+      searchPros();
+    });
+    
+    btn.addEventListener('mouseenter', ()=>{
+      btn.style.borderColor = 'rgba(249,115,22,0.8)';
+      btn.style.background = 'rgba(249,115,22,0.15)';
+    });
+    
+    btn.addEventListener('mouseleave', ()=>{
+      btn.style.borderColor = 'rgba(148,163,184,0.5)';
+      btn.style.background = 'rgba(15,23,42,0.7)';
+    });
+  });
+}
+
+// ===== MODAL OPEN/CLOSE =====
+function openModal(){
+  if(!modal) return;
+  modal.style.display = 'block';
+  modal.setAttribute('aria-hidden','false');
+  clearResults();
+  setStatus('—');
+  generateQuickSuggestions();
+  
+  setTimeout(()=>{
+    spQ?.focus();
+    if(!map) initMap();
+    else map.invalidateSize();
+  }, 100);
+  
+  tryGetGeoloc().catch(()=>{});
+}
+
+function closeModal(){
+  if(!modal) return;
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+}
+
+openCard?.addEventListener('click', openModal);
+closeBtn?.addEventListener('click', closeModal);
+modal?.addEventListener('click', e => { if(e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && modal?.style.display === 'block') closeModal();
+});
+
+// ===== FILTERS TOGGLE =====
+toggleFiltersBtn?.addEventListener('click', ()=>{
+  filtersVisible = !filtersVisible;
+  if(advancedFilters) advancedFilters.style.display = filtersVisible ? 'block' : 'none';
+  if(filterIcon) filterIcon.textContent = filtersVisible ? '▲' : '▼';
+});
+
+// ===== RECENTER MAP =====
+recenterBtn?.addEventListener('click', ()=>{
+  if(userPos && map){
+    map.setView([userPos.lat, userPos.lon], 13);
+  }else if(map){
+    map.setView(SENEGAL_CENTER, 8);
+  }
+});
+
+// ===== EVENTS =====
+spBtn?.addEventListener('click', ()=> searchPros(false));
+spLoadMore?.addEventListener('click', ()=> searchPros(true));
+spQ?.addEventListener('keydown', e => { if(e.key === 'Enter') searchPros(false); });
+
+console.log('✅ Search PRO V3 avec carte interactive prêt');
+
+})();
+  </script>
+
+  <script>
+  // Boot safe
+  (function(){
+    var m = document.getElementById("searchProModal");
+    if(m) m.style.display = "none";
+  })();
+  </script>
+</body>
+</html>
