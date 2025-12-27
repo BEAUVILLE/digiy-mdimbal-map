@@ -1,12 +1,135 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="refresh" content="0; url=core.html">
-  <title>DIGIY — Redirect</title>
+<meta charset="utf-8">
+<title>DIGIY • NDIMBAL — Recherche PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0E1A">
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+/* ===============================
+   DIGIY GLOBAL STYLE
+================================ */
+:root{
+  --bg:#020617; --bg2:#0B1120;
+  --line:rgba(148,163,184,.25);
+  --text:#e5e7eb; --muted:#9ca3af;
+  --gold:#facc15; --orange:#f97316;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Manrope,system-ui;
+  color:var(--text);
+  background:linear-gradient(180deg,var(--bg),var(--bg2));
+}
+.wrap{max-width:1100px;margin:auto;padding:16px}
+.btn{
+  border:none; border-radius:14px;
+  padding:12px 16px;
+  font-weight:900;
+  cursor:pointer;
+}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#111;
+}
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:14px;
+}
+.logo{
+  width:42px;height:42px;border-radius:14px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  color:#111;font-weight:900;
+}
+
+/* ===============================
+   MODAL
+================================ */
+#searchProModal{
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:9999;
+}
+.modal-card{
+  max-width:1000px;
+  margin:40px auto;
+  background:#020617;
+  border-radius:24px;
+  padding:16px;
+  border:1px solid var(--line);
+}
+#map{height:420px;border-radius:16px}
+</style>
 </head>
+
 <body>
-  <p>Redirection… <a href="core.html">ouvrir core.html</a></p>
+<div class="wrap">
+
+<header>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="logo">♾️</div>
+    <strong>DIGIY • NDIMBAL</strong>
+  </div>
+  <button id="openSearchPro" class="btn btn-primary">🔎 Rechercher un PRO</button>
+</header>
+
+</div>
+
+<!-- ===============================
+     MODAL SEARCH PRO
+================================ -->
+<div id="searchProModal">
+  <div class="modal-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>🔎 Recherche PRO</strong>
+      <button id="closeSearchPro" class="btn">✖</button>
+    </div>
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+/* ===============================
+   JS SIMPLE – AUCUNE DEPENDANCE
+================================ */
+const modal = document.getElementById("searchProModal");
+document.getElementById("openSearchPro").onclick = () => {
+  modal.style.display = "block";
+  setTimeout(initMap,200);
+};
+document.getElementById("closeSearchPro").onclick = () => {
+  modal.style.display = "none";
+};
+
+let mapInit = false;
+function initMap(){
+  if(mapInit) return;
+  mapInit = true;
+  const map = L.map('map').setView([14.6928,-17.4467],12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© OpenStreetMap'
+  }).addTo(map);
+  L.marker([14.6928,-17.4467]).addTo(map)
+    .bindPopup("Dakar – NDIMBAL prêt");
+}
+</script>
+
 </body>
 </html>
