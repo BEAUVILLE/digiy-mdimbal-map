@@ -203,7 +203,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>🗂️ Catégories</h2>
-      <p style="font-size:.85rem; opacity:.9;">Clique pour filtrer</p>
+      <p style="font-size:.85rem; opacity:.9;">Clique pour filtrer (et ouvrir une fiche ✅)</p>
     </div>
 
     <div class="category-section">
@@ -373,7 +373,6 @@ function toggleSidebar(){
 }
 
 function goBackHub(){
-  // adapte si tu veux le retour exact
   window.location.href = "https://beauville.github.io/digiy-hub/";
 }
 
@@ -382,13 +381,11 @@ function goBackHub(){
 ================================ */
 async function loadProfessionals(){
   try{
-    const q = SB.from('professionals').select('*');
-
-    // tente is_active si existe, sinon ignore silencieusement
+    // ✅ On évite l'erreur "is_active does not exist" : on tente, sinon fallback
     let res;
     try{
-      res = await q.eq("is_active", true);
-      if(res.error && String(res.error.message||'').includes('is_active')) throw res.error;
+      res = await SB.from('professionals').select('*').eq("is_active", true);
+      if(res.error && String(res.error.message||'').toLowerCase().includes('is_active')) throw res.error;
     }catch(e){
       res = await SB.from('professionals').select('*');
     }
@@ -398,19 +395,46 @@ async function loadProfessionals(){
       console.warn("Supabase error => fallback demo:", error);
       allProfessionals = generateDemoData();
     }else{
-      allProfessionals = data || generateDemoData();
+      allProfessionals = Array.isArray(data) ? data : generateDemoData();
     }
+
+    // ✅ normalisation légère pour éviter filtres cassés (region/category)
+    allProfessionals = allProfessionals.map(normalizePro);
 
     filteredProfessionals = [...allProfessionals];
     displayMarkers(filteredProfessionals);
     updateCounts();
   }catch(err){
     console.warn("Load error => fallback demo:", err);
-    allProfessionals = generateDemoData();
+    allProfessionals = generateDemoData().map(normalizePro);
     filteredProfessionals = [...allProfessionals];
     displayMarkers(filteredProfessionals);
     updateCounts();
   }
+}
+
+function normalizePro(p){
+  const out = { ...(p||{}) };
+
+  // category / region en minuscule
+  if(out.category) out.category = String(out.category).toLowerCase().trim();
+  if(out.region) out.region = String(out.region).toLowerCase().trim();
+
+  // si pas de slug, on fabrique un slug simple
+  if(!out.slug && out.name){
+    out.slug = String(out.name)
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+      .replace(/[^a-z0-9]+/g,"-")
+      .replace(/^-+|-+$/g,"")
+      .slice(0,60);
+  }
+
+  // coords en float si besoin
+  if(out.latitude != null) out.latitude = Number(out.latitude);
+  if(out.longitude != null) out.longitude = Number(out.longitude);
+
+  return out;
 }
 
 /* ================================
@@ -449,11 +473,13 @@ function displayMarkers(pros){
   markerCluster.clearLayers();
 
   pros.forEach(pro=>{
-    if(!pro.latitude || !pro.longitude) return;
+    if(!pro || !pro.latitude || !pro.longitude) return;
+
+    const cat = (pro.category && categoryIcons[pro.category]) ? pro.category : 'commerce';
 
     const icon = L.divIcon({
       className:'custom-div-icon',
-      html:`<div class="custom-marker marker-${pro.category || 'commerce'}">${categoryIcons[pro.category] || '📍'}</div>`,
+      html:`<div class="custom-marker marker-${cat}">${categoryIcons[cat] || '📍'}</div>`,
       iconSize:[35,35],
       iconAnchor:[17,17]
     });
@@ -493,12 +519,12 @@ function filterProfessionals(){
   const term = document.getElementById('searchInput').value.toLowerCase().trim();
   let res = [...allProfessionals];
 
-  if(currentCategory !== 'all') res = res.filter(p => p.category === currentCategory);
-  if(currentRegion !== 'all') res = res.filter(p => p.region === currentRegion);
+  if(currentCategory !== 'all') res = res.filter(p => (p.category||'') === currentCategory);
+  if(currentRegion !== 'all') res = res.filter(p => (p.region||'') === currentRegion);
 
   if(term){
     res = res.filter(p => {
-      const t = (p.name||'')+' '+(p.city||'')+' '+(p.description||'')+' '+(p.slug||'');
+      const t = (p.name||'')+' '+(p.city||'')+' '+(p.description||'')+' '+(p.slug||'')+' '+(p.region||'')+' '+(p.category||'');
       return t.toLowerCase().includes(term);
     });
   }
@@ -508,16 +534,48 @@ function filterProfessionals(){
   updateCounts();
 }
 
+/* ✅ Compteurs sidebar */
 function updateCounts(){
   document.getElementById('totalPros').textContent = String(filteredProfessionals.length);
   document.getElementById('count-all').textContent = `${filteredProfessionals.length} résultats`;
 
   const cats = Object.keys(categoryIcons);
   cats.forEach(cat=>{
-    const c = filteredProfessionals.filter(p=>p.category===cat).length;
+    const c = filteredProfessionals.filter(p=>(p.category||'')===cat).length;
     const el = document.getElementById(`count-${cat}`);
     if(el) el.textContent = `${c} résultats`;
   });
+}
+
+/* ✅ MAGIC: ouvrir la 1ère fiche du filtre (catégorie ou région) */
+function openFirstResult(){
+  if(!filteredProfessionals || filteredProfessionals.length === 0) return;
+
+  // prend le 1er qui a coords (sinon juste modal)
+  const pro = filteredProfessionals.find(p => p.latitude && p.longitude) || filteredProfessionals[0];
+  if(!pro) return;
+
+  // zoom
+  if(pro.latitude && pro.longitude){
+    map.setView([pro.latitude, pro.longitude], 15);
+  }
+
+  // ouvre popup marker si possible
+  let targetMarker = null;
+  markerCluster.eachLayer(layer=>{
+    if(layer && (String(layer._digiy_pro_id) === String(pro.id) || layer._digiy_slug === pro.slug)) {
+      targetMarker = layer;
+    }
+  });
+
+  if(targetMarker){
+    markerCluster.zoomToShowLayer(targetMarker, ()=>{
+      targetMarker.openPopup();
+    });
+  }
+
+  // ouvre modal fiche
+  setTimeout(()=> openDetailsModal(String(pro.id)), 250);
 }
 
 /* ================================
@@ -528,6 +586,10 @@ function openDetailsModal(proId){
   if(!pro) return;
 
   const modalBody = document.getElementById('modalBody');
+
+  const phoneSafe = (pro.phone || "").toString().trim();
+  const wa = phoneToWhatsApp(phoneSafe);
+
   modalBody.innerHTML = `
     <h2>${escapeHTML(pro.name || "")}</h2>
     <p style="color:var(--secondary); margin-bottom: 1rem; font-weight:900;">${getCategoryLabel(pro.category)}</p>
@@ -536,7 +598,7 @@ function openDetailsModal(proId){
       <div class="info-card"><div class="info-label">♾️ Slug</div><div class="info-value">${escapeHTML(pro.slug || "N/A")}</div></div>
       <div class="info-card"><div class="info-label">📍 Localisation</div><div class="info-value">${escapeHTML(pro.city || "")}${pro.region? ", "+escapeHTML(getRegionLabel(pro.region)):""}</div></div>
       <div class="info-card"><div class="info-label">⭐ Note</div><div class="info-value">${escapeHTML(pro.rating || "5.0")} / 5</div></div>
-      <div class="info-card"><div class="info-label">📞 Téléphone</div><div class="info-value">${escapeHTML(pro.phone || "N/A")}</div></div>
+      <div class="info-card"><div class="info-label">📞 Téléphone</div><div class="info-value">${escapeHTML(phoneSafe || "N/A")}</div></div>
       <div class="info-card"><div class="info-label">📧 Email</div><div class="info-value">${escapeHTML(pro.email || "N/A")}</div></div>
       <div class="info-card"><div class="info-label">⏰ Horaires</div><div class="info-value">${escapeHTML(pro.hours || "N/A")}</div></div>
     </div>
@@ -549,15 +611,20 @@ function openDetailsModal(proId){
     <div style="margin-bottom:1.2rem;">
       <div style="color:var(--muted); font-size:.85rem; margin-bottom:.5rem;">🏷️ Services</div>
       <div style="display:flex; flex-wrap:wrap; gap:.5rem;">
-        ${(pro.services || []).map(s=>`<span style="background:rgba(78,205,196,.2); color:var(--secondary); padding:.4rem 1rem; border-radius:999px; font-size:.85rem; font-weight:800;">${escapeHTML(s)}</span>`).join('')}
+        ${(Array.isArray(pro.services) ? pro.services : []).map(s=>`<span style="background:rgba(78,205,196,.2); color:var(--secondary); padding:.4rem 1rem; border-radius:999px; font-size:.85rem; font-weight:800;">${escapeHTML(s)}</span>`).join('')}
       </div>
     </div>
 
-    <div style="display:flex; gap:1rem;">
-      <button onclick="contactPro('${String(pro.id)}')" style="flex:1; padding:1rem; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:900; cursor:pointer;">
-        📞 Contacter
+    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+      <button onclick="contactPro('${String(pro.id)}')" style="flex:1; min-width:180px; padding:1rem; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:900; cursor:pointer;">
+        📞 Appeler
       </button>
-      <button onclick="viewOnMap('${String(pro.id)}')" style="flex:1; padding:1rem; background:var(--secondary); color:var(--dark); border:none; border-radius:12px; font-weight:900; cursor:pointer;">
+
+      <button onclick="whatsappPro('${String(pro.id)}')" style="flex:1; min-width:180px; padding:1rem; background:#25D366; color:#062; border:none; border-radius:12px; font-weight:900; cursor:pointer;">
+        💬 WhatsApp
+      </button>
+
+      <button onclick="viewOnMap('${String(pro.id)}')" style="flex:1; min-width:180px; padding:1rem; background:var(--secondary); color:var(--dark); border:none; border-radius:12px; font-weight:900; cursor:pointer;">
         🗺️ Voir sur la carte
       </button>
     </div>
@@ -570,8 +637,26 @@ function closeModal(){ document.getElementById('detailsModal').style.display = '
 
 function contactPro(proId){
   const pro = allProfessionals.find(p => String(p.id) === String(proId));
-  if(!pro || !pro.phone) return alert("Numéro non disponible");
-  window.location.href = `tel:${pro.phone}`;
+  const phone = (pro?.phone || "").toString().trim();
+  if(!phone) return alert("Numéro non disponible");
+  window.location.href = `tel:${phone}`;
+}
+
+function whatsappPro(proId){
+  const pro = allProfessionals.find(p => String(p.id) === String(proId));
+  const phone = (pro?.phone || "").toString().trim();
+  const wa = phoneToWhatsApp(phone);
+  if(!wa) return alert("WhatsApp non disponible");
+  const msg = encodeURIComponent(`Salam ${pro?.name || ""} — DIGIYLYFE ♾️`);
+  window.open(`https://wa.me/${wa}?text=${msg}`, "_blank", "noopener");
+}
+
+function phoneToWhatsApp(phone){
+  // enlève espaces + + + tirets
+  const p = (phone || "").toString().replace(/[^\d]/g,'');
+  // si déjà en format 221xxxxxxx, ok
+  if(p.length >= 9) return p;
+  return "";
 }
 
 function viewOnMap(proId){
@@ -579,6 +664,17 @@ function viewOnMap(proId){
   if(!pro || !pro.latitude || !pro.longitude) return;
   closeModal();
   map.setView([pro.latitude, pro.longitude], 15);
+
+  // popup si trouvé
+  let targetMarker = null;
+  markerCluster.eachLayer(layer=>{
+    if(layer && (String(layer._digiy_pro_id) === String(pro.id) || layer._digiy_slug === pro.slug)) {
+      targetMarker = layer;
+    }
+  });
+  if(targetMarker){
+    markerCluster.zoomToShowLayer(targetMarker, ()=> targetMarker.openPopup());
+  }
 }
 
 /* ================================
@@ -588,7 +684,7 @@ async function focusBySlug(slug){
   // 1) trouver pro en mémoire
   let pro = allProfessionals.find(p => (p.slug||'') === slug);
 
-  // 2) si pas trouvé, requête Supabase directe (au cas où pas chargé via filtre)
+  // 2) si pas trouvé, requête Supabase directe
   if(!pro){
     const { data, error } = await SB
       .from("professionals")
@@ -599,9 +695,8 @@ async function focusBySlug(slug){
     if(error){
       console.warn("Slug fetch error:", error);
     }else{
-      pro = data || null;
+      pro = data ? normalizePro(data) : null;
       if(pro){
-        // on l'ajoute pour pouvoir ouvrir modal + popup
         allProfessionals.push(pro);
         filteredProfessionals = [...allProfessionals];
         displayMarkers(filteredProfessionals);
@@ -611,7 +706,6 @@ async function focusBySlug(slug){
   }
 
   if(!pro){
-    // fallback : message + focus Sénégal
     document.getElementById('searchInput').value = slug;
     filterProfessionals();
     alert("Pro introuvable via ce slug : " + slug);
@@ -635,8 +729,8 @@ async function focusBySlug(slug){
     });
   }
 
-  // 5) ouvrir modal auto après un mini délai (effet "fiche")
-  setTimeout(()=> openDetailsModal(String(pro.id)), 400);
+  // 5) ouvrir modal auto
+  setTimeout(()=> openDetailsModal(String(pro.id)), 350);
 }
 
 /* ================================
@@ -665,29 +759,48 @@ function escapeHTML(str){
 function setupEventListeners(){
   document.getElementById('searchInput').addEventListener('input', filterProfessionals);
 
+  // ✅ Catégories: filtre + ouvre une fiche (sauf "all")
   document.querySelectorAll('.category-item').forEach(item=>{
     item.addEventListener('click', ()=>{
       document.querySelectorAll('.category-item').forEach(i=>i.classList.remove('active'));
       item.classList.add('active');
       currentCategory = item.dataset.category;
+
       filterProfessionals();
+
+      if(currentCategory !== 'all'){
+        openFirstResult();
+      }
     });
   });
 
+  // ✅ Régions: filtre + ouvre une fiche (sauf "all")
   document.querySelectorAll('.region-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       document.querySelectorAll('.region-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
       currentRegion = btn.dataset.region;
+
       filterProfessionals();
+
+      if(currentRegion !== 'all'){
+        openFirstResult();
+      }
     });
   });
 
+  // ✅ clic dehors modal => ferme
   window.onclick = (event)=>{
     if(event.target && event.target.id === 'detailsModal') closeModal();
   };
+
+  // ✅ ESC pour fermer modal
+  window.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape') closeModal();
+  });
 }
 </script>
 
 </body>
 </html>
+
