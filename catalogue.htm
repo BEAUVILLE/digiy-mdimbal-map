@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DIGIYLYFE — Catalogue Local Premium (Sable & Or)</title>
+<style>
+  /* ============================================ */
+  /* 🎨 THÈME SABLE & OR — sobre, premium, lisible */
+  /* ============================================ */
+  :root{
+    --bg-1: #f7f3ea;            /* sable clair */
+    --bg-2: #efe7d6;            /* sable rosé */
+    --ink: #1f2937;             /* anthracite */
+    --muted: #6b7280;           /* gris doux */
+    --card: #ffffff;            /* fond carte */
+    --line: rgba(31,41,55,.08); /* bordure douce */
+    --shadow: 0 10px 30px rgba(0,0,0,.06);
+
+    /* Or DIGIY */
+    --gold-1: #d1b464;          /* or chaud */
+    --gold-2: #b89231;          /* or foncé */
+    --gold-3: #f3e6b3;          /* or clair */
+
+    --accent-cta-1: #b38728;    /* bouton gradient A */
+    --accent-cta-2: #f9d976;    /* bouton gradient B */
+
+    --radius-xl: 28px;
+    --radius-lg: 18px;
+
+    --topbar-h: 64px;
+  }
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0; padding: 20px; min-height: 100svh;
+    background: radial-gradient(1200px 600px at 10% 0%, var(--bg-2), transparent),
+                radial-gradient(1200px 600px at 100% 30%, var(--bg-1), transparent),
+                linear-gradient(180deg, var(--bg-1), #fbfaf7 40%, #ffffff 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ink:#f4f5f7;
+      --card:#0f141b;
+      --line: rgba(255,255,255,.10);
+      --bg-1:#0a0d12; --bg-2:#141922;
+      --muted:#a3aab6;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+    }
+    body{ background: linear-gradient(180deg, #0b0f15, #10161e 60%, #0b0f15); }
+  }
+
+  .digiy-wrap {
+    max-width: 1200px; margin: 0 auto; padding: 24px;
+    background: rgba(255,255,255,.85);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 60px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.6) inset;
+    position: relative; overflow: hidden;
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-wrap{
+      background: rgba(15,20,27,.86);
+      box-shadow: 0 24px 70px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset;
+    }
+  }
+
+  /* Filet or subtil */
+  .digiy-wrap::before{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(90deg, transparent 0%, rgba(209,180,100,.08) 50%, transparent 100%);
+    pointer-events:none;
+    mask: linear-gradient(90deg, transparent 0%, black 45%, black 55%, transparent 100%);
+  }
+
+  .digiy-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 22px; }
+
+  /* ============================================ */
+  /* 🧭 TOPBAR — Retour + Branding */
+  /* ============================================ */
+  .digiy-topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    position: sticky; top: 0; z-index: 20;
+    height: var(--topbar-h);
+    padding: 12px 18px;
+    margin: -24px -24px 12px;
+    width: calc(100% + 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    border-bottom: 1px solid var(--line);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-topbar{
+      background: linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.82));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+  }
+  .digiy-brand{
+    display:flex; align-items:center; gap:10px; min-width: 220px;
+  }
+  .digiy-inf{
+    font-weight: 900; font-size: 22px; line-height:1;
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+  }
+  .digiy-brand-title{
+    margin:0; font-size: 14px; font-weight: 900; letter-spacing:.2px;
+  }
+  .digiy-brand-sub{
+    margin:0; font-size: 12px; color: var(--muted); font-weight: 700;
+  }
+  .digiy-back{
+    text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 12px; border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.7);
+    color: var(--ink);
+    font-weight: 900; font-size: 13px;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    white-space: nowrap;
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-back{ background: rgba(255,255,255,.06); }
+  }
+  .digiy-back:hover{
+    transform: translateY(-1px);
+    border-color: rgba(209,180,100,.45);
+    box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  }
+
+  /* ============================================ */
+  /* 🎯 BARRE D'OUTILS — sobre premium */
+  /* ============================================ */
+  .digiy-toolbar{
+    display:flex; gap:12px;
+    position: sticky; top: var(--topbar-h); z-index: 19;
+    padding:14px 18px; margin:0 -24px 18px; width:calc(100% + 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-toolbar{ background: linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.82)); }
+  }
+  .digiy-toolbar input, .digiy-toolbar select{
+    flex:1; padding:11px 14px; font-size:14px; color:var(--ink);
+    background:#fff; border:1px solid var(--line); border-radius: 12px;
+    transition: box-shadow .2s ease, border-color .2s ease, transform .15s ease;
+  }
+  @media (prefers-color-scheme: dark){
+    .digiy-toolbar input, .digiy-toolbar select{
+      background: rgba(255,255,255,.06);
+      color: var(--ink);
+    }
+  }
+  .digiy-toolbar input:focus, .digiy-toolbar select:focus{
+    outline:none; border-color: var(--gold-1);
+    box-shadow: 0 0 0 3px rgba(209,180,100,.25);
+    transform: translateY(-1px);
+  }
+
+  .digiy-count{ margin: 10px 0 8px; font-weight:900; color:var(--muted); }
+
+  mark{ background: linear-gradient(120deg, var(--gold-3), #fde68a); border-radius:4px; padding: 0 4px; }
+
+  /* ============================================ */
+  /* 💳 CARTE PREMIUM SABLE & OR */
+  /* ============================================ */
+  .digiy-card{
+    display:flex; flex-direction:column; background:var(--card); border-radius: var(--radius-lg);
+    border: 1px solid var(--line); box-shadow: var(--shadow); position:relative; overflow:hidden;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    content-visibility: auto; contain-intrinsic-size: 320px 420px;
+  }
+  .digiy-card:hover{ transform: translateY(-5px); box-shadow: 0 18px 40px rgba(0,0,0,.10); border-color: rgba(209,180,100,.45); }
+  .digiy-card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .2s ease;
+    background: radial-gradient(400px 120px at 80% 0%, rgba(209,180,100,.18), transparent 60%);
+  }
+  .digiy-card:hover::after{ opacity:1; }
+
+  .digiy-thumb{ height:220px; position:relative; overflow:hidden; background: linear-gradient(135deg, #c8b27a, #e9d9a4); }
+  .digiy-thumb img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease; }
+  .digiy-card:hover .digiy-thumb img{ transform: scale(1.05); }
+
+  /* Recentrage haut pour mieux libérer le texte/CTA */
+  #lamine .digiy-thumb img,
+  #michel .digiy-thumb img,
+  #daouda-old .digiy-thumb img,
+  #astou .digiy-thumb img{ object-position: center top; }
+
+  .digiy-badge{
+    position:absolute; top:12px; right:12px; z-index:2;
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2)); color:#111; border-radius:10px; font-size:11px; font-weight:900; padding:6px 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35) inset;
+  }
+
+  .digiy-body{ padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .digiy-title{ margin:0; font-size:18px; font-weight:900; color:var(--ink); letter-spacing:.2px; }
+  .digiy-meta{ margin:0; font-size:13px; color:var(--muted); font-weight:700; }
+  .digiy-desc{ margin:0; font-size:13px; color:#4b5563; }
+  @media (prefers-color-scheme: dark){ .digiy-desc{ color:#cbd5e1; } }
+  .digiy-price{ margin:6px 0 10px; font-weight:900; font-size:17px; color:var(--ink); }
+
+  .digiy-footer{ border-top:1px solid var(--line); padding-top:10px; margin-top:auto; }
+  .digiy-cta{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  .digiy-btn{
+    flex:1; text-align:center; text-decoration:none; font-weight:900; font-size:13px;
+    padding:10px 14px; border-radius:12px; color:#111; position:relative; overflow:hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+    user-select:none;
+  }
+  .digiy-btn:focus{ outline:3px solid rgba(209,180,100,.35); outline-offset:2px; }
+  .digiy-btn::before{
+    content:""; position:absolute; top:50%; left:50%; width:0; height:0; border-radius:50%;
+    background: rgba(255,255,255,.4); transform: translate(-50%,-50%); transition: width .35s, height .35s;
+  }
+  .digiy-btn:hover::before{ width:260px; height:260px; }
+  .digiy-btn:hover{ transform: translateY(-1px); }
+
+  .digiy-btn.view{ color:#111; background: linear-gradient(135deg, var(--accent-cta-2), var(--accent-cta-1)); box-shadow: 0 6px 16px rgba(179,135,40,.28); }
+  .digiy-btn.whatsapp{ color:#fff; background: linear-gradient(135deg, #35d07f, #0d9f54); box-shadow: 0 6px 16px rgba(13,159,84,.28); }
+
+  /* ============================================ */
+  /* 📱 MOBILE – Texte toujours lisible */
+  /* ============================================ */
+  @media (max-width: 640px){
+    body{ padding:10px; }
+    .digiy-wrap{ padding:14px; border-radius: 20px; }
+
+    .digiy-topbar{
+      margin:-14px -14px 10px; width: calc(100% + 28px);
+      padding:10px 12px; height: 58px;
+    }
+    :root{ --topbar-h: 58px; }
+
+    .digiy-toolbar{
+      flex-direction:column; padding:12px; margin:0 -14px 14px; width:calc(100% + 28px);
+    }
+    .digiy-brand{ min-width: 0; }
+    .digiy-brand-title{ font-size: 13px; }
+    .digiy-back{ padding:8px 10px; font-size:12px; }
+
+    .digiy-card{ display:grid; grid-template-columns: 1fr; grid-template-rows: 110px; border-radius:16px; }
+    .digiy-thumb{ grid-column:1 / -1; height:100%; width:100%; }
+
+    .digiy-body{
+      grid-column:1 / -1; grid-row:1 / -1;
+      background: linear-gradient(to right, rgba(255,255,255,0) 88px, rgba(255,255,255,.96) 110px, #fff 128px);
+      border-radius: 0 16px 16px 0;
+      padding:6px 8px 6px 114px;
+    }
+    @media (prefers-color-scheme: dark){
+      .digiy-body{
+        background: linear-gradient(to right, rgba(15,20,27,0) 88px, rgba(15,20,27,.92) 110px, rgba(15,20,27,.98) 128px);
+      }
+    }
+
+    .digiy-title{ font-size:14px; line-height:1.12; }
+    .digiy-meta{ display:none !important; }
+    .digiy-desc{ font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .digiy-price{ font-size:13px; margin:2px 0 4px; }
+
+    .digiy-footer{ border-top:none; padding-top:0; }
+    .digiy-cta{ gap:6px; }
+    .digiy-btn{ padding:6px 8px; font-size:11px; flex:0 0 auto; width:auto; }
+
+    .digiy-badge{ top:6px; right:8px; font-size:10px; padding:4px 7px; }
+  }
+
+  /* ============================================ */
+  /* 🚫 ÉTAT VIDE */
+  /* ============================================ */
+  .empty-state-box {
+    text-align:center; padding:56px 18px;
+    background: rgba(255,255,255,.6);
+    border-radius: 18px;
+    border: 2px dashed rgba(31,41,55,.12);
+    margin: 18px 0;
+  }
+  @media (prefers-color-scheme: dark){
+    .empty-state-box{ background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); }
+  }
+  .empty-state-box p:first-child{ font-size:18px; font-weight:900; margin:0 0 8px; }
+  .empty-state-box p:last-child{ font-size:14px; color:var(--muted); margin:0; }
+</style>
+</head>
+<body>
+
+<section class="digiy-wrap" aria-label="Partenaires DIGIYLYFE — catalogue">
+
+  <!-- 🧭 TOPBAR -->
+  <div class="digiy-topbar" role="region" aria-label="Navigation catalogue">
+    <div class="digiy-brand">
+      <div class="digiy-inf">∞</div>
+      <div>
+        <p class="digiy-brand-title">DIGIYLYFE — Catalogue local</p>
+        <p class="digiy-brand-sub">0% commission • contact direct • terrain</p>
+      </div>
+    </div>
+
+    <!-- 🔁 Mets ici ton URL Hub si tu veux -->
+    <a class="digiy-back" href="https://beauville.github.io/digiy-hub/" rel="noopener">
+      ← Retour DIGIY HUB
+    </a>
+  </div>
+
+  <div class="digiy-toolbar" role="region" aria-label="Filtres catalogue">
+    <input id="q-search" type="search" placeholder="🔍 Rechercher (Saly, chauffeur, villa...)" aria-label="Recherche partenaires" autocomplete="off" inputmode="search" />
+    <select id="cat-filter" aria-label="Filtrer par catégorie">
+      <option value="all">🌟 Toutes catégories</option>
+      <option value="hebergement">🏨 Hébergement</option>
+      <option value="market">🛒 Market & Style</option>
+      <option value="driver">🚗 Driver</option>
+      <option value="construction">🏗️ Bâtisseur</option>
+      <option value="explore">🌴 Explore</option>
+    </select>
+  </div>
+
+  <p id="count" class="digiy-count" aria-live="polite">—</p>
+
+  <div class="digiy-row" id="cards-container">
+    <!-- === Cartes (mêmes contenus, habillage premium) === -->
+    <article class="digiy-card is-heberg" data-cat="hebergement" data-keywords="sarlat dordogne france chambre privee" id="baptiste-sarlat">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">⏳ Plus que 1 dispo</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/09/IMG_0918-e1760705584582.png" alt="Chez Baptiste — Sarlat-la-Canéda" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">🏡 Chez Baptiste</h3>
+        <p class="digiy-meta">📍 Sarlat-la-Canéda (Dordogne)</p>
+        <p class="digiy-desc">Chambre privée • 1 lit</p>
+        <div class="digiy-footer">
+          <p class="digiy-price">💶 <strong>75 € / nuit</strong></p>
+          <div class="digiy-cta">
+            <a class="digiy-btn view" href="https://digiylyfe.com/page-partenaire-baptiste-sarlat/" target="_blank" rel="noopener">📲 Voir & réserver</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-driver" data-cat="driver" data-keywords="chauffeur taxi transport aibd dakar" id="lamine">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">⏳ 1 chauffeur dispo aujourd'hui</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/05/CHAUFFEUR-LAMINE-1-e1757908803734.webp" alt="Lamine — chauffeur privé" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">🚗 Lamine</h3>
+        <p class="digiy-meta">📍 Saly – Thiès – Dakar</p>
+        <p class="digiy-desc">Transferts AIBD et circuits</p>
+        <div class="digiy-footer">
+          <p class="digiy-price">💰 <strong>Sur demande</strong></p>
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE%20(j'aimerais%20réserver%20un%20trajet)" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/partenaires-lamine/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-heberg" data-cat="hebergement" data-keywords="saly appartement meuble 2 chambres cuisine" id="baptiste-saly">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">⏳ 1 hébergement libre</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png" alt="Chez Baptiste — Saly" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">🏝️ Chez Baptiste — Saly</h3>
+        <p class="digiy-meta">📍 Saly, Sénégal</p>
+        <p class="digiy-desc">Appartement meublé — 2 chambres, salon, cuisine</p>
+        <div class="digiy-footer">
+          <p class="digiy-price">💰 <strong>30 000 FCFA / nuit</strong></p>
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221771342889?text=Salam%20je%20veux%20réserver%20Chez%20Baptiste%20Saly%20🙏" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/partenaires-chez-baptiste/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-market is-style" data-cat="market" data-keywords="styliste couture robes personnalisees vetements" id="michel">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">✨ Atelier ouvert</div>
+        <img width="800" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/07/robe-senegalaise.gif" alt="Michel — styliste robes personnalisées" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">✂️ Michel</h3>
+        <p class="digiy-meta">📍 Saly – Thiès</p>
+        <p class="digiy-desc">Styliste — robes personnalisées</p>
+        <div class="digiy-footer">
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE%20je%20veux%20une%20création%20👗" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/page-partenaire-michel/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-constr" data-cat="construction" data-keywords="batisseur villa piscine travaux" id="mbaye">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">🏗️ 1 visite chantier</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/06/mbaye-diouf.jpeg" alt="Mbaye Diouf — Bâtisseur villas et piscines" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">👷 Mbaye Diouf</h3>
+        <p class="digiy-meta">📍 Dakar – Thiès – Petite Côte</p>
+        <p class="digiy-desc">Villas modernes, piscines, finitions pro</p>
+        <div class="digiy-footer">
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221776427113?text=Salam%20Mbaye%20je%20veux%20parler%20d%E2%80%99un%20projet%20🏗️%20(DIGIYLYFE)" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/partenaires-mbaye/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-constr" data-cat="construction" data-keywords="electricien electricite maison depannage" id="zal">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">⚡ Intervention rapide</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/06/039-ZAL.png" alt="Zal &amp; Kourant — électriciens" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">⚡ Zal &amp; Kourant</h3>
+        <p class="digiy-meta">📍 Saly — Sénégal</p>
+        <p class="digiy-desc">Électriciens maison &amp; bâtiment — neuf &amp; ancien</p>
+        <div class="digiy-footer">
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221772084781?text=Salam%20Zal%20je%20viens%20de%20DIGIYLYFE" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/partenaires-zal-kourant/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-constr" data-cat="construction" data-keywords="plombier plomberie dépannage fuite robinet wc douche chauffe eau installation canalisation" id="helage">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">🛠️ Intervention rapide</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/06/HELAGE-PLOMBIER.png" alt="Helage — Plombier" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">💧 Helage</h3>
+        <p class="digiy-meta">📍 Saly – Petite Côte</p>
+        <p class="digiy-desc">Plombier multi-services — dépannage, installation</p>
+        <div class="digiy-footer">
+          <p class="digiy-price">💰 <strong>Sur demande / devis</strong></p>
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221774513523?text=Salam%20Helage%2C%20je%20viens%20de%20DIGIYLYFE" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="tel:+221774513523">📞 Appeler</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-market" data-cat="market" data-keywords="linge maison couture sur mesure serviette torchon drap housse rideaux voilage literie" id="astou">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">🛍️ Promo locale</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/06/ASTOU-BOUTIK.png" alt="Astou — linge de maison" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">🧵 Astou</h3>
+        <p class="digiy-meta">📍 Saly — Sénégal</p>
+        <p class="digiy-desc">Linge de maison &amp; couture sur mesure</p>
+        <div class="digiy-footer">
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221778765785?text=Salam%20Astou%20je%20viens%20de%20DIGIYLYFE" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/partenaires-astou/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-explore" data-cat="explore" data-keywords="guide touristique circuit marché" id="daouda-old">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">🌴 Circuit dispo</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/06/036-DAOUDA-VOYAGE.png" alt="Daouda — circuits" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">🌴 Daouda Explore</h3>
+        <p class="digiy-meta">📍 Saly — Sénégal</p>
+        <p class="digiy-desc">Guide local — circuits authentiques</p>
+        <div class="digiy-footer">
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE%20circuit%20🌴" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/partenaires-daouda/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="digiy-card is-market" data-cat="market" data-keywords="sacs montres accessoires maroquinerie" id="tonton-elhadji">
+      <div class="digiy-thumb">
+        <div class="digiy-badge">🎒 Stock limité</div>
+        <img width="1200" height="800" src="https://digiylyfe.com/wp-content/uploads/2025/10/Gemini_Generated_Image_76q1ic76q1ic76q1.png" alt="Tonton Elhadji — sacs et montres" loading="lazy" decoding="async" />
+      </div>
+      <div class="digiy-body">
+        <h3 class="digiy-title">👜 Tonton Elhadji</h3>
+        <p class="digiy-meta">📍 Saly — Sénégal</p>
+        <p class="digiy-desc">Sélection sacs &amp; montres — qualité</p>
+        <div class="digiy-footer">
+          <div class="digiy-cta">
+            <a class="digiy-btn whatsapp" href="https://wa.me/221778329612?text=Salam%20Tonton%20DIGIYLYFE%20👜" target="_blank" rel="noopener">💬 WhatsApp</a>
+            <a class="digiy-btn view" href="https://digiylyfe.com/partenaire-tonton-elhadji/" target="_blank" rel="noopener">🔎 Voir</a>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div id="empty-state" class="empty-state-box" hidden>
+    <p>😕 Oups ! Aucun partenaire trouvé.</p>
+    <p>Vérifiez l'orthographe ou choisissez “Toutes catégories”.</p>
+  </div>
+</section>
+
+<script>
+// ============================================
+// JS: recherche accent-insensible + tri score + highlight SAFE
+// ============================================
+document.addEventListener('DOMContentLoaded', () => {
+  const $  = (s, p=document) => p.querySelector(s);
+  const $$ = (s, p=document) => Array.from(p.querySelectorAll(s));
+
+  const searchInput  = $('#q-search');
+  const filterSelect = $('#cat-filter');
+  const container    = $('#cards-container');
+  const countDisplay = $('#count');
+  const emptyState   = $('#empty-state');
+  const allCards     = $$('.digiy-card');
+
+  // compteur initial basé sur le DOM réel
+  function setCount(n){
+    countDisplay.textContent = `${n} partenaire${n>1?'s':''} trouvé${n>1?'s':''}`;
+  }
+
+  const fold = (s) => (s || '')
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+  const tokenize = (s) => fold(s).split(/\s+/).filter(t => t.length > 1);
+  const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  // ✅ highlight "safe" : on ne touche qu'au texte, jamais aux balises
+  function safeHighlight(el, terms){
+    if(!el) return;
+    // reset = texte brut actuel (pas de tags internes)
+    const raw = el.textContent;
+    if(!terms.length){ el.textContent = raw; return; }
+
+    const escaped = terms.map(escapeRegex).filter(Boolean);
+    if(!escaped.length){ el.textContent = raw; return; }
+
+    const rx = new RegExp('(' + escaped.join('|') + ')', 'gi');
+    const parts = raw.split(rx);
+
+    el.innerHTML = '';
+    for(const part of parts){
+      if(!part) continue;
+      if(rx.test(part)){
+        const m = document.createElement('mark');
+        m.textContent = part;
+        el.appendChild(m);
+      }else{
+        el.appendChild(document.createTextNode(part));
+      }
+    }
+  }
+
+  // index texte pour tri/filtre rapide
+  const index = allCards.map(card => {
+    const titleEl = card.querySelector('.digiy-title');
+    const descEl  = card.querySelector('.digiy-desc');
+    const metaEl  = card.querySelector('.digiy-meta');
+
+    const rawText = (titleEl?.textContent||'')+' '+(metaEl?.textContent||'')+' '+(descEl?.textContent||'')+' '+(card.dataset.keywords||'');
+    return {
+      card,
+      category: card.dataset.cat || 'all',
+      foldedText: fold(rawText),
+      titleEl,
+      descEl,
+      titleRaw: titleEl?.textContent || '',
+      descRaw: descEl?.textContent || ''
+    };
+  });
+
+  let timeoutId;
+
+  function updateFilter(){
+    const query = searchInput.value.trim();
+    const category = filterSelect.value;
+    const terms = tokenize(query);
+
+    let visibleCount = 0;
+    const results = [];
+
+    index.forEach(item => {
+      const { card } = item;
+      let score = 0;
+      let ok = true;
+
+      if(category !== 'all' && item.category !== category) ok = false;
+
+      if(terms.length && ok){
+        ok = terms.every(t => {
+          const hit = item.foldedText.includes(t);
+          if(hit) score++;
+          return hit;
+        });
+      }
+
+      card.style.display = 'none';
+
+      // reset texte (avant highlight)
+      if(item.titleEl) item.titleEl.textContent = item.titleRaw;
+      if(item.descEl)  item.descEl.textContent  = item.descRaw;
+
+      if(ok){
+        visibleCount++;
+        results.push({ item, score });
+      }
+    });
+
+    if(terms.length) results.sort((a,b)=> b.score - a.score);
+
+    const frag = document.createDocumentFragment();
+
+    results.forEach(({ item }) => {
+      const card = item.card;
+
+      card.style.display = (window.innerWidth <= 640) ? 'grid' : 'flex';
+      frag.appendChild(card);
+
+      // highlight : on prend les vrais mots tapés (sans filtre longueur >1 dans tokenize)
+      const searchTerms = query.split(/\s+/).filter(t => t.length > 1);
+      safeHighlight(item.titleEl, searchTerms);
+      safeHighlight(item.descEl,  searchTerms);
+    });
+
+    container.appendChild(frag);
+
+    setCount(visibleCount);
+    emptyState.hidden = visibleCount > 0;
+  }
+
+  const debounced = () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(updateFilter, 70);
+  };
+
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      $$('.digiy-card').forEach(c => c.style.display = (window.innerWidth <= 640) ? 'grid' : 'flex');
+      updateFilter();
+    }, 120);
+  }, { passive:true });
+
+  searchInput.addEventListener('input', debounced);
+  searchInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); updateFilter(); } });
+  filterSelect.addEventListener('change', updateFilter);
+
+  // init
+  setCount(allCards.length);
+  updateFilter();
+});
+</script>
+
+</body>
+</html>
