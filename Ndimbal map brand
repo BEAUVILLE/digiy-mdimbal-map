@@ -1,0 +1,520 @@
+# 🎨 NDIMBAL MAP — IDENTITÉ VISUELLE
+
+**Charte graphique & assets**
+
+---
+
+## 🎯 LOGO PRINCIPAL
+
+### **Concept**
+
+```
+┌────────────────────────────────────────┐
+│                                        │
+│         🗺️  ♾️                        │
+│                                        │
+│       NDIMBAL MAP                      │
+│                                        │
+│   Trouve ton pro près de toi          │
+│                                        │
+└────────────────────────────────────────┘
+
+Éléments :
+- Icône carte (🗺️) = Navigation/géolocalisation
+- Symbole infini (♾️) = Entraide sans fin, DIGIY
+- Texte NDIMBAL MAP = Nom clair
+- Baseline = Promesse client
+```
+
+### **Versions du logo**
+
+```
+1. LOGO COMPLET (header, landing)
+   🗺️ ♾️ NDIMBAL MAP
+   Trouve ton pro près de toi
+
+2. LOGO COMPACT (mobile, favicon)
+   🗺️ ♾️
+   NDIMBAL
+
+3. ICÔNE APP (favicon, PWA)
+   🗺️
+   ♾️
+
+4. MONOCHROME (impression)
+   [🗺️] NDIMBAL MAP
+```
+
+---
+
+## 🎨 PALETTE COULEURS
+
+### **Couleurs principales**
+
+```css
+/* Orange — Action, énergie */
+--ndimbal-orange: #f97316;
+--ndimbal-orange-light: #fb923c;
+--ndimbal-orange-dark: #ea580c;
+
+/* Cyan — Digital, innovation */
+--ndimbal-cyan: #22d3ee;
+--ndimbal-cyan-light: #67e8f9;
+--ndimbal-cyan-dark: #06b6d4;
+
+/* Or — Valeur, premium */
+--ndimbal-gold: #facc15;
+--ndimbal-gold-light: #fde68a;
+--ndimbal-gold-dark: #eab308;
+```
+
+### **Couleurs secondaires**
+
+```css
+/* Vert — Succès, validation */
+--ndimbal-green: #22c55e;
+--ndimbal-green-light: #86efac;
+
+/* Rouge — Urgence, alerte */
+--ndimbal-red: #ef4444;
+--ndimbal-red-light: #fca5a5;
+
+/* Gris — Neutre */
+--ndimbal-gray-50: #f9fafb;
+--ndimbal-gray-100: #f3f4f6;
+--ndimbal-gray-200: #e5e7eb;
+--ndimbal-gray-500: #6b7280;
+--ndimbal-gray-800: #1f2937;
+--ndimbal-gray-900: #111827;
+
+/* Fond sombre */
+--ndimbal-dark: #020617;
+--ndimbal-dark-soft: #0f172a;
+```
+
+---
+
+## 🖋️ TYPOGRAPHIE
+
+### **Fonts**
+
+```css
+/* Headlines & Titres */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+font-family: 'Outfit', sans-serif;
+font-weight: 900; /* Extra Bold pour impact */
+letter-spacing: 0.05em; /* Espacement pour lisibilité */
+
+/* Corps de texte */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+font-family: 'Manrope', sans-serif;
+font-weight: 400-700;
+line-height: 1.6; /* Confort de lecture */
+```
+
+### **Hiérarchie typographique**
+
+```css
+/* H1 — Hero title */
+font-size: 3.5rem;     /* 56px */
+font-weight: 900;
+line-height: 1.1;
+
+/* H2 — Section title */
+font-size: 2.25rem;    /* 36px */
+font-weight: 900;
+line-height: 1.2;
+
+/* H3 — Subsection */
+font-size: 1.5rem;     /* 24px */
+font-weight: 800;
+
+/* Body Large */
+font-size: 1.125rem;   /* 18px */
+font-weight: 600;
+
+/* Body Regular */
+font-size: 1rem;       /* 16px */
+font-weight: 400;
+
+/* Small */
+font-size: 0.875rem;   /* 14px */
+font-weight: 600;
+```
+
+---
+
+## 🎭 COMPOSANTS UI
+
+### **Boutons**
+
+```css
+/* Bouton Primary (CTA principal) */
+.btn-primary {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: #111827;
+  font-weight: 900;
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  box-shadow: 0 14px 40px rgba(249,115,22,0.75);
+}
+
+/* Bouton Secondary */
+.btn-secondary {
+  background: rgba(15,23,42,0.98);
+  color: #f9fafb;
+  border: 1px solid rgba(148,163,184,0.7);
+  font-weight: 800;
+}
+
+/* Bouton Gold (Premium) */
+.btn-gold {
+  background: linear-gradient(135deg, #facc15, #fde68a);
+  color: #111827;
+  font-weight: 950;
+  box-shadow: 0 10px 30px rgba(250,204,21,0.6);
+}
+```
+
+### **Cards**
+
+```css
+.card {
+  background: rgba(11,17,32,0.98);
+  border: 1px solid rgba(148,163,184,0.50);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 16px 52px rgba(0,0,0,0.9);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(249,115,22,0.95);
+  box-shadow: 0 20px 60px rgba(249,115,22,0.4);
+}
+```
+
+### **Badges**
+
+```css
+/* Badge Success (En ligne) */
+.badge-success {
+  background: rgba(34,197,94,0.18);
+  border: 1px solid #22c55e;
+  color: #dcfce7;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+/* Badge Distance */
+.badge-distance {
+  background: rgba(34,211,238,0.15);
+  border: 1px solid #22d3ee;
+  color: #67e8f9;
+}
+
+/* Badge Score */
+.badge-score {
+  background: rgba(250,204,21,0.15);
+  border: 1px solid #facc15;
+  color: #fef08a;
+}
+```
+
+---
+
+## 📱 ICÔNES
+
+### **Système d'icônes**
+
+```
+🗺️  Carte / Navigation
+♾️  Infini / DIGIY / Entraide
+📍  Localisation / Point GPS
+🔍  Recherche
+🎯  Ciblage / Précision
+📊  Stats / Analytics
+💳  Paiement
+🦅  Aigle / Excellence
+🇸🇳  Sénégal / Local
+🔥  Populaire / Tendance
+⭐  Note / Qualité
+✅  Validé / Certifié
+🚗  Chauffeur / Transport
+🍽️  Restaurant
+🏠  Logement
+🛍️  Boutique / Market
+🏗️  Artisan / Build
+💼  Jobs / Emploi
+🚚  Fret / Livraison
+💬  Chat / Message
+📞  Appel / Contact
+```
+
+---
+
+## 🖼️ IMAGES & ILLUSTRATIONS
+
+### **Style photographique**
+
+```
+GUIDELINES :
+✓ Lumière naturelle
+✓ Couleurs vibrantes (orange, cyan)
+✓ Personnes souriantes
+✓ Contexte sénégalais authentique
+✓ Action (pas statique)
+
+SUJETS PRIORITAIRES :
+- Professionnels au travail
+- Quartiers de Dakar/Thiès
+- Clients satisfaits
+- Technologie mobile
+- Paysages urbains Sénégal
+```
+
+### **Illustrations**
+
+```
+STYLE :
+- Flat design moderne
+- Couleurs NDIMBAL (orange, cyan, gold)
+- Simplicité
+- Optimisme
+
+CONCEPTS :
+- Carte avec markers
+- Smartphone avec app
+- Pros + clients qui se connectent
+- Flèches d'entraide (pas extraction)
+```
+
+---
+
+## 🎬 ANIMATIONS
+
+### **Micro-interactions**
+
+```css
+/* Hover cards */
+@keyframes cardHover {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
+}
+
+/* Pulse CTA */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.97); }
+}
+
+/* Blink urgence */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Slide in */
+@keyframes slideInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(32px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+```
+
+---
+
+## 📐 GRILLE & ESPACEMENT
+
+### **Grid system**
+
+```css
+/* Container principal */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Grid responsive */
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* 1 colonne mobile */
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+/* 2 colonnes tablet */
+@media (min-width: 768px) {
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 3 colonnes desktop */
+@media (min-width: 1024px) {
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+}
+```
+
+### **Spacing scale**
+
+```css
+--space-xs: 0.25rem;   /* 4px */
+--space-sm: 0.5rem;    /* 8px */
+--space-md: 1rem;      /* 16px */
+--space-lg: 1.5rem;    /* 24px */
+--space-xl: 2rem;      /* 32px */
+--space-2xl: 3rem;     /* 48px */
+--space-3xl: 4rem;     /* 64px */
+```
+
+---
+
+## 🌐 COMPOSANTS SPÉCIFIQUES
+
+### **Marker carte**
+
+```html
+<!-- Marker PRO en ligne -->
+<div class="map-marker map-marker-online">
+  🍽️
+</div>
+
+<style>
+.map-marker {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 3px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.map-marker:hover {
+  transform: scale(1.15);
+}
+
+.map-marker-offline {
+  background: #ef4444;
+}
+</style>
+```
+
+### **Popup carte**
+
+```html
+<div class="map-popup">
+  <div class="map-popup-header">
+    <strong>Chez Fatou</strong>
+    <span class="badge-success">🟢 En ligne</span>
+  </div>
+  <div class="map-popup-body">
+    📍 Plateau, Dakar<br>
+    🍽️ Restaurant<br>
+    📞 77 123 45 67
+  </div>
+  <button class="btn-primary btn-sm">
+    Voir profil →
+  </button>
+</div>
+```
+
+---
+
+## 📱 APP ICON
+
+### **Design**
+
+```
+┌──────────────┐
+│              │
+│   🗺️        │  ← Carte stylisée
+│      ♾️     │  ← Symbole infini overlay
+│              │
+│  NDIMBAL     │  ← Nom (optionnel selon taille)
+│              │
+└──────────────┘
+
+Couleurs :
+- Background : Dégradé orange → cyan
+- Carte : Blanc
+- Infini : Or
+```
+
+### **Tailles requises**
+
+```
+Favicon : 16x16, 32x32
+Apple Touch : 180x180
+Android : 192x192, 512x512
+PWA : 192x192, 512x512
+```
+
+---
+
+## 🎯 EXEMPLES D'APPLICATION
+
+### **Page d'accueil**
+
+```
+HEADER :
+- Logo NDIMBAL MAP (gauche)
+- Menu (droite) : Rechercher | Devenir PRO | Se connecter
+
+HERO :
+- Titre : "Trouve ton pro près de toi"
+- Subtitle : "0% commission • Paiement direct"
+- CTA : "Rechercher maintenant →"
+- Illustration : Carte Sénégal avec markers animés
+
+FEATURES :
+- 3 colonnes : Recherche GPS | 0% Commission | Pros vérifiés
+
+CARTE INTERACTIVE :
+- Fullwidth
+- Recherche intégrée
+- Résultats live
+```
+
+---
+
+## ✅ CHECKLIST ASSETS
+
+### **À créer**
+
+- [ ] Logo SVG (toutes versions)
+- [ ] Favicon (16x16, 32x32)
+- [ ] App icons (180x180, 192x192, 512x512)
+- [ ] Screenshots (mobile, desktop)
+- [ ] Bannière réseaux sociaux (1200x630)
+- [ ] Illustrations page d'accueil
+
+### **À définir**
+
+- [ ] Photos pros authentiques
+- [ ] Photos quartiers Dakar/Thiès
+- [ ] Témoignages vidéo
+- [ ] Tutoriel utilisation
+
+---
+
+**NDIMBAL MAP — L'identité qui inspire confiance 🎨🇸🇳**
+
+**GO GO GO ! 🦅🔥**
