@@ -1,0 +1,462 @@
+# 🤝 Guide de Contribution — DIGIY NDIMBAL MAP
+
+**Merci de vouloir contribuer à DIGIY NDIMBAL MAP ! 🎉**
+
+Ce guide t'explique comment participer au développement de la plateforme.
+
+---
+
+## 🌟 Philosophie de Contribution
+
+DIGIY NDIMBAL MAP est basé sur le principe de **NDIMBAL** (entraide en Wolof).
+
+Nous valorisons :
+- ✊ **La collaboration** plutôt que la compétition
+- 🤝 **Le partage** plutôt que l'accaparement
+- 💪 **L'autonomisation** plutôt que l'exploitation
+- 🇸🇳 **Le développement local** avant tout
+
+---
+
+## 🎯 Comment Contribuer
+
+### 1️⃣ Reporter des Bugs
+
+Tu as trouvé un bug ? Super ! Voici comment le signaler :
+
+**Avant de créer une issue :**
+- Vérifie que le bug n'a pas déjà été signalé
+- Assure-toi que c'est bien un bug (pas une feature manquante)
+
+**Crée une issue avec :**
+- 📝 **Titre clair** : "Bug: La carte ne charge pas sur mobile"
+- 🔍 **Description** : Que s'est-il passé ?
+- 🔄 **Reproduction** : Comment reproduire le bug ?
+- 💻 **Environnement** : Navigateur, OS, version
+- 📸 **Screenshots** : Si possible
+
+**Template :**
+```markdown
+## Description
+La carte ne s'affiche pas sur iPhone Safari.
+
+## Reproduction
+1. Ouvre le site sur iPhone
+2. Clique sur l'onglet "CARTE"
+3. La carte reste blanche
+
+## Environnement
+- Navigateur: Safari 17
+- OS: iOS 17.2
+- Device: iPhone 13
+
+## Screenshots
+[Ajoute screenshot ici]
+```
+
+---
+
+### 2️⃣ Proposer des Fonctionnalités
+
+Tu as une idée de feature ? Génial !
+
+**Crée une issue avec :**
+- 💡 **Titre** : "Feature: Recherche vocale"
+- 📋 **Description** : Qu'est-ce que tu veux ajouter ?
+- 🎯 **Utilité** : Pourquoi c'est utile ?
+- 🎨 **UI/UX** : À quoi ça ressemblerait ?
+
+**Template :**
+```markdown
+## Feature Proposée
+Recherche vocale pour trouver des pros
+
+## Pourquoi ?
+Facilite la recherche pour les utilisateurs en déplacement
+
+## Comment ?
+Bouton micro à côté de la barre de recherche
+Speech-to-text → Query → Résultats
+
+## Mockup
+[Ajoute mockup/sketch si possible]
+```
+
+---
+
+### 3️⃣ Contribuer du Code
+
+**Étape 1 : Fork le repo**
+```bash
+# Fork sur GitHub
+# Clone ton fork
+git clone https://github.com/TON-USERNAME/digiy-ndimbal-map.git
+cd digiy-ndimbal-map
+```
+
+**Étape 2 : Crée une branche**
+```bash
+# Crée une branche descriptive
+git checkout -b feature/recherche-vocale
+
+# OU pour un bug fix
+git checkout -b fix/carte-mobile
+```
+
+**Étape 3 : Code**
+```bash
+# Fais tes modifications
+# Teste localement
+# Commit souvent avec des messages clairs
+```
+
+**Étape 4 : Commit**
+```bash
+# Commits descriptifs
+git commit -m "feat: ajout recherche vocale"
+git commit -m "fix: carte mobile safari"
+git commit -m "docs: mise à jour README"
+```
+
+**Convention de nommage des commits :**
+- `feat:` — Nouvelle fonctionnalité
+- `fix:` — Correction de bug
+- `docs:` — Documentation
+- `style:` — Formatage (pas de changement de code)
+- `refactor:` — Refactoring
+- `test:` — Ajout de tests
+- `chore:` — Maintenance
+
+**Étape 5 : Push**
+```bash
+# Push ta branche
+git push origin feature/recherche-vocale
+```
+
+**Étape 6 : Pull Request**
+1. Va sur GitHub
+2. Clique "Compare & pull request"
+3. Remplis le template de PR
+4. Attends la review
+
+**Template PR :**
+```markdown
+## Description
+Ajout de la recherche vocale
+
+## Type de changement
+- [ ] Bug fix
+- [x] Nouvelle fonctionnalité
+- [ ] Breaking change
+- [ ] Documentation
+
+## Checklist
+- [x] Code testé localement
+- [x] Documentation mise à jour
+- [x] Aucun warning dans la console
+- [x] Responsive mobile vérifié
+
+## Screenshots
+[Ajoute screenshots avant/après]
+```
+
+---
+
+## 📋 Standards de Code
+
+### JavaScript
+
+**Style :**
+```javascript
+// ✅ BON
+function searchPros(query) {
+  const results = [];
+  // ...
+  return results;
+}
+
+// ❌ MAUVAIS
+function search_pros(q){
+var r=[]
+return r
+}
+```
+
+**Bonnes pratiques :**
+- ✅ camelCase pour variables/fonctions
+- ✅ UPPER_CASE pour constantes
+- ✅ Commentaires clairs
+- ✅ Pas de `var`, utilise `const`/`let`
+- ✅ Use strict mode
+- ✅ Évite le code dupliqué
+
+### HTML
+
+```html
+<!-- ✅ BON -->
+<button 
+  id="searchBtn" 
+  class="btn btn-primary" 
+  type="button"
+  aria-label="Rechercher">
+  Chercher
+</button>
+
+<!-- ❌ MAUVAIS -->
+<button onclick="search()">chercher</button>
+```
+
+**Bonnes pratiques :**
+- ✅ Indentation 2 espaces
+- ✅ Attributs `aria-*` pour accessibilité
+- ✅ Sémantique HTML5
+- ✅ Pas de styles inline (sauf exceptions)
+
+### CSS
+
+```css
+/* ✅ BON */
+.search-btn {
+  padding: 1rem 2rem;
+  border-radius: 999px;
+  background: var(--digiy-orange);
+  transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ❌ MAUVAIS */
+.sb{padding:10px;background:#f97316}
+```
+
+**Bonnes pratiques :**
+- ✅ Variables CSS pour couleurs
+- ✅ Classes descriptives
+- ✅ Mobile-first
+- ✅ Évite `!important`
+
+---
+
+## 🧪 Tests
+
+Avant de submit une PR :
+
+### Checklist Tests
+- [ ] ✅ Testé sur Chrome
+- [ ] ✅ Testé sur Firefox
+- [ ] ✅ Testé sur Safari
+- [ ] ✅ Testé sur mobile (responsive)
+- [ ] ✅ Aucune erreur console
+- [ ] ✅ Carte s'affiche correctement
+- [ ] ✅ Recherche fonctionne
+- [ ] ✅ Filtres fonctionnent
+- [ ] ✅ Géolocalisation fonctionne
+
+### Tests Manuels
+```bash
+# Ouvre index.html dans un navigateur
+# Teste chaque fonctionnalité
+# Vérifie la console (F12)
+# Teste en mode responsive (DevTools)
+```
+
+---
+
+## 🗺️ Ajouter des Villes/Quartiers
+
+Tu veux ajouter ta ville ? Génial !
+
+**Fichier à éditer :** `js/business-database.js`
+
+**Template :**
+```javascript
+ta_ville: {
+  city_name: 'Ta Ville',
+  city_type: 'ville',
+  population: 50000,
+  center: { lat: XX.XXXX, lng: -XX.XXXX },
+  
+  quartiers: {
+    quartier_1: {
+      name: 'Nom du Quartier',
+      coords: { lat: XX.XXXX, lng: -XX.XXXX },
+      type: 'résidentiel', // ou commercial, touristique, etc.
+      density: 'moyenne', // faible, moyenne, élevée, très_élevée
+      activities: ['marché', 'boutiques', 'services'],
+      pro_potential: {
+        resto: 'moyen',
+        chauffeur: 'élevé',
+        loc: 'faible',
+        market: 'très_élevé',
+        build: 'moyen'
+      },
+      transport: 'bon', // faible, moyen, bon, excellent
+      affluence: 'moyenne' // faible, moyenne, élevée, très_élevée
+    }
+  }
+}
+```
+
+**Comment trouver les coordonnées GPS :**
+1. Va sur [OpenStreetMap](https://www.openstreetmap.org/)
+2. Cherche ta ville/quartier
+3. Click droit → "Show address"
+4. Copie lat/lng
+
+---
+
+## 📚 Documentation
+
+Améliorer la doc est une contribution précieuse !
+
+**Tu peux :**
+- ✅ Corriger des fautes
+- ✅ Clarifier des instructions
+- ✅ Ajouter des exemples
+- ✅ Traduire en Wolof/Anglais
+- ✅ Ajouter des screenshots
+
+**Fichiers de doc :**
+- `README.md` — Documentation principale
+- `CONTRIBUTING.md` — Ce fichier
+- `docs/` — Documentation détaillée (à venir)
+
+---
+
+## 🎨 Design
+
+Tu es designer ? On a besoin de toi !
+
+**Tu peux contribuer :**
+- 🎨 Logo DIGIY NDIMBAL MAP
+- 📱 Mockups d'améliorations UI
+- 🖼️ Illustrations pour landing page
+- 📸 Photos de pros/quartiers
+- 🎥 Vidéos tutoriels
+
+**Guidelines design :**
+- Couleurs : Orange (#f97316), Cyan (#22d3ee), Or (#facc15)
+- Fonts : Outfit (titres), Manrope (corps)
+- Style : Moderne, épuré, accessible
+
+---
+
+## 🌍 Traduction
+
+Aide-nous à rendre DIGIY NDIMBAL MAP accessible à tous !
+
+**Langues prioritaires :**
+- 🇸🇳 **Wolof** — Langue nationale du Sénégal
+- 🇬🇧 **Anglais** — International
+- 🇫🇷 **Français** — Actuel
+
+**Fichiers à traduire :**
+- Interface (boutons, labels)
+- README.md
+- Messages d'erreur
+- Aide & support
+
+---
+
+## 💬 Communication
+
+### Où poser des questions ?
+
+**GitHub Discussions** (recommandé)
+- Questions générales
+- Idées de features
+- Aide au développement
+
+**GitHub Issues**
+- Bugs confirmés
+- Feature requests spécifiques
+
+**WhatsApp** (+221 77 134 2889)
+- Support utilisateur
+- Questions urgentes
+
+---
+
+## 🏆 Reconnaissance
+
+Tous les contributeurs seront mentionnés dans :
+- 📚 README.md (section Remerciements)
+- 🌐 Site web (page Contributeurs)
+- 📱 App (section À propos)
+
+**Types de contribution valorisées :**
+- 💻 Code
+- 🎨 Design
+- 📚 Documentation
+- 🌍 Traduction
+- 🐛 Bug reports
+- 💡 Feature ideas
+- 📣 Promotion
+- 🙏 Support communauté
+
+---
+
+## ⚖️ Code de Conduite
+
+**Nous attendons de tous les contributeurs :**
+
+### ✅ DO (Fais)
+- Sois respectueux et bienveillant
+- Accueille les nouveaux contributeurs
+- Donne des feedbacks constructifs
+- Écoute les autres points de vue
+- Aide la communauté à grandir
+
+### ❌ DON'T (Ne fais pas)
+- Sois agressif ou insultant
+- Discrimine qui que ce soit
+- Spam ou troll
+- Partage d'infos privées
+- Harcèle d'autres contributeurs
+
+**Violations :**  
+Tout manquement au code de conduite peut entraîner un ban du projet.
+
+---
+
+## 🚀 Premiers Pas pour Nouveaux Contributeurs
+
+**Tu débutes en contribution open source ? Parfait !**
+
+### Issues "Good First Issue"
+Cherche les issues taggées `good first issue` :
+- Bugs simples à corriger
+- Documentation à améliorer
+- Petites features à ajouter
+
+### Mentorship
+Besoin d'aide ? Tag `@beauville` dans ton issue/PR, on t'aidera !
+
+---
+
+## 📞 Contact Mainteneurs
+
+**Beauville** (Créateur & Lead)
+- GitHub: [@beauville](https://github.com/beauville)
+- WhatsApp: +221 77 134 2889
+- Email: beauville@digiylyfe.com
+
+---
+
+## 🙏 Merci !
+
+Chaque contribution, petite ou grande, fait avancer DIGIY NDIMBAL MAP.
+
+**Pierre par pierre, on construit l'entraide digitale.** 🇸🇳
+
+---
+
+<div align="center">
+
+**🤝 Ensemble, on est plus forts**
+
+Made with ❤️ in Senegal 🇸🇳
+
+</div>
