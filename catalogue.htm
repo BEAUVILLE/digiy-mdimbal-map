@@ -2,26 +2,20 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>DIGIYLYFE — Catalogue Local Premium (Sable & Or) — Supabase</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DIGIYLYFE — Catalogue NDIMBAL (Cards Premium) — Supabase</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-  /* ============================================ */
-  /* 🎨 THÈME SABLE & OR — premium */
-  /* ============================================ */
   :root{
     --bg-1:#f7f3ea; --bg-2:#efe7d6; --ink:#1f2937; --muted:#6b7280;
     --card:#fff; --line:rgba(31,41,55,.08); --shadow:0 10px 30px rgba(0,0,0,.06);
-
     --gold-1:#d1b464; --gold-2:#b89231; --gold-3:#f3e6b3;
     --accent-cta-1:#b38728; --accent-cta-2:#f9d976;
-
     --radius-xl:28px; --radius-lg:18px; --topbar-h:64px;
   }
   *{box-sizing:border-box}
-
   body{
     margin:0; padding:20px; min-height:100svh; color:var(--ink);
     background:
@@ -30,483 +24,257 @@
       linear-gradient(180deg, var(--bg-1), #fbfaf7 40%, #ffffff 100%);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
-
   @media (prefers-color-scheme: dark){
     :root{ --ink:#f4f5f7; --card:#0f141b; --line: rgba(255,255,255,.08); --bg-1:#0a0d12; --bg-2:#141922; --muted:#a3aab6; }
     body{ background: linear-gradient(180deg, #0b0f15, #10161e 60%, #0b0f15); }
   }
 
-  .digiy-wrap{
+  .wrap{
     max-width:1200px; margin:0 auto; padding:24px;
-    background:rgba(255,255,255,.85);
+    background: rgba(255,255,255,.85);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
     backdrop-filter: blur(14px) saturate(140%);
     border-radius: var(--radius-xl);
     border:1px solid var(--line);
-    box-shadow:0 24px 60px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.6) inset;
+    box-shadow: 0 24px 60px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.6) inset;
     position:relative; overflow:hidden;
   }
-  .digiy-wrap::before{
+  .wrap::before{
     content:""; position:absolute; inset:0;
-    background:linear-gradient(90deg, transparent 0%, rgba(209,180,100,.08) 50%, transparent 100%);
-    pointer-events:none;
-    mask: linear-gradient(90deg, transparent 0%, black 45%, black 55%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(209,180,100,.08) 50%, transparent 100%);
+    pointer-events:none; mask: linear-gradient(90deg, transparent 0%, black 45%, black 55%, transparent 100%);
   }
 
-  /* ============================================ */
-  /* 🧭 TOPBAR */
-  /* ============================================ */
   .topbar{
-    display:flex; gap:10px; align-items:center; justify-content:space-between;
-    margin:-24px -24px 14px; padding:14px 18px;
-    position:sticky; top:0; z-index:20;
-    background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.82));
+    display:flex; gap:12px; align-items:center;
+    position:sticky; top:0; z-index:10;
+    padding:14px 18px; margin:-24px -24px 18px; width:calc(100% + 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
     -webkit-backdrop-filter: blur(10px) saturate(140%);
     backdrop-filter: blur(10px) saturate(140%);
-    border-bottom:1px solid var(--line);
+    border-bottom: 1px solid var(--line);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    box-shadow:0 10px 30px rgba(0,0,0,.06);
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
   }
-  .brand{
-    display:flex; align-items:center; gap:10px; min-width:220px;
-  }
-  .brand .inf{
-    width:38px; height:38px; border-radius:12px;
-    display:grid; place-items:center;
-    background:linear-gradient(135deg, var(--gold-3), var(--gold-1));
-    border:1px solid rgba(0,0,0,.06);
-    box-shadow:0 8px 18px rgba(0,0,0,.08);
-    font-weight:1000; font-size:20px; color:#111;
-  }
-  .brand .txt{line-height:1.05}
-  .brand .txt b{display:block; font-size:14px; letter-spacing:.2px}
-  .brand .txt span{display:block; font-size:12px; color:var(--muted); font-weight:700}
-
-  .top-actions{display:flex; gap:8px; align-items:center}
-  .btn{
-    border:1px solid var(--line);
-    background:#fff;
-    color:var(--ink);
-    border-radius:12px;
-    padding:10px 12px;
-    font-weight:900;
-    font-size:13px;
-    cursor:pointer;
-    text-decoration:none;
-    display:inline-flex;
-    gap:8px;
-    align-items:center;
-    transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
-    user-select:none;
-  }
-  .btn:hover{ transform:translateY(-1px); box-shadow:0 10px 18px rgba(0,0,0,.08); border-color:rgba(209,180,100,.45); }
-  .btn.gold{
-    background: linear-gradient(135deg, var(--accent-cta-2), var(--accent-cta-1));
-    border-color: rgba(179,135,40,.25);
-    color:#111;
-    box-shadow: 0 8px 16px rgba(179,135,40,.18);
-  }
-
-  /* ============================================ */
-  /* 🎯 TOOLBAR FILTERS */
-  /* ============================================ */
-  .digiy-toolbar{
-    display:flex; gap:12px; margin-bottom:12px;
-  }
-  .digiy-toolbar input, .digiy-toolbar select{
+  .topbar input, .topbar select{
     flex:1; padding:11px 14px; font-size:14px; color:var(--ink);
     background:#fff; border:1px solid var(--line); border-radius: 12px;
     transition: box-shadow .2s ease, border-color .2s ease, transform .15s ease;
   }
-  .digiy-toolbar input:focus, .digiy-toolbar select:focus{
+  .topbar input:focus, .topbar select:focus{
     outline:none; border-color: var(--gold-1);
     box-shadow: 0 0 0 3px rgba(209,180,100,.25);
     transform: translateY(-1px);
   }
-
-  .digiy-subbar{
-    display:flex; gap:10px; align-items:center; justify-content:space-between;
-    margin: 10px 0 8px;
+  .btn-hub{
+    flex:0 0 auto;
+    padding:11px 14px; border-radius:12px; border:1px solid var(--line);
+    background: rgba(255,255,255,.9);
+    font-weight:900; cursor:pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
   }
-  .digiy-count{ font-weight:900; color:var(--muted); }
-  .digiy-hint{ font-size:12px; color:var(--muted); font-weight:800; }
+  .btn-hub:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,.10); }
 
-  mark{ background: linear-gradient(120deg, var(--gold-3), #fde68a); border-radius:4px; padding: 0 4px; }
+  .count{ margin: 10px 0 8px; font-weight:900; color:var(--muted); }
+  .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 22px; }
 
-  /* ============================================ */
-  /* 💳 GRID + CARDS */
-  /* ============================================ */
-  .digiy-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:22px; }
-
-  .digiy-card{
-    display:flex; flex-direction:column;
-    background:var(--card);
+  .card{
+    display:flex; flex-direction:column; background:var(--card);
     border-radius: var(--radius-lg);
     border:1px solid var(--line);
     box-shadow: var(--shadow);
     position:relative; overflow:hidden;
     transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-    content-visibility:auto;
-    contain-intrinsic-size: 320px 420px;
+    content-visibility:auto; contain-intrinsic-size: 320px 420px;
   }
-  .digiy-card:hover{ transform:translateY(-5px); box-shadow:0 18px 40px rgba(0,0,0,.10); border-color: rgba(209,180,100,.45); }
-  .digiy-card::after{
-    content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .2s ease;
-    background: radial-gradient(420px 140px at 80% 0%, rgba(209,180,100,.18), transparent 60%);
-  }
-  .digiy-card:hover::after{opacity:1}
+  .card:hover{ transform: translateY(-5px); box-shadow: 0 18px 40px rgba(0,0,0,.10); border-color: rgba(209,180,100,.45); }
+  .thumb{ height:220px; position:relative; overflow:hidden; background: linear-gradient(135deg, #c8b27a, #e9d9a4); }
+  .thumb img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease; }
+  .card:hover .thumb img{ transform: scale(1.05); }
 
-  .digiy-thumb{ height:220px; position:relative; overflow:hidden; background:linear-gradient(135deg,#c8b27a,#e9d9a4); }
-  .digiy-thumb img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease; }
-  .digiy-card:hover .digiy-thumb img{ transform:scale(1.05); }
-
-  .digiy-badge{
+  .badge{
     position:absolute; top:12px; right:12px; z-index:2;
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-    color:#111;
-    border-radius:10px;
-    font-size:11px;
-    font-weight:1000;
-    padding:6px 10px;
+    color:#111; border-radius:10px; font-size:11px; font-weight:900; padding:6px 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35) inset;
+    max-width: 80%;
+    white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
   }
 
-  .digiy-body{ padding:16px; display:flex; flex-direction:column; gap:6px; }
-  .digiy-title{ margin:0; font-size:18px; font-weight:1000; color:var(--ink); letter-spacing:.2px; }
-  .digiy-meta{ margin:0; font-size:13px; color:var(--muted); font-weight:800; }
-  .digiy-desc{ margin:0; font-size:13px; color:#4b5563; }
-  .digiy-price{ margin:6px 0 10px; font-weight:1000; font-size:17px; color:#1f2937; }
+  .body{ padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .title{ margin:0; font-size:18px; font-weight:1000; letter-spacing:.2px; }
+  .meta{ margin:0; font-size:13px; color:var(--muted); font-weight:700; }
+  .desc{ margin:0; font-size:13px; color:#4b5563; }
+  .price{ margin:6px 0 10px; font-weight:1000; font-size:17px; }
 
-  .digiy-footer{ border-top:1px solid var(--line); padding-top:10px; margin-top:auto; }
-  .digiy-cta{ display:flex; gap:8px; flex-wrap:wrap; }
+  .footer{ border-top:1px solid var(--line); padding-top:10px; margin-top:auto; }
+  .cta{ display:flex; gap:8px; flex-wrap:wrap; }
 
-  .digiy-btn{
-    flex:1; text-align:center; text-decoration:none;
+  .btn{
+    flex:1;
+    text-align:center; text-decoration:none;
     font-weight:1000; font-size:13px;
     padding:10px 14px; border-radius:12px;
-    color:#111; position:relative; overflow:hidden;
+    position:relative; overflow:hidden;
     transition: transform .15s ease, box-shadow .15s ease;
-    border:1px solid rgba(0,0,0,.06);
   }
-  .digiy-btn:focus{ outline:3px solid rgba(209,180,100,.35); outline-offset:2px; }
-  .digiy-btn::before{
-    content:""; position:absolute; top:50%; left:50%;
-    width:0; height:0; border-radius:50%;
-    background: rgba(255,255,255,.4);
-    transform: translate(-50%,-50%);
-    transition: width .35s, height .35s;
-  }
-  .digiy-btn:hover::before{ width:260px; height:260px; }
-  .digiy-btn:hover{ transform:translateY(-1px); }
-
-  .digiy-btn.view{
-    background: linear-gradient(135deg, var(--accent-cta-2), var(--accent-cta-1));
-    box-shadow: 0 6px 16px rgba(179,135,40,.20);
-  }
-  .digiy-btn.whatsapp{
+  .btn:hover{ transform: translateY(-1px); }
+  .btn.primary{
     color:#fff;
     background: linear-gradient(135deg, #35d07f, #0d9f54);
-    box-shadow: 0 6px 16px rgba(13,159,84,.18);
+    box-shadow: 0 6px 16px rgba(13,159,84,.28);
   }
-  .digiy-btn.map{
-    background: #fff;
-    border-color: rgba(209,180,100,.35);
-  }
-
-  /* ============================================ */
-  /* 📱 MOBILE */
-  /* ============================================ */
-  @media (max-width: 640px){
-    body{ padding:10px; }
-    .digiy-wrap{ padding:14px; border-radius: 20px; }
-    .topbar{ flex-wrap:wrap; gap:10px; margin:-14px -14px 12px; padding:12px; }
-    .brand{ min-width:auto; }
-    .top-actions{ width:100%; justify-content:flex-end; }
-
-    .digiy-toolbar{ flex-direction:column; }
-
-    .digiy-card{ display:grid; grid-template-columns:1fr; grid-template-rows:110px; border-radius:16px; }
-    .digiy-thumb{ grid-column:1 / -1; height:100%; width:100%; }
-
-    .digiy-body{
-      grid-column:1 / -1; grid-row:1 / -1;
-      background: linear-gradient(to right, rgba(255,255,255,0) 88px, rgba(255,255,255,.96) 110px, #fff 128px);
-      border-radius: 0 16px 16px 0;
-      padding:6px 8px 6px 114px;
-    }
-    .digiy-title{ font-size:14px; line-height:1.12; }
-    .digiy-meta{ display:none !important; }
-    .digiy-desc{ font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .digiy-price{ font-size:13px; margin:2px 0 4px; }
-    .digiy-footer{ border-top:none; padding-top:0; }
-    .digiy-btn{ padding:6px 8px; font-size:11px; flex:0 0 auto; width:auto; }
-    .digiy-badge{ top:6px; right:8px; font-size:10px; padding:4px 7px; }
+  .btn.secondary{
+    color:#111;
+    background: linear-gradient(135deg, var(--accent-cta-2), var(--accent-cta-1));
+    box-shadow: 0 6px 16px rgba(179,135,40,.28);
   }
 
-  /* ============================================ */
-  /* 🚫 EMPTY / LOADER */
-  /* ============================================ */
-  .empty-state-box{
+  .empty{
     text-align:center; padding:56px 18px;
     background: rgba(255,255,255,.6);
     border-radius: 18px;
     border: 2px dashed rgba(31,41,55,.12);
     margin: 18px 0;
   }
-  .empty-state-box p:first-child{ font-size:18px; font-weight:1000; margin:0 0 8px; }
-  .empty-state-box p:last-child{ font-size:14px; color:var(--muted); margin:0; font-weight:800; }
+  .empty p:first-child{ font-size:18px; font-weight:1000; margin:0 0 8px; }
+  .empty p:last-child{ font-size:14px; color:var(--muted); margin:0; }
 
-  .loader{
-    display:flex; align-items:center; gap:10px;
-    padding:12px 14px; border-radius:14px;
-    background:rgba(255,255,255,.7);
-    border:1px solid var(--line);
-    font-weight:900; color:var(--muted);
-    margin: 10px 0 14px;
+  @media (max-width: 640px){
+    body{ padding:10px; }
+    .wrap{ padding:14px; border-radius: 20px; }
+    .topbar{ flex-direction:column; padding:12px; margin:-14px -14px 14px; width:calc(100% + 28px); }
+    .btn-hub{ width:100%; }
+    .card{ display:grid; grid-template-columns: 1fr; grid-template-rows: 110px; border-radius:16px; }
+    .thumb{ grid-column:1 / -1; height:100%; width:100%; }
+    .body{
+      grid-column:1 / -1; grid-row:1 / -1;
+      background: linear-gradient(to right, rgba(255,255,255,0) 88px, rgba(255,255,255,.96) 110px, #fff 128px);
+      border-radius: 0 16px 16px 0; padding:6px 8px 6px 114px;
+    }
+    .title{ font-size:14px; line-height:1.12; }
+    .meta{ display:none !important; }
+    .desc{ font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .price{ font-size:13px; margin:2px 0 4px; }
+    .footer{ border-top:none; padding-top:0; }
+    .btn{ padding:6px 8px; font-size:11px; flex:0 0 auto; width:auto; }
+    .badge{ top:6px; right:8px; font-size:10px; padding:4px 7px; }
   }
-  .dot{
-    width:10px; height:10px; border-radius:50%;
-    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-    animation: pulse .9s infinite ease-in-out;
-  }
-  @keyframes pulse{ 0%,100%{transform:scale(1);opacity:.6} 50%{transform:scale(1.25);opacity:1} }
 </style>
 </head>
 
 <body>
+<section class="wrap" aria-label="Catalogue NDIMBAL — DIGIYLYFE">
 
-<section class="digiy-wrap" aria-label="Catalogue partenaires DIGIYLYFE">
-
-  <div class="topbar" role="banner" aria-label="DIGIY topbar">
-    <div class="brand">
-      <div class="inf">∞</div>
-      <div class="txt">
-        <b>DIGIYLYFE • Catalogue</b>
-        <span>0% commission • paiement direct au pro</span>
-      </div>
-    </div>
-
-    <div class="top-actions">
-      <a class="btn" href="https://beauville.github.io/digiy-hub/" title="Retour au HUB">🏠 Retour HUB</a>
-      <a class="btn gold" id="openMapBtn" href="https://beauville.github.io/digiy-mdimbal-map/" title="Ouvrir NDIMBAL MAP">🗺️ NDIMBAL MAP</a>
-    </div>
-  </div>
-
-  <div class="digiy-toolbar" role="region" aria-label="Filtres catalogue">
-    <input id="q-search" type="search" placeholder="🔍 Rechercher (Saly, chauffeur, villa...)" aria-label="Recherche partenaires" autocomplete="off" inputmode="search" />
-    <select id="cat-filter" aria-label="Filtrer par catégorie">
+  <div class="topbar" role="region" aria-label="Recherche et filtres">
+    <input id="q" type="search" placeholder="🔍 Rechercher (Saly, chauffeur, villa…)" autocomplete="off" />
+    <select id="cat">
       <option value="all">🌟 Toutes catégories</option>
-      <option value="logement">🏨 Hébergement</option>
-      <option value="commerce">🛒 Market & Style</option>
-      <option value="taxi">🚗 Driver</option>
-      <option value="batiment">🏗️ Bâtisseur</option>
-      <option value="voyage">🌴 Explore</option>
-      <option value="restaurant">🍽️ Resto</option>
+      <option value="hebergement">🏨 Hébergement</option>
+      <option value="market">🛒 Market & Style</option>
+      <option value="driver">🚗 Driver</option>
+      <option value="construction">🏗️ Bâtisseur</option>
+      <option value="explore">🌴 Explore</option>
+      <option value="restaurant">🍽️ Restaurant</option>
     </select>
-    <select id="region-filter" aria-label="Filtrer par région">
-      <option value="all">🗺️ Toutes régions</option>
-      <option value="dakar">Dakar</option>
-      <option value="thies">Thiès (Saly inclus)</option>
-      <option value="diourbel">Diourbel</option>
-      <option value="fatick">Fatick</option>
-      <option value="kaolack">Kaolack</option>
-      <option value="saint-louis">Saint-Louis</option>
-      <option value="ziguinchor">Ziguinchor</option>
-      <option value="louga">Louga</option>
-      <option value="tambacounda">Tambacounda</option>
-      <option value="matam">Matam</option>
-    </select>
+    <button class="btn-hub" id="btnMap">🗺️ Carte NDIMBAL</button>
+    <button class="btn-hub" id="btnHub">🏠 HUB</button>
   </div>
 
-  <div class="digiy-subbar">
-    <p id="count" class="digiy-count" aria-live="polite">Chargement…</p>
-    <div class="digiy-hint" id="hint">Astuce : clique “🗺️ NDIMBAL MAP” pour guidage/distance.</div>
-  </div>
+  <p class="count" id="count">Chargement…</p>
 
-  <div id="loading" class="loader" aria-live="polite">
-    <span class="dot"></span> Synchronisation NDIMBAL…
-  </div>
+  <div class="grid" id="grid"></div>
 
-  <div class="digiy-row" id="cards-container"></div>
-
-  <div id="empty-state" class="empty-state-box" hidden>
+  <div class="empty" id="empty" hidden>
     <p>😕 Oups ! Aucun partenaire trouvé.</p>
-    <p>Vérifie l’orthographe ou repasse sur “Toutes catégories / régions”.</p>
+    <p>Vérifie l’orthographe ou remets “Toutes catégories”.</p>
   </div>
-
 </section>
 
 <script>
-/* ==========================================================
-   ✅ CONFIG SUPABASE
-========================================================== */
+/* 🔐 SUPABASE — intégré */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ==========================================================
-   ✅ HELPERS (anti-bugs + Saly→Thiès)
-========================================================== */
 const $ = (s, p=document)=> p.querySelector(s);
 const $$ = (s, p=document)=> Array.from(p.querySelectorAll(s));
 
-function fold(s){
-  return (s||"").toString().toLowerCase()
-    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-    .trim();
+const grid = $("#grid");
+const countEl = $("#count");
+const emptyEl = $("#empty");
+const qEl = $("#q");
+const catEl = $("#cat");
+
+let all = [];
+let view = [];
+
+const fold = (s) => (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const safe = (s) => (s??"").toString().replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+function normalizeCat(p){
+  // on accepte plusieurs noms possibles
+  const c = (p.category || p.cat || p.type || "").toString().toLowerCase().trim();
+  if(!c) return "market";
+  return c;
 }
 
-function toRegionKey(regionOrCity){
-  const v = fold(regionOrCity);
+function computeKeywords(p){
+  return fold([
+    p.name, p.title, p.slug, p.city, p.region, p.description,
+    p.keywords, p.tags
+  ].filter(Boolean).join(" "));
+}
 
-  // ✅ Saly / Petite Côte -> Thiès
-  if(v.includes("saly") || v.includes("mbour") || v.includes("somone") || v.includes("ngaparou") || v.includes("warang") || v.includes("popenguine")){
-    return "thies";
+function pick(p, ...keys){
+  for(const k of keys){
+    if(p && p[k] != null && String(p[k]).trim() !== "") return String(p[k]);
   }
-
-  if(v.includes("dakar")) return "dakar";
-  if(v.includes("thies")) return "thies";
-  if(v.includes("saint") && v.includes("louis")) return "saint-louis";
-  if(v.includes("ziguinchor")) return "ziguinchor";
-  if(v.includes("diourbel")) return "diourbel";
-  if(v.includes("fatick")) return "fatick";
-  if(v.includes("kaolack")) return "kaolack";
-  if(v.includes("louga")) return "louga";
-  if(v.includes("tambacounda")) return "tambacounda";
-  if(v.includes("matam")) return "matam";
-
-  const clean = v.replace(/\s+/g,"-");
-  return clean || "unknown";
+  return "";
 }
 
-function normalizeCategory(cat){
-  const v = fold(cat);
-  if(v.includes("resto") || v.includes("restaurant")) return "restaurant";
-  if(v.includes("market") || v.includes("boutique") || v.includes("shop") || v.includes("commerce") || v.includes("style") || v.includes("couture")) return "commerce";
-  if(v.includes("logement") || v.includes("villa") || v.includes("appart") || v.includes("hotel") || v.includes("heberg") || v.includes("hebergement")) return "logement";
-  if(v.includes("taxi") || v.includes("vtc") || v.includes("chauffeur") || v.includes("driver") || v.includes("transport")) return "taxi";
-  if(v.includes("bat") || v.includes("chantier") || v.includes("construction") || v.includes("plomb") || v.includes("electric")) return "batiment";
-  if(v.includes("voyage") || v.includes("tour") || v.includes("guide") || v.includes("excursion") || v.includes("explore")) return "voyage";
-  return "commerce";
-}
+function cardHTML(p){
+  const name = pick(p, "name", "title", "label") || "Partenaire";
+  const meta = [pick(p,"city"), pick(p,"region")].filter(Boolean).join(" — ");
+  const desc = pick(p, "description") || "Service local — DIGIYLYFE";
+  const cover = pick(p, "cover_url", "photo_url", "image_url") || "https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png";
+  const badge = pick(p, "badge_text") || "✨ Partenaire";
+  const price = pick(p, "price_text") || "💰 Sur demande";
 
-function escapeHTML(str){
-  return (str ?? "").toString()
-    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-}
+  const cta1Label = pick(p, "cta_primary_label") || "💬 Contacter";
+  const cta1Url   = pick(p, "cta_primary_url", "whatsapp_url", "phone_url");
+  const cta2Label = pick(p, "cta_secondary_label") || "🔎 Voir";
+  const cta2Url   = pick(p, "cta_secondary_url", "page_url", "website", "url", "link");
 
-function getParam(name){
-  try{
-    const url = new URL(window.location.href);
-    return url.searchParams.get(name);
-  }catch(e){ return null; }
-}
+  const cat = normalizeCat(p);
 
-/* ==========================================================
-   ✅ UI + TEMPLATES
-========================================================== */
-const CAT_LABELS = {
-  restaurant:"🍽️ Restaurant",
-  commerce:"🛒 Market & Style",
-  logement:"🏨 Hébergement",
-  taxi:"🚗 Driver",
-  batiment:"🏗️ Bâtisseur",
-  voyage:"🌴 Explore"
-};
+  // fallback contact si on a un phone
+  const phone = pick(p, "phone");
+  const telUrl = phone ? `tel:${phone.replace(/\s+/g,"")}` : "";
+  const waAuto = phone ? `https://wa.me/${phone.replace(/[^\d]/g,"")}?text=${encodeURIComponent("Salam je viens de DIGIYLYFE 🙏")}` : "";
 
-function badgeTextFor(p){
-  // petite logique “premium” pour badge
-  if(p.__cat === "taxi") return "⏳ Dispo aujourd’hui";
-  if(p.__cat === "logement") return "⏳ 1 dispo";
-  if(p.__cat === "commerce") return "🛍️ Local";
-  if(p.__cat === "restaurant") return "🍽️ À tester";
-  if(p.__cat === "batiment") return "🏗️ Pro terrain";
-  if(p.__cat === "voyage") return "🌴 Circuit";
-  return "✨ Premium";
-}
+  const primaryHref = cta1Url || waAuto || telUrl || "#";
+  const secondaryHref = cta2Url || (p.slug ? (`https://digiylyfe.com/partenaires-${encodeURIComponent(p.slug)}/`) : "#");
 
-function pickCover(p){
-  // essaie plusieurs champs possibles selon ta DB
-  const url =
-    p.cover_url || p.cover || p.photo_url || p.image_url || p.image || p.avatar_url || p.logo_url || "";
-  if(url && String(url).startsWith("http")) return url;
-
-  // fallback premium (pas d’images externes obligatoires)
-  // (petit SVG inline simple)
-  const title = escapeHTML(p.name || p.title || "DIGIYLYFE");
-  const subtitle = escapeHTML(CAT_LABELS[p.__cat] || "Partenaire");
-  const bg1 = "f3e6b3", bg2 = "d1b464";
-  const svg = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800">
-    <defs>
-      <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#${bg1}"/>
-        <stop offset="1" stop-color="#${bg2}"/>
-      </linearGradient>
-    </defs>
-    <rect width="1200" height="800" fill="url(#g)"/>
-    <circle cx="980" cy="180" r="220" fill="rgba(255,255,255,.25)"/>
-    <circle cx="250" cy="620" r="320" fill="rgba(0,0,0,.06)"/>
-    <text x="70" y="160" font-family="Arial" font-size="54" font-weight="800" fill="#111">${title}</text>
-    <text x="70" y="230" font-family="Arial" font-size="34" font-weight="700" fill="rgba(17,17,17,.7)">${subtitle}</text>
-    <text x="70" y="710" font-family="Arial" font-size="28" font-weight="800" fill="rgba(17,17,17,.55)">∞ DIGIYLYFE — Paiement direct au pro</text>
-  </svg>`;
-  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-}
-
-function buildCard(p, highlightTerms=[]){
-  const name = escapeHTML(p.name || p.title || "Partenaire");
-  const city = escapeHTML(p.city || p.town || "");
-  const rawRegion = p.region || p.area || p.zone || "";
-  const regionLabel = escapeHTML((p.__region || rawRegion || "").toString().replace(/-/g," ").replace(/\b\w/g, c=>c.toUpperCase()));
-  const desc = escapeHTML(p.description || p.short_desc || p.bio || "Service local • contact direct");
-  const badge = badgeTextFor(p);
-  const cover = pickCover(p);
-
-  // prix
-  const price = p.price_text || p.price || p.tarif || "";
-  const priceHTML = price ? `💰 <strong>${escapeHTML(String(price))}</strong>` : `💰 <strong>Sur demande</strong>`;
-
-  // actions
-  const slug = (p.slug || "").toString().trim();
-  const phone = (p.phone || p.tel || p.whatsapp || "").toString().trim();
-
-  // lien fiche
-  const page = p.page_url || p.website || p.url || p.link || "";
-  const hasPage = page && String(page).startsWith("http");
-
-  // whatsapp
-  const wa = phone ? phone.replace(/\D/g,"") : "";
-  const waLink = wa ? `https://wa.me/${wa}?text=${encodeURIComponent("Salam " + (p.name||"") + " • DIGIYLYFE (je veux des infos)")}` : "";
-
-  // map (slug ready)
-  const mapUrl = slug ? `https://beauville.github.io/digiy-mdimbal-map/?pro=${encodeURIComponent(slug)}` : `https://beauville.github.io/digiy-mdimbal-map/`;
-
-  // highlight safe (simple)
-  const hName = highlightText(name, highlightTerms);
-  const hDesc = highlightText(desc, highlightTerms);
+  const primaryOk = primaryHref.startsWith("http") || primaryHref.startsWith("tel:");
+  const secondaryOk = secondaryHref.startsWith("http");
 
   return `
-    <article class="digiy-card" data-cat="${escapeHTML(p.__cat)}" data-region="${escapeHTML(p.__region)}" data-keywords="${escapeHTML(p.__text)}" id="${escapeHTML(slug || ("pro-"+String(p.id||""))) }">
-      <div class="digiy-thumb">
-        <div class="digiy-badge">${badge}</div>
-        <img width="1200" height="800" src="${cover}" alt="${name}" loading="lazy" decoding="async"/>
+    <article class="card" data-cat="${safe(cat)}" data-key="${safe(p.__kw)}">
+      <div class="thumb">
+        <div class="badge">${safe(badge)}</div>
+        <img src="${safe(cover)}" alt="${safe(name)}" loading="lazy" decoding="async" />
       </div>
-
-      <div class="digiy-body">
-        <h3 class="digiy-title">${hName}</h3>
-        <p class="digiy-meta">📍 ${city || "Sénégal"}${regionLabel ? " • "+regionLabel : ""} • ${escapeHTML(CAT_LABELS[p.__cat] || "Service")}</p>
-        <p class="digiy-desc">${hDesc}</p>
-
-        <div class="digiy-footer">
-          <p class="digiy-price">${priceHTML}</p>
-
-          <div class="digiy-cta">
-            ${waLink ? `<a class="digiy-btn whatsapp" href="${waLink}" target="_blank" rel="noopener">💬 WhatsApp</a>` : (phone ? `<a class="digiy-btn whatsapp" href="tel:${escapeHTML(phone)}">📞 Appeler</a>` : ``)}
-            ${hasPage ? `<a class="digiy-btn view" href="${escapeHTML(page)}" target="_blank" rel="noopener">📲 Voir</a>` : ``}
-            <a class="digiy-btn map" href="${mapUrl}" target="_blank" rel="noopener">🗺️ Carte</a>
+      <div class="body">
+        <h3 class="title">${safe(name)}</h3>
+        <p class="meta">${safe(meta || "Sénégal")}</p>
+        <p class="desc">${safe(desc)}</p>
+        <div class="footer">
+          <p class="price">${safe(price)}</p>
+          <div class="cta">
+            ${primaryOk ? `<a class="btn primary" href="${safe(primaryHref)}" target="_blank" rel="noopener">${safe(cta1Label)}</a>` : ""}
+            ${secondaryOk ? `<a class="btn secondary" href="${safe(secondaryHref)}" target="_blank" rel="noopener">${safe(cta2Label)}</a>` : ""}
           </div>
         </div>
       </div>
@@ -514,200 +282,58 @@ function buildCard(p, highlightTerms=[]){
   `;
 }
 
-function highlightText(htmlSafeText, terms){
-  // htmlSafeText est déjà échappé ; on peut injecter <mark> dessus sans risque
-  if(!terms || !terms.length) return htmlSafeText;
-  const uniq = Array.from(new Set(terms.map(t=>t.trim()).filter(t=>t.length>1))).slice(0,6);
-  if(!uniq.length) return htmlSafeText;
-  const escaped = uniq.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  const rx = new RegExp("(" + escaped.join("|") + ")", "gi");
-  return htmlSafeText.replace(rx, "<mark>$1</mark>");
-}
-
-/* ==========================================================
-   ✅ DATA (Supabase)
-========================================================== */
-let allPros = [];
-let filtered = [];
-
-async function loadPros(){
-  // On ne dépend PAS de is_active (tu as eu l’erreur colonne)
-  // On charge tout, puis on filtre côté front si besoin.
-  const res = await SB.from("professionals").select("*").order("created_at", { ascending:false });
-  if(res.error){
-    console.warn("Supabase load error:", res.error);
-    return [];
-  }
-  return res.data || [];
-}
-
-function normalizePros(rows){
-  return (rows||[]).map(p=>{
-    const name = p.name || p.title || p.business_name || "";
-    const city = p.city || p.town || p.commune || "";
-    const region = p.region || p.area || p.zone || city || "";
-    const cat = p.category || p.cat || p.type || p.module || "";
-
-    const __cat = normalizeCategory(cat);
-    const __region = toRegionKey(region);
-    const __text = fold(
-      (name||"") + " " + (city||"") + " " + (region||"") + " " +
-      (p.description||p.short_desc||p.bio||"") + " " + (p.slug||"")
-    );
-
-    return { ...p, __cat, __region, __text };
-  });
-}
-
-/* ==========================================================
-   ✅ FILTER ENGINE
-========================================================== */
-const searchInput = $("#q-search");
-const catFilter   = $("#cat-filter");
-const regFilter   = $("#region-filter");
-const container   = $("#cards-container");
-const countEl     = $("#count");
-const emptyState  = $("#empty-state");
-const loadingEl   = $("#loading");
-const openMapBtn  = $("#openMapBtn");
-
-function tokenize(q){
-  return fold(q).split(/\s+/).filter(t => t.length > 1).slice(0,8);
+function render(list){
+  grid.innerHTML = list.map(cardHTML).join("");
+  const n = list.length;
+  countEl.textContent = `${n} partenaire${n>1?"s":""} trouvé${n>1?"s":""}`;
+  emptyEl.hidden = n > 0;
 }
 
 function applyFilters(){
-  const q = searchInput.value.trim();
-  const terms = tokenize(q);
-  const cat = catFilter.value;
-  const reg = regFilter.value;
+  const q = fold(qEl.value.trim());
+  const cat = catEl.value;
 
-  let res = [...allPros];
+  view = all.filter(p=>{
+    if(cat !== "all" && p.__cat !== cat) return false;
+    if(q){
+      const tokens = q.split(/\s+/).filter(t=>t.length>1);
+      return tokens.every(t=> p.__kw.includes(t));
+    }
+    return true;
+  });
 
-  if(cat !== "all") res = res.filter(p => p.__cat === cat);
-  if(reg !== "all") res = res.filter(p => p.__region === reg);
-
-  if(terms.length){
-    res = res
-      .map(p=>{
-        let score = 0;
-        for(const t of terms){ if(p.__text.includes(t)) score++; }
-        return { p, score };
-      })
-      .filter(x => x.score > 0)
-      .sort((a,b)=> b.score - a.score)
-      .map(x => x.p);
-  }
-
-  filtered = res;
-  render(res, q);
-  updateCount();
-  updateMapButton();
+  render(view);
 }
 
-function updateCount(){
-  const n = filtered.length;
-  countEl.textContent = `${n} partenaire${n>1?"s":""} trouvé${n>1?"s":""}`;
-  emptyState.hidden = n > 0;
-}
+async function load(){
+  countEl.textContent = "Chargement…";
+  const { data, error } = await SB
+    .from("professionals")
+    .select("id, created_at, name, title, slug, category, cat, type, city, region, description, keywords, tags, phone, cover_url, badge_text, price_text, cta_primary_label, cta_primary_url, cta_secondary_label, cta_secondary_url, page_url, website, url, link");
 
-function updateMapButton(){
-  // si un seul résultat et qu’il a un slug -> bouton map direct sur ce pro
-  if(filtered.length === 1 && filtered[0].slug){
-    openMapBtn.href = `https://beauville.github.io/digiy-mdimbal-map/?pro=${encodeURIComponent(filtered[0].slug)}`;
-    openMapBtn.textContent = "🗺️ NDIMBAL MAP (ce pro)";
-  }else{
-    openMapBtn.href = "https://beauville.github.io/digiy-mdimbal-map/";
-    openMapBtn.textContent = "🗺️ NDIMBAL MAP";
-  }
-}
-
-function render(list, q){
-  const terms = q ? q.split(/\s+/).filter(t=>t.trim().length>1).slice(0,8) : [];
-  const html = list.map(p => buildCard(p, terms)).join("");
-  container.innerHTML = html || "";
-}
-
-/* ==========================================================
-   ✅ SLUG READY (open catalogue.htm?pro=slug)
-========================================================== */
-function focusSlugIfAny(){
-  const slug = (getParam("pro") || "").trim();
-  if(!slug) return;
-
-  // cherche dans la liste
-  const hit = allPros.find(p => String(p.slug||"") === slug);
-  if(!hit){
-    // si pas trouvé, on met le slug dans recherche, ça aide
-    searchInput.value = slug;
-    applyFilters();
+  if(error){
+    console.error("Supabase error:", error);
+    countEl.textContent = "Erreur Supabase (voir console)";
+    render([]);
     return;
   }
 
-  // force filtres en “all” pour éviter disparition
-  catFilter.value = "all";
-  regFilter.value = "all";
-  searchInput.value = hit.name || hit.title || slug;
+  all = (data || []).map(p=>{
+    p.__cat = normalizeCat(p);
+    p.__kw = computeKeywords(p);
+    return p;
+  });
 
   applyFilters();
-
-  // scroll vers la card
-  const el = document.getElementById(slug);
-  if(el){
-    setTimeout(()=> el.scrollIntoView({ behavior:"smooth", block:"start" }), 200);
-  }
 }
 
-/* ==========================================================
-   ✅ INIT
-========================================================== */
-let debounceId;
-function debouncedApply(){
-  clearTimeout(debounceId);
-  debounceId = setTimeout(applyFilters, 70);
-}
+$("#btnHub").addEventListener("click", ()=>{ window.location.href = "https://beauville.github.io/digiy-hub/"; });
+$("#btnMap").addEventListener("click", ()=>{ window.location.href = "https://beauville.github.io/digiy-mdimbal-map/"; });
 
-document.addEventListener("DOMContentLoaded", async ()=>{
-  try{
-    loadingEl.style.display = "flex";
+qEl.addEventListener("input", ()=>{ applyFilters(); });
+catEl.addEventListener("change", ()=>{ applyFilters(); });
 
-    const rows = await loadPros();
-    allPros = normalizePros(rows);
-
-    // ✅ Sécurité : si ta table est vide, on affiche un message propre
-    if(!allPros.length){
-      container.innerHTML = "";
-      emptyState.hidden = false;
-      countEl.textContent = "0 partenaire trouvé";
-      loadingEl.style.display = "none";
-      updateMapButton();
-      return;
-    }
-
-    // render initial
-    filtered = [...allPros];
-    render(filtered, "");
-    updateCount();
-    updateMapButton();
-
-    // events
-    searchInput.addEventListener("input", debouncedApply);
-    searchInput.addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); applyFilters(); }});
-    catFilter.addEventListener("change", applyFilters);
-    regFilter.addEventListener("change", applyFilters);
-
-    // ✅ slug focus
-    focusSlugIfAny();
-
-  }catch(err){
-    console.warn("Init error:", err);
-    container.innerHTML = "";
-    emptyState.hidden = false;
-    countEl.textContent = "Erreur chargement";
-  }finally{
-    loadingEl.style.display = "none";
-  }
-});
+load();
 </script>
-
 </body>
 </html>
