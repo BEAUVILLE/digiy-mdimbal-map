@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIGIY NDIMBAL MAP - Carte Interactive Nationale du Sénégal</title>
-    
+
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-    
+
     <style>
         /* ================================
            VARIABLES CSS
@@ -28,7 +28,7 @@
             --text-gray: #B8B8B8;
             --border-radius: 15px;
             --transition: all 0.3s ease;
-            
+
             /* COULEURS PAR CATÉGORIE */
             --color-restaurant: #FF6B35;
             --color-commerce: #4ECDC4;
@@ -42,11 +42,7 @@
             --color-hotel: #FF9800;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -120,9 +116,7 @@
             color: var(--text-light);
         }
 
-        .stat-item {
-            text-align: center;
-        }
+        .stat-item { text-align: center; }
 
         .stat-value {
             font-size: 1.5rem;
@@ -167,9 +161,7 @@
             margin-bottom: 0.5rem;
         }
 
-        .category-section {
-            padding: 1rem;
-        }
+        .category-section { padding: 1rem; }
 
         .category-title {
             color: var(--text-gray);
@@ -214,9 +206,7 @@
             text-align: center;
         }
 
-        .category-info {
-            flex: 1;
-        }
+        .category-info { flex: 1; }
 
         .category-name {
             color: var(--text-light);
@@ -228,15 +218,6 @@
         .category-count {
             color: var(--text-gray);
             font-size: 0.8rem;
-        }
-
-        .category-badge {
-            background: var(--primary-color);
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            font-weight: bold;
         }
 
         /* PINS COLORÉS PAR CATÉGORIE */
@@ -301,15 +282,9 @@
         /* ================================
            CARTE PRINCIPALE
         ================================ */
-        .map-container {
-            flex: 1;
-            position: relative;
-        }
+        .map-container { flex: 1; position: relative; }
 
-        #map {
-            width: 100%;
-            height: 100%;
-        }
+        #map { width: 100%; height: 100%; }
 
         /* ================================
            CONTROLS CARTE
@@ -353,10 +328,7 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
-        .leaflet-popup-content {
-            margin: 0;
-            min-width: 280px;
-        }
+        .leaflet-popup-content { margin: 0; min-width: 280px; }
 
         .popup-header {
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
@@ -370,14 +342,9 @@
             margin-bottom: 0.3rem;
         }
 
-        .popup-category {
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
+        .popup-category { font-size: 0.85rem; opacity: 0.9; }
 
-        .popup-body {
-            padding: 1rem;
-        }
+        .popup-body { padding: 1rem; }
 
         .popup-info {
             display: flex;
@@ -395,10 +362,7 @@
             margin-bottom: 1rem;
         }
 
-        .popup-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
+        .popup-actions { display: flex; gap: 0.5rem; }
 
         .popup-btn {
             flex: 1;
@@ -411,15 +375,8 @@
             font-size: 0.85rem;
         }
 
-        .popup-btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .popup-btn-secondary {
-            background: var(--secondary-color);
-            color: var(--dark-bg);
-        }
+        .popup-btn-primary { background: var(--primary-color); color: white; }
+        .popup-btn-secondary { background: var(--secondary-color); color: var(--dark-bg); }
 
         .popup-btn:hover {
             transform: translateY(-2px);
@@ -449,11 +406,7 @@
             font-size: 0.9rem;
         }
 
-        .legend-items {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
+        .legend-items { display: flex; flex-direction: column; gap: 0.4rem; }
 
         .legend-item {
             display: flex;
@@ -498,14 +451,8 @@
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
@@ -525,14 +472,9 @@
             transition: var(--transition);
         }
 
-        .close:hover {
-            color: var(--danger-color);
-        }
+        .close:hover { color: var(--danger-color); }
 
-        .modal-body h2 {
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
+        .modal-body h2 { color: var(--primary-color); margin-bottom: 1rem; }
 
         .modal-info-grid {
             display: grid;
@@ -547,16 +489,8 @@
             border-radius: var(--border-radius);
         }
 
-        .info-label {
-            color: var(--text-gray);
-            font-size: 0.85rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .info-value {
-            color: var(--text-light);
-            font-weight: 600;
-        }
+        .info-label { color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.3rem; }
+        .info-value { color: var(--text-light); font-weight: 600; }
 
         /* ================================
            LOADER
@@ -584,13 +518,8 @@
            RESPONSIVE
         ================================ */
         @media (max-width: 1024px) {
-            .sidebar {
-                width: 280px;
-            }
-
-            .header-stats {
-                display: none;
-            }
+            .sidebar { width: 280px; }
+            .header-stats { display: none; }
         }
 
         @media (max-width: 768px) {
@@ -613,54 +542,31 @@
                 z-index: 1000;
             }
 
-            .sidebar.open {
-                left: 0;
-            }
+            .sidebar.open { left: 0; }
 
-            .region-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .map-legend {
-                display: none;
-            }
+            .region-grid { grid-template-columns: 1fr; }
+            .map-legend { display: none; }
 
             .modal-content {
                 margin: 5% 1rem;
                 max-width: calc(100% - 2rem);
             }
 
-            .modal-info-grid {
-                grid-template-columns: 1fr;
-            }
+            .modal-info-grid { grid-template-columns: 1fr; }
         }
 
         /* ================================
            UTILITY CLASSES
         ================================ */
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
 
         /* ================================
            SCROLLBAR
         ================================ */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark-bg); }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
 
         /* ================================
            CUSTOM MARKERS
@@ -679,9 +585,7 @@
             transition: var(--transition);
         }
 
-        .custom-marker:hover {
-            transform: scale(1.2);
-        }
+        .custom-marker:hover { transform: scale(1.2); }
 
         .marker-restaurant { background: var(--color-restaurant); }
         .marker-commerce { background: var(--color-commerce); }
@@ -708,7 +612,7 @@
                 <p>L'annuaire géolocalisé du Sénégal</p>
             </div>
         </div>
-        
+
         <div class="header-search">
             <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un service, une ville, un nom...">
         </div>
@@ -733,7 +637,7 @@
          MAIN CONTAINER
     ================================ -->
     <div class="main-container">
-        
+
         <!-- SIDEBAR CATÉGORIES -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -860,18 +764,12 @@
         <!-- CARTE PRINCIPALE -->
         <div class="map-container">
             <div id="map"></div>
-            
+
             <!-- CONTROLS -->
             <div class="map-controls">
-                <button class="control-btn" onclick="centerMap()" title="Centrer sur le Sénégal">
-                    🎯
-                </button>
-                <button class="control-btn" onclick="locateUser()" title="Ma position">
-                    📍
-                </button>
-                <button class="control-btn" onclick="toggleSidebar()" title="Menu" style="display: none;" id="menuBtn">
-                    ☰
-                </button>
+                <button class="control-btn" onclick="centerMap()" title="Centrer sur le Sénégal">🎯</button>
+                <button class="control-btn" onclick="locateUser()" title="Ma position">📍</button>
+                <button class="control-btn" onclick="toggleSidebar()" title="Menu" style="display: none;" id="menuBtn">☰</button>
             </div>
 
             <!-- LEGEND -->
@@ -919,21 +817,15 @@
                 <h2 style="color: var(--primary-color);">Détails du professionnel</h2>
                 <span class="close" onclick="closeModal()">&times;</span>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Contenu dynamique -->
-            </div>
+            <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
 
     <!-- ================================
          SCRIPTS
     ================================ -->
-    
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-    
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -942,7 +834,6 @@
         // ================================
         const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-        
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // ================================
@@ -954,7 +845,6 @@
         let filteredProfessionals = [];
         let currentCategory = 'all';
         let currentRegion = 'all';
-        let markers = [];
 
         // ICÔNES PAR CATÉGORIE
         const categoryIcons = {
@@ -970,31 +860,17 @@
             hotel: '🏨'
         };
 
-        const categoryColors = {
-            restaurant: '#FF6B35',
-            commerce: '#4ECDC4',
-            logement: '#FFD93D',
-            taxi: '#95E1D3',
-            notable: '#9B59B6',
-            batiment: '#E67E22',
-            voiture: '#3498DB',
-            voyage: '#1ABC9C',
-            loisir: '#E91E63',
-            hotel: '#FF9800'
-        };
-
         // ================================
         // INITIALISATION
         // ================================
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('🚀 DIGIY NDIMBAL MAP - Initialisation...');
-            
+
             initMap();
             await loadProfessionals();
             setupEventListeners();
-            
+
             document.getElementById('loader').classList.add('hidden');
-            
             console.log('✅ Application prête !');
         });
 
@@ -1002,21 +878,19 @@
         // CARTE
         // ================================
         function initMap() {
-            // Centrer sur le Sénégal
             map = L.map('map').setView([14.4974, -14.4524], 7);
-            
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap | DIGIYLYFE',
                 maxZoom: 19
             }).addTo(map);
-            
-            // Initialiser le cluster
+
             markerCluster = L.markerClusterGroup({
                 showCoverageOnHover: false,
                 maxClusterRadius: 50
             });
             map.addLayer(markerCluster);
-            
+
             console.log('🗺️ Carte initialisée');
         }
 
@@ -1025,22 +899,22 @@
         }
 
         function locateUser() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
-                        map.setView([latitude, longitude], 13);
-                        
-                        L.marker([latitude, longitude])
-                            .addTo(map)
-                            .bindPopup('📍 Vous êtes ici')
-                            .openPopup();
-                    },
-                    (error) => {
-                        alert('Impossible de récupérer votre position');
-                    }
-                );
+            if (!navigator.geolocation) {
+                alert("Géolocalisation non disponible.");
+                return;
             }
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    map.setView([latitude, longitude], 13);
+
+                    L.marker([latitude, longitude])
+                        .addTo(map)
+                        .bindPopup('📍 Vous êtes ici')
+                        .openPopup();
+                },
+                () => alert('Impossible de récupérer votre position')
+            );
         }
 
         // ================================
@@ -1049,26 +923,25 @@
         async function loadProfessionals() {
             try {
                 console.log('📥 Chargement des professionnels...');
-                
+
                 const { data, error } = await supabaseClient
                     .from('professionals')
                     .select('*');
-                
+
                 if (error) {
                     console.error('Erreur Supabase:', error);
                     allProfessionals = generateDemoData();
                 } else {
-                    allProfessionals = data || generateDemoData();
+                    allProfessionals = (data && data.length) ? data : generateDemoData();
                 }
-                
+
                 filteredProfessionals = [...allProfessionals];
                 displayMarkers(filteredProfessionals);
                 updateCounts();
-                
+
                 console.log(`✅ ${allProfessionals.length} professionnels chargés`);
-                
-            } catch (error) {
-                console.error('Erreur:', error);
+            } catch (err) {
+                console.error('Erreur:', err);
                 allProfessionals = generateDemoData();
                 filteredProfessionals = [...allProfessionals];
                 displayMarkers(filteredProfessionals);
@@ -1082,7 +955,7 @@
         function generateDemoData() {
             const categories = ['restaurant', 'commerce', 'logement', 'taxi', 'notable', 'batiment', 'voiture', 'voyage', 'loisir', 'hotel'];
             const regions = ['dakar', 'thies', 'diourbel', 'saint-louis', 'kaolack', 'ziguinchor', 'louga', 'tambacounda', 'fatick', 'matam'];
-            
+
             const names = {
                 restaurant: ['Restaurant Teranga', 'Chez Fatou', 'Le Safoutier', 'La Linguère', 'Ocean View'],
                 commerce: ['Boutique Élégance', 'Market Plus', 'Super Shop', 'Commerce du Coin', 'Grand Marché'],
@@ -1095,33 +968,33 @@
                 loisir: ['Centre de Loisirs', 'Parc Attractions', 'Salle de Jeux', 'Club Sportif', 'Espace Détente'],
                 hotel: ['Hôtel Teranga', 'Auberge du Coin', 'Résidence Hôtelière', 'Lodge Safari', 'Boutique Hotel']
             };
-            
+
             const demoData = [];
-            
+
             for (let i = 0; i < 100; i++) {
                 const category = categories[i % categories.length];
                 const region = regions[Math.floor(Math.random() * regions.length)];
                 const nameList = names[category];
-                
+
                 demoData.push({
                     id: `demo-${i}`,
                     name: nameList[i % nameList.length] + ` ${Math.floor(i / nameList.length) + 1}`,
-                    category: category,
-                    region: region,
+                    category,
+                    region,
                     city: getCityForRegion(region),
                     address: `Rue ${i + 1}, Quartier ${Math.floor(Math.random() * 10) + 1}`,
                     description: getDescriptionForCategory(category),
-                    phone: `+221 77 ${Math.floor(100 + Math.random() * 900)} ${Math.floor(10 + Math.random() * 90)} ${Math.floor(10 + Math.random() * 90)}`,
+                    phone: `+22177${Math.floor(1000000 + Math.random() * 9000000)}`,
                     email: `contact${i}@digiylyfe.sn`,
-                    website: `www.pro${i}.digiylyfe.sn`,
+                    website: `https://digiylyfe.sn`,
                     rating: (4 + Math.random()).toFixed(1),
                     latitude: getLatitudeForRegion(region),
                     longitude: getLongitudeForRegion(region),
                     hours: 'Lun-Sam 8h-20h',
-                    services: getServicesForCategory(category)
+                    services: getServicesForCategory(category),
+                    slug: `demo-${i}-${category}-${region}`
                 });
             }
-            
             return demoData;
         }
 
@@ -1207,12 +1080,51 @@
         }
 
         // ================================
+        // BOOKING-LIKE: OUVRIR FICHE PRO
+        // ================================
+        function openProCard(proId){
+            const pro = allProfessionals.find(p => String(p.id) === String(proId));
+            if(!pro) return;
+
+            if(pro.card_url){
+                window.open(pro.card_url, "_blank");
+                return;
+            }
+            const url = pro.slug
+                ? `card.html?slug=${encodeURIComponent(pro.slug)}`
+                : `card.html?id=${encodeURIComponent(pro.id)}`;
+
+            window.open(url, "_blank");
+        }
+
+        // ================================
+        // CONTACT: WHATSAPP OU APPEL (terrain)
+        // ================================
+        function contactPro(proId) {
+            const pro = allProfessionals.find(p => String(p.id) === String(proId));
+            if (!pro) return;
+
+            const phone = (pro.phone || "").toString().replace(/\s+/g, "");
+            if(!phone){
+                alert("Téléphone non disponible.");
+                return;
+            }
+
+            const useWhatsApp = confirm("Ouvrir WhatsApp ?\nOK = WhatsApp\nAnnuler = Appeler");
+            if(useWhatsApp){
+                const wa = phone.replace(/^\+/, "");
+                window.open(`https://wa.me/${wa}`, "_blank");
+            }else{
+                window.location.href = `tel:${phone}`;
+            }
+        }
+
+        // ================================
         // AFFICHAGE MARKERS
         // ================================
         function displayMarkers(professionals) {
-            // Nettoyer les markers existants
             markerCluster.clearLayers();
-            
+
             professionals.forEach(pro => {
                 if (pro.latitude && pro.longitude) {
                     const icon = L.divIcon({
@@ -1221,43 +1133,44 @@
                         iconSize: [35, 35],
                         iconAnchor: [17, 17]
                     });
-                    
+
                     const marker = L.marker([pro.latitude, pro.longitude], { icon: icon });
-                    
                     marker.bindPopup(createPopupContent(pro));
-                    marker.on('click', () => {
-                        // Optionnel : analytics ou actions supplémentaires
-                    });
-                    
                     markerCluster.addLayer(marker);
                 }
             });
-            
+
             console.log(`📍 ${professionals.length} markers affichés`);
         }
 
         function createPopupContent(pro) {
+            const desc = pro.description ? pro.description : "Service professionnel";
             return `
                 <div class="popup-header">
-                    <div class="popup-title">${pro.name}</div>
-                    <div class="popup-category">${getCategoryLabel(pro.category)}</div>
+                    <div class="popup-title">${escapeHTML(pro.name || "Professionnel")}</div>
+                    <div class="popup-category">${escapeHTML(getCategoryLabel(pro.category))}</div>
                 </div>
                 <div class="popup-body">
                     <div class="popup-info">
-                        📍 ${pro.city}, ${getRegionLabel(pro.region)}
+                        📍 ${escapeHTML(pro.city || "—")}, ${escapeHTML(getRegionLabel(pro.region || ""))}
                     </div>
                     <div class="popup-info">
-                        ⭐ ${pro.rating || '5.0'} | 📞 ${pro.phone}
+                        ⭐ ${escapeHTML(String(pro.rating || "5.0"))}
                     </div>
                     <div class="popup-description">
-                        ${pro.description ? pro.description.substring(0, 100) + '...' : 'Service professionnel'}
+                        ${escapeHTML(desc.length > 110 ? desc.substring(0, 110) + '...' : desc)}
                     </div>
                     <div class="popup-actions">
                         <button class="popup-btn popup-btn-primary" onclick='openDetailsModal("${pro.id}")'>
                             👁️ Détails
                         </button>
-                        <button class="popup-btn popup-btn-secondary" onclick='contactPro("${pro.id}")'>
-                            📞 Contact
+                        <button class="popup-btn popup-btn-secondary" onclick='openProCard("${pro.id}")'>
+                            🧾 Fiche
+                        </button>
+                    </div>
+                    <div style="margin-top:.6rem; display:flex; gap:.5rem;">
+                        <button class="popup-btn popup-btn-primary" style="background:#22c55e" onclick='contactPro("${pro.id}")'>
+                            💬 Contact
                         </button>
                     </div>
                 </div>
@@ -1269,47 +1182,36 @@
         // ================================
         function filterProfessionals() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            
             let results = [...allProfessionals];
-            
-            // Filtre catégorie
+
             if (currentCategory !== 'all') {
                 results = results.filter(p => p.category === currentCategory);
             }
-            
-            // Filtre région
             if (currentRegion !== 'all') {
                 results = results.filter(p => p.region === currentRegion);
             }
-            
-            // Filtre recherche
             if (searchTerm) {
-                results = results.filter(p => 
-                    p.name.toLowerCase().includes(searchTerm) ||
-                    p.city.toLowerCase().includes(searchTerm) ||
+                results = results.filter(p =>
+                    (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                    (p.city && p.city.toLowerCase().includes(searchTerm)) ||
                     (p.description && p.description.toLowerCase().includes(searchTerm))
                 );
             }
-            
+
             filteredProfessionals = results;
             displayMarkers(results);
             updateCounts();
         }
 
         function updateCounts() {
-            // Total
             document.getElementById('totalPros').textContent = allProfessionals.length;
             document.getElementById('count-all').textContent = `${filteredProfessionals.length} résultats`;
-            
-            // Par catégorie
+
             const categories = ['restaurant', 'commerce', 'logement', 'taxi', 'notable', 'batiment', 'voiture', 'voyage', 'loisir', 'hotel'];
-            
             categories.forEach(cat => {
                 const count = filteredProfessionals.filter(p => p.category === cat).length;
                 const element = document.getElementById(`count-${cat}`);
-                if (element) {
-                    element.textContent = `${count} résultats`;
-                }
+                if (element) element.textContent = `${count} résultats`;
             });
         }
 
@@ -1317,63 +1219,71 @@
         // MODAL
         // ================================
         function openDetailsModal(proId) {
-            const pro = allProfessionals.find(p => p.id === proId);
+            const pro = allProfessionals.find(p => String(p.id) === String(proId));
             if (!pro) return;
-            
+
             const modalBody = document.getElementById('modalBody');
             modalBody.innerHTML = `
-                <h2>${pro.name}</h2>
-                <p style="color: var(--secondary-color); margin-bottom: 1rem;">${getCategoryLabel(pro.category)}</p>
-                
+                <h2>${escapeHTML(pro.name || "")}</h2>
+                <p style="color: var(--secondary-color); margin-bottom: 1rem;">${escapeHTML(getCategoryLabel(pro.category))}</p>
+
                 <div class="modal-info-grid">
                     <div class="info-card">
                         <div class="info-label">📍 Localisation</div>
-                        <div class="info-value">${pro.city}, ${getRegionLabel(pro.region)}</div>
+                        <div class="info-value">${escapeHTML((pro.city || "—") + ", " + getRegionLabel(pro.region || ""))}</div>
                     </div>
                     <div class="info-card">
                         <div class="info-label">⭐ Note</div>
-                        <div class="info-value">${pro.rating || '5.0'} / 5</div>
+                        <div class="info-value">${escapeHTML(String(pro.rating || "5.0"))} / 5</div>
                     </div>
                     <div class="info-card">
                         <div class="info-label">📞 Téléphone</div>
-                        <div class="info-value">${pro.phone}</div>
+                        <div class="info-value">${escapeHTML(pro.phone || "—")}</div>
                     </div>
                     <div class="info-card">
                         <div class="info-label">📧 Email</div>
-                        <div class="info-value">${pro.email}</div>
+                        <div class="info-value">${escapeHTML(pro.email || "—")}</div>
                     </div>
                     <div class="info-card">
                         <div class="info-label">🌐 Site web</div>
-                        <div class="info-value">${pro.website || 'N/A'}</div>
+                        <div class="info-value">${pro.website ? `<a href="${escapeHTML(pro.website)}" target="_blank" rel="noopener">Ouvrir</a>` : 'N/A'}</div>
                     </div>
                     <div class="info-card">
                         <div class="info-label">⏰ Horaires</div>
-                        <div class="info-value">${pro.hours || 'N/A'}</div>
+                        <div class="info-value">${escapeHTML(pro.hours || "N/A")}</div>
                     </div>
                 </div>
-                
+
                 <div style="margin-bottom: 1rem;">
                     <div style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.5rem;">📝 Description</div>
-                    <p style="color: var(--text-light); line-height: 1.6;">${pro.description}</p>
+                    <p style="color: var(--text-light); line-height: 1.6;">${escapeHTML(pro.description || "—")}</p>
                 </div>
-                
+
                 <div style="margin-bottom: 1.5rem;">
                     <div style="color: var(--text-gray); font-size: 0.85rem; margin-bottom: 0.5rem;">🏷️ Services</div>
                     <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        ${(pro.services || []).map(s => `<span style="background: rgba(78, 205, 196, 0.2); color: var(--secondary-color); padding: 0.4rem 1rem; border-radius: 15px; font-size: 0.85rem;">${s}</span>`).join('')}
+                        ${(Array.isArray(pro.services) ? pro.services : []).map(s =>
+                            `<span style="background: rgba(78, 205, 196, 0.2); color: var(--secondary-color); padding: 0.4rem 1rem; border-radius: 15px; font-size: 0.85rem;">${escapeHTML(s)}</span>`
+                        ).join('')}
                     </div>
                 </div>
-                
+
                 <div style="display: flex; gap: 1rem;">
                     <button onclick="contactPro('${pro.id}')" style="flex: 1; padding: 1rem; background: var(--primary-color); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
-                        📞 Contacter
+                        💬 Contacter
                     </button>
                     <button onclick="viewOnMap('${pro.id}')" style="flex: 1; padding: 1rem; background: var(--secondary-color); color: var(--dark-bg); border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
                         🗺️ Voir sur la carte
                     </button>
                 </div>
+
+                <div style="margin-top: 1rem;">
+                    <button onclick="openProCard('${pro.id}')" style="width:100%; padding: 1rem; background: rgba(255,255,255,.08); color: white; border: 1px solid rgba(255,255,255,.18); border-radius: 10px; font-weight: bold; cursor: pointer;">
+                        🧾 Ouvrir la fiche
+                    </button>
+                </div>
             `;
-            
+
             document.getElementById('detailsModal').style.display = 'block';
         }
 
@@ -1381,17 +1291,10 @@
             document.getElementById('detailsModal').style.display = 'none';
         }
 
-        function contactPro(proId) {
-            const pro = allProfessionals.find(p => p.id === proId);
-            if (!pro) return;
-            
-            window.location.href = `tel:${pro.phone}`;
-        }
-
         function viewOnMap(proId) {
-            const pro = allProfessionals.find(p => p.id === proId);
+            const pro = allProfessionals.find(p => String(p.id) === String(proId));
             if (!pro || !pro.latitude || !pro.longitude) return;
-            
+
             closeModal();
             map.setView([pro.latitude, pro.longitude], 15);
         }
@@ -1399,6 +1302,15 @@
         // ================================
         // UTILS
         // ================================
+        function escapeHTML(str){
+            return (str ?? "").toString()
+                .replaceAll("&","&amp;")
+                .replaceAll("<","&lt;")
+                .replaceAll(">","&gt;")
+                .replaceAll('"',"&quot;")
+                .replaceAll("'","&#039;");
+        }
+
         function getCategoryLabel(category) {
             const labels = {
                 restaurant: '🍽️ Restaurant',
@@ -1412,10 +1324,11 @@
                 loisir: '🎭 Loisir',
                 hotel: '🏨 Hôtel'
             };
-            return labels[category] || category;
+            return labels[category] || category || "—";
         }
 
         function getRegionLabel(region) {
+            if(!region) return "—";
             return region.charAt(0).toUpperCase() + region.slice(1);
         }
 
@@ -1427,42 +1340,40 @@
         // EVENT LISTENERS
         // ================================
         function setupEventListeners() {
-            // Recherche
             document.getElementById('searchInput').addEventListener('input', filterProfessionals);
-            
-            // Catégories
+
             document.querySelectorAll('.category-item').forEach(item => {
                 item.addEventListener('click', () => {
                     document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
                     item.classList.add('active');
-                    
                     currentCategory = item.dataset.category;
                     filterProfessionals();
                 });
             });
-            
-            // Régions
+
             document.querySelectorAll('.region-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    
                     currentRegion = btn.dataset.region;
                     filterProfessionals();
                 });
             });
-            
-            // Modal
+
             window.onclick = (event) => {
-                if (event.target.id === 'detailsModal') {
+                if (event.target && event.target.id === 'detailsModal') {
                     closeModal();
                 }
             };
-            
-            // Responsive
-            if (window.innerWidth <= 768) {
-                document.getElementById('menuBtn').style.display = 'block';
+
+            // Responsive menu button
+            const menuBtn = document.getElementById('menuBtn');
+            function updateMenuBtn(){
+                if (window.innerWidth <= 768) menuBtn.style.display = 'block';
+                else menuBtn.style.display = 'none';
             }
+            updateMenuBtn();
+            window.addEventListener('resize', updateMenuBtn);
         }
 
         console.log('✅ DIGIY NDIMBAL MAP - Système opérationnel ! 🗺️🇸🇳');
