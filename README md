@@ -1,0 +1,432 @@
+# 🗺️ DIGIY NDIMBAL MAP
+
+**Trouve ton pro DIGIY près de toi • 0% commission • Entraide digitale 🇸🇳**
+
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen)](https://beauville.github.io/digiy-ndimbal-map/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub-Pages-blue)](https://github.com/beauville/digiy-ndimbal-map)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+---
+
+## 🎯 Qu'est-ce que DIGIY NDIMBAL MAP ?
+
+**DIGIY NDIMBAL MAP** est le premier moteur de recherche géographique intelligent au Sénégal qui connecte les clients aux professionnels **sans commission**.
+
+- 🗺️ **Carte interactive** — Visualise les pros près de toi
+- 🔍 **Recherche intelligente** — Par nom, ville, quartier, métier
+- 📍 **80+ quartiers** — Tout le Sénégal cartographié
+- 💳 **0% commission** — Paiement direct au professionnel
+- 🤝 **Entraide digitale** — NDIMBAL = Entraide en Wolof
+
+---
+
+## ✨ Fonctionnalités
+
+### 🔍 Recherche Avancée
+- Recherche textuelle libre
+- Filtres par zone géographique (8 zones)
+- Filtres par ville (70+ villes)
+- Filtres par quartier (80+ quartiers)
+- Filtres par module DIGIY (11 métiers)
+- Rayon de recherche configurable (5-50 km)
+
+### 🗺️ Carte Interactive
+- Carte Leaflet.js (OpenStreetMap gratuit)
+- Markers cliquables avec popup
+- Géolocalisation automatique
+- Zoom automatique sur résultats
+- Bouton recentrer
+- Bouton "Ma position"
+
+### 📱 Interface Utilisateur
+- Tabs synchronisés Carte ↔ Liste
+- Design responsive (mobile-first)
+- Suggestions rapides
+- Filtres avancés dépliables
+- Animations fluides
+
+### 🦅 Modules DIGIY Disponibles
+- 🍽️ **RESTO** — Restaurants
+- 🚗 **CHAUFFEUR** — VTC & taxis
+- 🏠 **LOC** — Logements & hébergements
+- 🛍️ **MARKET** — Boutiques & commerces
+- 🏗️ **BUILD** — Artisans & BTP
+- 💼 **JOBS** — Emploi & recrutement
+- 🚚 **FRET** — Transport & logistique
+- 💳 **PAY** — Paiements
+- 📱 Autres modules à venir...
+
+---
+
+## 🚀 Installation & Déploiement
+
+### Prérequis
+- Un compte GitHub
+- (Optionnel) Node.js pour développement local
+
+### Déploiement sur GitHub Pages
+
+#### Étape 1 : Clone le repo
+```bash
+git clone https://github.com/beauville/digiy-ndimbal-map.git
+cd digiy-ndimbal-map
+```
+
+#### Étape 2 : Édite les fichiers
+```bash
+# Personnalise index.html selon tes besoins
+# Ajoute tes données dans les fichiers JS
+```
+
+#### Étape 3 : Push
+```bash
+git add .
+git commit -m "Initial commit - DIGIY NDIMBAL MAP"
+git push origin main
+```
+
+#### Étape 4 : Active GitHub Pages
+1. Va dans **Settings** → **Pages**
+2. Source : **main branch**
+3. Folder : **/ (root)**
+4. **Save**
+5. Attends 2 minutes
+
+Ton site sera disponible sur :
+```
+https://[ton-username].github.io/digiy-ndimbal-map/
+```
+
+---
+
+## 📁 Structure du Projet
+
+```
+digiy-ndimbal-map/
+│
+├── index.html                          # Page principale
+│
+├── js/
+│   ├── zones-senegal.js               # 8 zones, 70+ villes, coordonnées GPS
+│   ├── business-database.js           # 80+ quartiers, potentiel business
+│   └── search-engine.js               # Moteur de recherche + carte
+│
+├── css/
+│   └── styles.css                     # Styles (optionnel, inline dans index.html)
+│
+├── assets/
+│   ├── logo.svg                       # Logo DIGIY NDIMBAL MAP
+│   └── images/                        # Images diverses
+│
+├── README.md                          # Ce fichier
+└── LICENSE                            # Licence MIT
+```
+
+---
+
+## 🛠️ Technologies Utilisées
+
+### Frontend
+- **HTML5** — Structure
+- **CSS3** — Design moderne & responsive
+- **JavaScript** (Vanilla) — Logique client
+
+### Bibliothèques
+- **[Leaflet.js](https://leafletjs.com/)** v1.9.4 — Carte interactive
+- **[OpenStreetMap](https://www.openstreetmap.org/)** — Tuiles gratuites
+- **[Supabase](https://supabase.com/)** — Base de données pros
+
+### Fonts
+- **[Outfit](https://fonts.google.com/specimen/Outfit)** — Titres
+- **[Manrope](https://fonts.google.com/specimen/Manrope)** — Corps de texte
+
+### Hébergement
+- **GitHub Pages** — Gratuit, rapide, fiable
+
+---
+
+## 🎨 Design System
+
+### Couleurs DIGIY
+```css
+/* Orange — Action, CTA */
+--digiy-orange: #f97316;
+
+/* Cyan — Digital, innovation */
+--digiy-cyan: #22d3ee;
+
+/* Or — Valeur, premium */
+--digiy-gold: #facc15;
+
+/* Vert — En ligne, succès */
+--digiy-green: #22c55e;
+
+/* Fond sombre — Élégance */
+--digiy-dark: #020617;
+```
+
+### Typographie
+```css
+/* Titres */
+font-family: 'Outfit', sans-serif;
+font-weight: 900;
+
+/* Corps */
+font-family: 'Manrope', sans-serif;
+font-weight: 400-700;
+```
+
+---
+
+## 🗺️ Couverture Géographique
+
+### Régions Couvertes (6/14)
+✅ **DAKAR** — 37 quartiers  
+✅ **THIÈS** — 17 quartiers (Thiès, Mbour, Saly, Somone, Joal)  
+✅ **SAINT-LOUIS** — 3 quartiers  
+✅ **KAOLACK** — 2 quartiers  
+✅ **ZIGUINCHOR** — 2 quartiers (Casamance)  
+✅ **DIOURBEL** — 3 quartiers (Touba, Diourbel)
+
+### Statistiques
+- **6 régions** couvertes
+- **15 villes** cartographiées
+- **80+ quartiers** avec données
+- **Coordonnées GPS** précises
+- **Potentiel business** analysé
+
+---
+
+## 🔧 Configuration
+
+### Supabase
+Pour connecter à ta propre base de données Supabase :
+
+1. Crée un projet sur [supabase.com](https://supabase.com)
+2. Récupère ton URL et ta clé ANON
+3. Édite `index.html` :
+
+```javascript
+const SUPABASE_URL = "https://TON-PROJET.supabase.co";
+const SUPABASE_ANON_KEY = "TA_CLE_ANON_ICI";
+```
+
+### Table `pros_public`
+Structure recommandée :
+
+```sql
+CREATE TABLE pros_public (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  business_name TEXT,
+  full_name TEXT,
+  phone TEXT,
+  city TEXT,
+  quartier TEXT,
+  modules TEXT[],
+  lat DOUBLE PRECISION,
+  lon DOUBLE PRECISION,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Index pour performances
+CREATE INDEX idx_pros_city ON pros_public(city);
+CREATE INDEX idx_pros_quartier ON pros_public(quartier);
+CREATE INDEX idx_pros_modules ON pros_public USING GIN(modules);
+CREATE INDEX idx_pros_location ON pros_public(lat, lon);
+```
+
+---
+
+## 📊 Usage
+
+### Recherche Simple
+```
+1. Tape "resto plateau" dans la barre
+2. Click "Chercher"
+3. Vois les résultats sur la carte
+4. Click un marker pour voir les détails
+```
+
+### Recherche Avancée
+```
+1. Click "▼ Filtres avancés"
+2. Sélectionne Zone + Module + Rayon
+3. Click "Chercher"
+4. Switch entre tabs Carte/Liste
+```
+
+### Géolocalisation
+```
+1. Click "🎯 Ma position"
+2. Autorise la géolocalisation
+3. La carte se centre sur toi
+4. Vois les pros autour de toi
+```
+
+---
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! 🎉
+
+### Comment contribuer
+
+1. **Fork** le projet
+2. **Crée** une branche (`git checkout -b feature/AmazingFeature`)
+3. **Commit** tes changements (`git commit -m 'Add AmazingFeature'`)
+4. **Push** vers la branche (`git push origin feature/AmazingFeature`)
+5. **Ouvre** une Pull Request
+
+### Priorités de Contribution
+- [ ] Ajouter plus de villes/quartiers
+- [ ] Améliorer l'algorithme de recherche
+- [ ] Ajouter des filtres supplémentaires
+- [ ] Optimiser les performances
+- [ ] Traduction en Wolof/Anglais
+- [ ] Mode sombre
+- [ ] PWA (Progressive Web App)
+
+---
+
+## 🐛 Bug Reports
+
+Tu as trouvé un bug ? Ouvre une [issue](https://github.com/beauville/digiy-ndimbal-map/issues) avec :
+
+- 📝 Description du bug
+- 🔄 Étapes pour reproduire
+- 💻 Environnement (navigateur, OS)
+- 📸 Screenshots si possible
+
+---
+
+## 📈 Roadmap
+
+### Version 1.0 (Actuelle)
+- [x] Recherche textuelle
+- [x] Carte interactive Leaflet
+- [x] Filtres avancés
+- [x] Géolocalisation
+- [x] 80+ quartiers
+- [x] Design responsive
+
+### Version 1.1 (Prochaine)
+- [ ] Auto-complétion recherche
+- [ ] Favoris
+- [ ] Historique recherches
+- [ ] Partage WhatsApp
+- [ ] Avis & notes
+
+### Version 1.2 (Future)
+- [ ] Recherche vocale
+- [ ] Itinéraire GPS
+- [ ] Réservation in-app
+- [ ] Mode sombre
+- [ ] PWA
+
+### Version 2.0 (Vision)
+- [ ] Expansion Côte d'Ivoire
+- [ ] Expansion Mali
+- [ ] Expansion toute l'Afrique
+- [ ] App mobile native
+
+---
+
+## 💰 Modèle Économique
+
+### Pour les Clients
+✅ **100% GRATUIT**
+- Recherche illimitée
+- Aucun frais caché
+- Pas de compte obligatoire
+
+### Pour les Professionnels
+💎 **Abonnement mensuel : 29,900 F CFA**
+- Visibilité sur la carte
+- Fiche PRO complète
+- **0% commission** sur réservations
+- Paiement direct du client
+
+---
+
+## 🌍 Philosophie : NDIMBAL
+
+**NDIMBAL** (Wolof) = **Entraide**
+
+Nous croyons en :
+- ✊ L'entraide plutôt que l'extraction
+- 🤝 La collaboration plutôt que la compétition
+- 💪 L'autonomie plutôt que la dépendance
+- 🇸🇳 Le local plutôt que le global
+
+**0% commission** n'est pas un slogan marketing.  
+C'est notre **engagement fondamental**.
+
+---
+
+## 📞 Contact & Support
+
+### Support Utilisateurs
+- 💬 **WhatsApp** : [+221 77 134 2889](https://wa.me/221771342889)
+- 📧 **Email** : support@digiylyfe.com
+- 🌐 **Site Web** : [digiylyfe.com](https://digiylyfe.com)
+
+### Développeurs
+- 🐙 **GitHub** : [@beauville](https://github.com/beauville)
+- 📱 **Twitter** : [@digiylyfe](https://twitter.com/digiylyfe)
+
+---
+
+## 📄 Licence
+
+Ce projet est sous licence **MIT** — voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+**TL;DR :** Tu peux utiliser, modifier, distribuer ce code librement. Juste mentionne DIGIY NDIMBAL MAP dans les crédits. 🙏
+
+---
+
+## 🙏 Remerciements
+
+Merci à :
+- **[Leaflet.js](https://leafletjs.com/)** — Pour la meilleure bibliothèque de cartes
+- **[OpenStreetMap](https://www.openstreetmap.org/)** — Pour les données cartographiques libres
+- **[Supabase](https://supabase.com/)** — Pour le backend gratuit
+- **Communauté Sénégalaise** — Pour l'inspiration et le soutien
+- **Tous les contributeurs** — Pierre par pierre, on construit ensemble
+
+---
+
+## 🦅 Fait avec ❤️ au Sénégal
+
+**DIGIY NDIMBAL MAP** est né au Sénégal, pour le Sénégal, et toute l'Afrique.
+
+> "L'Afrique enracinée, connectée au monde"
+
+**Pierre par pierre, on construit l'entraide digitale.** 🇸🇳
+
+---
+
+## 🔗 Liens Utiles
+
+- 🌐 [Site Live](https://beauville.github.io/digiy-ndimbal-map/)
+- 📚 [Documentation](https://github.com/beauville/digiy-ndimbal-map/wiki)
+- 🐛 [Bug Reports](https://github.com/beauville/digiy-ndimbal-map/issues)
+- 💡 [Feature Requests](https://github.com/beauville/digiy-ndimbal-map/issues/new)
+- 📱 [DIGIYLYFE Écosystème](https://digiylyfe.com)
+
+---
+
+<div align="center">
+
+**🗺️ DIGIY NDIMBAL MAP**
+
+Trouve ton pro DIGIY près de toi
+
+[![Star on GitHub](https://img.shields.io/github/stars/beauville/digiy-ndimbal-map.svg?style=social)](https://github.com/beauville/digiy-ndimbal-map/starers)
+[![Fork on GitHub](https://img.shields.io/github/forks/beauville/digiy-ndimbal-map.svg?style=social)](https://github.com/beauville/digiy-ndimbal-map/network/members)
+
+**♾️ L'entraide commence ici • 0% commission • Pierre par pierre**
+
+Made with ❤️ in Senegal 🇸🇳
+
+</div>
