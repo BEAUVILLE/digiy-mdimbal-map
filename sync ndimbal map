@@ -1,0 +1,203 @@
+/**
+ * 🗺️ SYNCHRONISATION AUTOMATIQUE FICHE → NDIMBAL MAP
+ * 
+ * Ce script synchronise automatiquement les nouveaux partenaires
+ * entre partners-data.json et la table Supabase 'partners' pour NDIMBAL Map
+ */
+
+// Configuration Supabase
+const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+
+/**
+ * Fonction principale : Ajouter un partenaire à NDIMBAL Map
+ * @param {Object} partnerData - Données du partenaire depuis partners-data.json
+ */
+async function addPartnerToNdimbalMap(partnerData) {
+  
+  // Créer client Supabase
+  const { createClient } = window.supabase;
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  // Préparer données pour table 'partners' (NDIMBAL Map)
+  const mapPartner = {
+    slug: partnerData.id,
+    name: partnerData.name,
+    category: partnerData.category,
+    description: partnerData.description,
+    price: partnerData.price,
+    location: partnerData.location,
+    latitude: partnerData.gps.lat,
+    longitude: partnerData.gps.lng,
+    icon: partnerData.emoji,
+    keywords: [
+      partnerData.name.toLowerCase(),
+      partnerData.category,
+      partnerData.location.toLowerCase(),
+      ...partnerData.features.map(f => f.toLowerCase()),
+      ...partnerData.services.slice(0, 3).map(s => s.toLowerCase())
+    ].join(' '),
+    whatsapp_url: partnerData.whatsapp,
+    website_url: `https://TON-USERNAME.github.io/digiy-partenaires/?id=${partnerData.id}`,
+    phone: partnerData.phone,
+    email: partnerData.email,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+  
+  try {
+    // Vérifier si existe déjà
+    const { data: existing } = await supabase
+      .from('partners')
+      .select('id')
+      .eq('slug', partnerData.id)
+      .single();
+    
+    if (existing) {
+      // Mise à jour
+      const { data, error } = await supabase
+        .from('partners')
+        .update(mapPartner)
+        .eq('slug', partnerData.id)
+        .select();
+      
+      if (error) throw error;
+      
+      console.log(`✅ Partenaire ${partnerData.name} mis à jour sur NDIMBAL Map`);
+      return { success: true, action: 'updated', data };
+      
+    } else {
+      // Insertion
+      const { data, error } = await supabase
+        .from('partners')
+        .insert(mapPartner)
+        .select();
+      
+      if (error) throw error;
+      
+      console.log(`✅ Partenaire ${partnerData.name} ajouté à NDIMBAL Map`);
+      return { success: true, action: 'created', data };
+    }
+    
+  } catch (error) {
+    console.error(`❌ Erreur NDIMBAL Map pour ${partnerData.name}:`, error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Synchroniser TOUS les partenaires de partners-data.json vers NDIMBAL Map
+ */
+async function syncAllPartnersToMap() {
+  
+  console.log('🗺️ Début synchronisation NDIMBAL Map...');
+  
+  try {
+    // Charger partners-data.json
+    const response = await fetch('partners-data.json');
+    const data = await response.json();
+    
+    const results = {
+      total: data.partners.length,
+      created: 0,
+      updated: 0,
+      failed: 0,
+      errors: []
+    };
+    
+    // Traiter chaque partenaire
+    for (const partner of data.partners) {
+      const result = await addPartnerToNdimbalMap(partner);
+      
+      if (result.success) {
+        if (result.action === 'created') results.created++;
+        if (result.action === 'updated') results.updated++;
+      } else {
+        results.failed++;
+        results.errors.push({
+          partner: partner.name,
+          error: result.error
+        });
+      }
+      
+      // Pause pour éviter rate limiting
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    console.log('📊 Résultat synchronisation:', results);
+    
+    return results;
+    
+  } catch (error) {
+    console.error('❌ Erreur synchronisation globale:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Webhook appelé après création d'un nouveau partenaire
+ * (À intégrer dans le processus post-paiement)
+ */
+async function onNewPartnerCreated(partnerData) {
+  
+  console.log('🆕 Nouveau partenaire détecté:', partnerData.name);
+  
+  // 1. Ajouter à NDIMBAL Map
+  const mapResult = await addPartnerToNdimbalMap(partnerData);
+  
+  if (!mapResult.success) {
+    console.error('Échec ajout NDIMBAL Map');
+    return { success: false, error: mapResult.error };
+  }
+  
+  // 2. Envoyer notification WhatsApp au partenaire
+  const message = `
+🦅 Bienvenue ${partnerData.name} dans DIGIYLYFE !
+
+✅ Ton inscription est validée
+✅ Ta fiche partenaire est en ligne :
+https://TON-USERNAME.github.io/digiy-partenaires/?id=${partnerData.id}
+
+✅ Tu es maintenant sur NDIMBAL Map !
+🗺️ Les clients peuvent te trouver facilement
+
+📱 Partage ton lien !
+💰 0% commission - tu gardes 100%
+
+L'équipe DIGIYLYFE ∞
+  `.trim();
+  
+  console.log('📱 Message WhatsApp préparé:', message);
+  
+  // Ici, intégrer ton système WhatsApp
+  // await sendWhatsAppMessage(partnerData.phone, message);
+  
+  return {
+    success: true,
+    mapAdded: true,
+    partnerUrl: `https://TON-USERNAME.github.io/digiy-partenaires/?id=${partnerData.id}`
+  };
+}
+
+/**
+ * Interface pour tester depuis la console
+ */
+window.DIGIY_NDIMBAL = {
+  addPartner: addPartnerToNdimbalMap,
+  syncAll: syncAllPartnersToMap,
+  onNewPartner: onNewPartnerCreated
+};
+
+console.log('🗺️ DIGIY NDIMBAL Sync chargé !');
+console.log('💡 Utilise : DIGIY_NDIMBAL.syncAll() pour synchroniser tous les partenaires');
+console.log('💡 Utilise : DIGIY_NDIMBAL.addPartner(data) pour ajouter un partenaire');
+
+// Export pour Node.js (si utilisé côté serveur)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    addPartnerToNdimbalMap,
+    syncAllPartnersToMap,
+    onNewPartnerCreated
+  };
+}
