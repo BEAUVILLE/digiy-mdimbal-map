@@ -1,860 +1,652 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Fiche Pro — DIGIY NDIMBAL</title>
-  <meta name="description" content="Fiche professionnelle DIGIY NDIMBAL — horaires, services, contact, localisation." />
-  <meta name="theme-color" content="#0b1020" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fiche Pro — DIGIYLYFE</title>
+  <meta name="description" content="Fiche partenaire — photos, horaires, services, contact." />
+  <meta name="theme-color" content="#0B1120" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg:#0b1020;
-      --panel:#111a2f;
-      --card:#16213e;
-      --line:rgba(255,255,255,.10);
-      --text:#ffffff;
-      --muted:#b8b8b8;
-
-      --primary:#FF6B35;
-      --primary-dark:#E55A2B;
-      --secondary:#4ECDC4;
-
-      --ok:#22c55e;
-      --warn:#fbbf24;
-      --danger:#ff6b6b;
-
-      --r-xl:22px;
-      --r-lg:16px;
-      --r-md:12px;
+      --bg:#0b1020; --card:#0f172a; --card2:#0b1328; --line:rgba(255,255,255,.10);
+      --text:#e5e7eb; --muted:#9ca3af;
+      --gold:#facc15; --green:#22c55e; --orange:#f97316; --red:#ef4444; --blue:#60a5fa;
+      --radius:18px; --radius2:22px;
       --shadow: 0 18px 50px rgba(0,0,0,.45);
-      --t: all .22s ease;
+      --glow: 0 0 0 1px rgba(250,204,21,.20), 0 18px 80px rgba(250,204,21,.08);
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
       color:var(--text);
       background:
-        radial-gradient(900px 520px at 10% -10%, rgba(255,107,53,.18), transparent 55%),
-        radial-gradient(900px 520px at 100% 0%, rgba(78,205,196,.14), transparent 55%),
-        linear-gradient(180deg, #070b16 0%, var(--bg) 40%, #070b16 100%);
-      overflow-x:hidden;
+        radial-gradient(1200px 700px at 12% -10%, rgba(250,204,21,.14), transparent 55%),
+        radial-gradient(1000px 600px at 90% 10%, rgba(34,197,94,.10), transparent 55%),
+        radial-gradient(900px 600px at 50% 120%, rgba(96,165,250,.10), transparent 55%),
+        linear-gradient(180deg, #070b16 0%, #0b1020 45%, #070b16 100%);
+      min-height:100vh;
     }
     a{color:inherit}
-    .wrap{max-width:1120px;margin:0 auto;padding:18px 14px 70px}
+    .wrap{max-width:1080px;margin:0 auto;padding:16px 14px 40px}
     .topbar{
-      position:sticky; top:0; z-index:50;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:12px 10px;
-      background: rgba(11,16,32,.78);
-      backdrop-filter: blur(10px) saturate(140%);
-      border-bottom:1px solid var(--line);
+      position:sticky;top:0;z-index:10;
+      background:rgba(7,11,22,.62);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    .brand{display:flex;align-items:center;gap:10px}
-    .infty{
-      width:42px;height:42px;border-radius:14px;
+    .topbar .inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px}
+    .brand{
+      display:flex;align-items:center;gap:10px;min-width:0;
+      font-weight:900;letter-spacing:.3px;
+    }
+    .brand .mark{
+      width:36px;height:36px;border-radius:12px;
       display:grid;place-items:center;
-      background: linear-gradient(135deg, rgba(255,107,53,.22), rgba(78,205,196,.18));
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 10px 26px rgba(0,0,0,.25);
-      font-weight:900; font-size:22px; color: var(--primary);
+      background: radial-gradient(circle at 30% 30%, rgba(250,204,21,.35), rgba(250,204,21,.08) 55%, rgba(255,255,255,.06) 100%);
+      box-shadow: var(--glow);
+      border:1px solid rgba(250,204,21,.25);
+      font-size:18px;
     }
-    .brand h1{margin:0;font-size:14px;letter-spacing:.2px}
-    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted)}
-    .actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .brand .txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .spacer{flex:1}
     .btn{
-      cursor:pointer; border:none; text-decoration:none;
-      padding:10px 12px; border-radius:999px;
-      display:inline-flex; align-items:center; gap:8px;
-      font-weight:900; font-size:13px;
-      transition: var(--t);
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      text-decoration:none;cursor:pointer;
+      transition:.15s transform ease, .15s background ease, .15s border-color ease;
+      font-weight:800;
       user-select:none;
-      white-space:nowrap;
     }
-    .btn:active{transform:translateY(1px)}
-    .btn-outline{
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.14);
-      color:var(--text);
-    }
-    .btn-outline:hover{border-color: rgba(255,107,53,.45); transform: translateY(-1px)}
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+    .btn:active{transform:translateY(0)}
     .btn-primary{
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color:#fff;
+      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.85));
+      color:#0b1020;border-color:rgba(250,204,21,.35);
+      box-shadow: 0 16px 60px rgba(250,204,21,.18);
     }
-    .btn-primary:hover{transform: translateY(-1px)}
-    .btn-secondary{
-      background: linear-gradient(135deg, rgba(78,205,196,1), rgba(78,205,196,.75));
-      color:#09121f;
+    .btn-primary:hover{background: linear-gradient(135deg, rgba(250,204,21,1), rgba(245,158,11,.92))}
+    .btn-green{
+      background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(16,185,129,.80));
+      color:#04120c;border-color:rgba(34,197,94,.35);
     }
-    .btn-secondary:hover{transform: translateY(-1px)}
-    .btn-whatsapp{
-      background: linear-gradient(135deg, #35d07f, #0d9f54);
-      color:#fff;
+    .btn-ghost{background:transparent}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-weight:750;
+      max-width:100%;
+    }
+    .hero{
+      margin-top:14px;
+      border-radius:var(--radius2);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      box-shadow: var(--shadow);
+    }
+    .cover{
+      position:relative;
+      height:240px;
+      background: linear-gradient(135deg, rgba(250,204,21,.14), rgba(34,197,94,.10));
+    }
+    .cover img{
+      width:100%;height:100%;object-fit:cover;display:block;
+      filter:saturate(1.05) contrast(1.05);
+    }
+    .cover::after{
+      content:"";
+      position:absolute;inset:0;
+      background: linear-gradient(180deg, rgba(7,11,22,.15), rgba(7,11,22,.75));
+      pointer-events:none;
+    }
+    .hero-body{padding:14px 14px 16px}
+    .head{
+      display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;
+    }
+    .title{
+      font-size:22px;line-height:1.15;font-weight:950;letter-spacing:.2px;
+      margin:0;
+    }
+    .subtitle{
+      margin:6px 0 0;color:var(--muted);font-weight:650
+    }
+    .metaRow{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
+    }
+    .ctaRow{
+      display:flex;gap:10px;flex-wrap:wrap;margin-top:14px
     }
 
     .grid{
-      margin-top:16px;
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap:14px;
+      display:grid;grid-template-columns: 1.25fr .75fr;gap:14px;
+      margin-top:14px;
     }
-    @media (max-width: 980px){
-      .grid{grid-template-columns:1fr}
-      .actions{justify-content:flex-start}
-    }
-
-    .hero{
-      background: linear-gradient(135deg, rgba(255,107,53,.18), rgba(78,205,196,.12));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--r-xl);
-      box-shadow: var(--shadow);
+    .card{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      border-radius: var(--radius2);
+      box-shadow: 0 12px 40px rgba(0,0,0,.30);
       overflow:hidden;
-      position:relative;
     }
-    .hero::before{
-      content:""; position:absolute; inset:-2px;
-      background: radial-gradient(520px 180px at 70% 0%, rgba(255,255,255,.12), transparent 55%);
-      pointer-events:none;
+    .card .hd{
+      padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .hero-inner{display:grid; grid-template-columns: 1fr; gap:12px; padding:14px}
-    .cover{
-      position:relative;
-      border-radius: var(--r-lg);
-      overflow:hidden;
-      background: linear-gradient(135deg, rgba(255,107,53,.35), rgba(78,205,196,.22));
-      border:1px solid rgba(255,255,255,.10);
-      min-height: 220px;
-    }
-    .cover img{width:100%;height:100%;object-fit:cover;display:block}
-    .badge{
-      position:absolute; top:12px; left:12px;
-      background: rgba(0,0,0,.45);
-      border:1px solid rgba(255,255,255,.16);
-      padding:8px 10px; border-radius:999px;
-      font-weight:900; font-size:12px;
-      backdrop-filter: blur(10px);
-    }
-    .badge.ok{border-color: rgba(34,197,94,.35)}
-    .badge.warn{border-color: rgba(251,191,36,.35)}
-    .badge.danger{border-color: rgba(255,107,107,.35)}
-
-    .head{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
-      padding:2px 2px 0;
-      flex-wrap:wrap;
-    }
-    .title h2{margin:0; font-size:22px; letter-spacing:.2px}
-    .subtitle{
-      margin:6px 0 0;
-      color: var(--muted);
-      font-weight:700;
-      font-size:13px;
-    }
-    .chips{display:flex; gap:8px; flex-wrap:wrap}
-    .chip{
-      background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.12);
-      padding:8px 10px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:12px;
-      color:#fff;
-    }
-    .chip strong{color: var(--secondary)}
-    .section{
+    .card .hd b{font-size:14px;letter-spacing:.25px}
+    .card .bd{padding:12px 14px}
+    .list{display:grid;gap:10px}
+    .item{
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
       background: rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--r-xl);
-      box-shadow: 0 12px 40px rgba(0,0,0,.32);
-      overflow:hidden;
     }
-    .section h3{
-      margin:0;
-      padding:14px 14px 10px;
-      font-size:14px;
-      letter-spacing:.2px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
-    }
-    .section .content{padding:12px 14px 14px}
-    .kvs{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    @media (max-width:540px){.kvs{grid-template-columns:1fr}}
-    .kv{
-      background: rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--r-md);
-      padding:10px 12px;
-    }
-    .kv .k{color:var(--muted); font-size:12px; font-weight:800}
-    .kv .v{margin-top:3px; font-weight:900; font-size:13px}
-
-    .desc{
-      line-height:1.6;
-      color: rgba(255,255,255,.92);
-      font-weight:600;
-      font-size:14px;
-    }
-    .services{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
-    .tag{
-      background: rgba(78,205,196,.14);
-      border:1px solid rgba(78,205,196,.28);
-      color: var(--secondary);
-      padding:7px 10px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:12px;
-    }
+    .item .t{font-weight:900}
+    .item .s{color:var(--muted);margin-top:4px;font-weight:650}
 
     .gallery{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap:10px;
     }
-    @media (max-width: 540px){ .gallery{grid-template-columns:repeat(2,1fr)} }
-    .photo{
-      border-radius: 14px;
+    .ph{
+      position:relative;
+      border-radius:18px;
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      min-height:110px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      aspect-ratio: 4 / 3;
     }
-    .photo img{width:100%; height:100%; object-fit:cover; display:block}
+    .ph img{width:100%;height:100%;object-fit:cover;display:block}
+    .ph::after{
+      content:"";
+      position:absolute;inset:0;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,.28));
+      pointer-events:none;
+    }
 
-    .side-stack{display:grid; gap:14px}
-    .cta-box{
-      background: linear-gradient(135deg, rgba(255,107,53,.18), rgba(78,205,196,.12));
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--r-xl);
-      padding:14px;
-      box-shadow: var(--shadow);
-    }
-    .cta-box h4{margin:0 0 10px; font-size:14px}
-    .cta-row{display:flex; gap:10px; flex-wrap:wrap}
-    .cta-row .btn{flex:1; justify-content:center; min-width:160px}
     .note{
       margin-top:10px;
-      color: var(--muted);
-      font-size:12px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px dashed rgba(250,204,21,.32);
+      background: rgba(250,204,21,.06);
+      color: rgba(255,255,255,.92);
       font-weight:700;
-      line-height:1.5;
     }
 
-    .skeleton{
-      height: 12px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.12), rgba(255,255,255,.06));
-      background-size: 220% 100%;
-      animation: shimmer 1.2s linear infinite;
+    .err{
+      margin:18px 0;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(239,68,68,.35);
+      background: rgba(239,68,68,.08);
+      color: rgba(255,255,255,.95);
+      font-weight:800;
+      white-space:pre-line;
     }
-    @keyframes shimmer{0%{background-position: 0% 0%}100%{background-position: 220% 0%}}
-    .sk-wrap{display:grid; gap:10px; padding:14px}
-    .toast{
-      position:fixed; left:12px; right:12px; bottom:12px;
-      max-width:980px; margin:0 auto;
-      background: rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius: 16px;
-      padding:12px 14px;
-      backdrop-filter: blur(10px);
-      display:none;
-      z-index:99;
-      box-shadow: 0 18px 60px rgba(0,0,0,.5);
+
+    .foot{
+      margin-top:18px;
+      padding:14px 2px 0;
+      color: rgba(255,255,255,.55);
+      font-weight:650;
+      text-align:center;
     }
-    .toast strong{color: var(--secondary)}
-    .toast small{display:block; margin-top:6px; color: var(--muted); font-weight:700}
+
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+      .cover{height:220px}
+    }
+    @media (max-width: 560px){
+      .cover{height:210px}
+      .gallery{grid-template-columns: repeat(2, 1fr)}
+      .btn{flex:1}
+      .ctaRow .btn{flex:1}
+    }
   </style>
-
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
-
   <div class="topbar">
-    <div class="brand">
-      <div class="infty">∞</div>
-      <div>
-        <h1 id="brandTitle">DIGIY NDIMBAL — Fiche</h1>
-        <p id="brandSub">Propriété du pro • zéro intermédiaire</p>
+    <div class="inner">
+      <a class="btn btn-ghost" id="btnBack" href="#" title="Retour">← Retour</a>
+
+      <div class="brand" title="DIGIYLYFE">
+        <div class="mark">∞</div>
+        <div class="txt">DIGIYLYFE · Fiche Pro</div>
       </div>
-    </div>
-    <div class="actions">
-      <a class="btn btn-outline" id="btnBackMap" href="#">🗺️ Retour carte</a>
-      <a class="btn btn-outline" id="btnHub" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">🏠 HUB</a>
+
+      <div class="spacer"></div>
+
+      <a class="btn" id="btnSearch" href="https://digiylyfe.com/page-partenaires/" target="_blank" rel="noopener">
+        🔎 Moteur
+      </a>
+      <a class="btn btn-primary" id="btnHub" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">
+        🏠 HUB
+      </a>
     </div>
   </div>
 
   <div class="wrap">
 
-    <!-- Skeleton while loading -->
-    <div id="loading" class="section" style="margin-top:14px">
-      <div class="sk-wrap">
-        <div class="skeleton" style="width:55%"></div>
-        <div class="skeleton" style="width:85%"></div>
-        <div class="skeleton" style="width:65%"></div>
-        <div class="skeleton" style="width:95%; height:160px; border-radius:18px"></div>
-        <div class="skeleton" style="width:75%"></div>
-        <div class="skeleton" style="width:92%"></div>
-      </div>
+    <div id="loading" class="note" style="display:none">Chargement…</div>
+    <div id="infoNoSlug" class="note" style="display:none">
+      Aucun <b>slug</b> dans l’URL → on t’affiche <b>Astou</b> par défaut. (Astou d’abord 😄)
     </div>
+    <div id="errorBox" class="err" style="display:none"></div>
 
-    <!-- Real content -->
-    <div id="content" class="grid" style="display:none">
+    <section class="hero" id="hero" style="display:none">
+      <div class="cover" id="cover">
+        <img id="coverImg" alt="Couverture" />
+      </div>
 
-      <!-- LEFT -->
-      <div class="hero">
-        <div class="hero-inner">
-          <div class="cover">
-            <img id="coverImg" alt="Photo du professionnel" loading="lazy" decoding="async" />
-            <div id="badge" class="badge ok" hidden>✅ Vérifié</div>
+      <div class="hero-body">
+        <div class="head">
+          <div style="flex:1;min-width:260px">
+            <h1 class="title" id="proName">—</h1>
+            <div class="subtitle" id="proSubtitle">—</div>
+
+            <div class="metaRow" id="metaRow"></div>
+
+            <div class="ctaRow" id="ctaRow"></div>
           </div>
 
-          <div class="head">
-            <div class="title">
-              <h2 id="proName">—</h2>
-              <div class="subtitle" id="proMeta">—</div>
-            </div>
+          <div style="min-width:220px;display:grid;gap:10px;align-content:start">
+            <div class="pill" id="badgePill" style="display:none">🏷️ <span id="badgeText">—</span></div>
+            <div class="pill" id="pricePill" style="display:none">💰 <span id="priceText">—</span></div>
+            <div class="pill" id="slugPill">🔗 <span id="slugText">—</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <div class="chips">
-              <div class="chip">⭐ <strong id="proRating">—</strong>/5</div>
-              <div class="chip">♾️ <strong id="proSlug">—</strong></div>
-            </div>
+    <section class="grid" id="grid" style="display:none">
+      <div class="card">
+        <div class="hd">
+          <b>🧾 Présentation</b>
+          <span class="pill" id="verifiedPill" style="display:none">✅ Vérifié</span>
+        </div>
+        <div class="bd">
+          <div class="item">
+            <div class="t">Description</div>
+            <div class="s" id="proDesc">—</div>
           </div>
 
-          <div class="section">
-            <h3>📝 Histoire & description</h3>
-            <div class="content">
-              <div class="desc" id="proDesc">—</div>
-              <div class="services" id="proServices"></div>
-            </div>
+          <div class="item" id="servicesBox" style="display:none">
+            <div class="t">Services</div>
+            <div class="s" id="proServices">—</div>
           </div>
 
-          <div class="section">
-            <h3>📸 Photos</h3>
-            <div class="content">
-              <div class="gallery" id="gallery"></div>
-              <div class="note">Astuce : plus tu ajoutes des photos réelles, plus la fiche “respire” et la confiance grimpe.</div>
-            </div>
+          <div class="item" id="hoursBox" style="display:none">
+            <div class="t">Horaires</div>
+            <div class="s" id="proHours">—</div>
+          </div>
+
+          <div class="item" id="galleryBox" style="display:none">
+            <div class="t">Photos</div>
+            <div class="s" style="margin-bottom:10px;color:var(--muted)">Tape une photo pour zoomer (si ton navigateur gère).</div>
+            <div class="gallery" id="gallery"></div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT -->
-      <div class="side-stack">
-
-        <div class="cta-box">
-          <h4>⚡ Contacter maintenant</h4>
-          <div class="cta-row">
-            <a class="btn btn-primary" id="btnCall" href="#">📞 Appeler</a>
-            <a class="btn btn-whatsapp" id="btnWA" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
-          </div>
-          <div class="cta-row" style="margin-top:10px">
-            <button class="btn btn-secondary" id="btnShare" type="button">🔗 Partager la fiche</button>
-            <a class="btn btn-outline" id="btnOpenMap" href="#">🧭 Ouvrir GPS</a>
-          </div>
-          <div class="note">
-            Ici, pas d’OTA qui pompe ton SEO : c’est la fiche du pro, par le pro, pour le peuple.
-          </div>
+      <div class="card">
+        <div class="hd">
+          <b>📍 Contact</b>
+          <span class="pill" id="statusPill" style="display:none">🟢 En ligne</span>
         </div>
+        <div class="bd">
+          <div class="list">
 
-        <div class="section">
-          <h3>📌 Infos rapides</h3>
-          <div class="content">
-            <div class="kvs">
-              <div class="kv">
-                <div class="k">Catégorie</div>
-                <div class="v" id="kvCategory">—</div>
-              </div>
-              <div class="kv">
-                <div class="k">Région</div>
-                <div class="v" id="kvRegion">—</div>
-              </div>
-              <div class="kv">
-                <div class="k">Ville / Zone</div>
-                <div class="v" id="kvCity">—</div>
-              </div>
-              <div class="kv">
-                <div class="k">Horaires</div>
-                <div class="v" id="kvHours">—</div>
-              </div>
-              <div class="kv">
-                <div class="k">Email</div>
-                <div class="v" id="kvEmail">—</div>
-              </div>
-              <div class="kv">
-                <div class="k">Téléphone</div>
-                <div class="v" id="kvPhone">—</div>
+            <div class="item">
+              <div class="t">Infos</div>
+              <div class="s" id="infoLines">—</div>
+            </div>
+
+            <div class="item" id="phoneBox" style="display:none">
+              <div class="t">Téléphone</div>
+              <div class="s"><a id="phoneLink" href="#" rel="nofollow">—</a></div>
+            </div>
+
+            <div class="item" id="addressBox" style="display:none">
+              <div class="t">Adresse</div>
+              <div class="s" id="addressText">—</div>
+            </div>
+
+            <div class="item" id="mapBox" style="display:none">
+              <div class="t">Carte</div>
+              <div class="s"><a id="mapLink" href="#" target="_blank" rel="noopener">Ouvrir Google Maps</a></div>
+            </div>
+
+            <div class="item" id="shareBox">
+              <div class="t">Partager</div>
+              <div class="s">
+                <a class="btn" href="#" id="btnCopy">📋 Copier le lien</a>
               </div>
             </div>
+
           </div>
         </div>
-
-        <div class="section">
-          <h3>🗺️ Localisation</h3>
-          <div class="content">
-            <div class="desc" id="locLine">—</div>
-            <div class="note" id="gpsNote"></div>
-          </div>
-        </div>
-
-        <div class="section">
-          <h3>🧠 SEO (invisible mais puissant)</h3>
-          <div class="content">
-            <div class="desc" style="font-size:13px;color:rgba(255,255,255,.82)">
-              Cette fiche génère automatiquement un bloc “Business” (JSON-LD) pour aider Google à comprendre le pro.
-              C’est propre, et ça travaille pendant que toi tu dors.
-            </div>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div id="toast" class="toast">
-    <div id="toastMsg">—</div>
-    <small>Astuce : tu peux partager la fiche comme un lien WhatsApp / QR.</small>
+    <div class="foot">© DIGIYLYFE · 0% commission · Paiement direct au pro</div>
   </div>
 
 <script>
-/* ================================
-   CONFIG SUPABASE (UNIQUE)
-================================ */
+/* ✅ SUPABASE — intégré */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 
-window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const SB = window.SB;
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ================================
-   PRIORITÉ ASTOU (si pas de slug)
-================================ */
+/* ===== UTIL ===== */
+const $ = (id)=>document.getElementById(id);
+
 const DEFAULT_SLUG = "astou-boutique";
 
-/* ================================
-   PARAMS (robuste)
-   - ?slug=xxx
-   - ?pro=xxx
-   - #xxx
-   - /xxx (dernier segment)
-================================ */
-function canon(x){ return String(x ?? "").trim(); }
+// Pages / repo à ignorer si on lit "dernier segment"
+const RESERVED = new Set([
+  "index","index.html",
+  "pro","pro.html",
+  "map","map.html",
+  "digiy-mdimbal-map","digiy-mdimbal-map.html",
+  "digiy-ndimbal-map","digiy-ndimbal-map.html"
+]);
 
-function parseKey(){
-  const u = new URL(window.location.href);
-  const qs = canon(u.searchParams.get("slug") || u.searchParams.get("pro") || "");
-
-  if(qs) return qs;
-
-  const h = canon((window.location.hash || "").replace("#",""));
-  if(h) return h;
-
-  const parts = window.location.pathname.split("/").filter(Boolean);
-  const last = canon(parts[parts.length - 1] || "");
-  const clean = canon(last.replace(/\.html$/i,""));
-  // évite de prendre "index" comme slug
-  if(clean && clean.toLowerCase() !== "index") return clean;
-
-  return "";
+function safeText(v, fallback="—"){
+  if(v===null || v===undefined) return fallback;
+  const s = (""+v).trim();
+  return s ? s : fallback;
 }
 
-const KEY = parseKey();
+function parseSlug(){
+  // 1) ?slug=xxx ou ?pro=xxx
+  const q = new URLSearchParams(location.search);
+  let slug = (q.get("slug") || q.get("pro") || "").trim();
 
-/* ================================
-   CATEGORY LABELS
-================================ */
-function fold(s){
-  return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-}
-function normCategory(cat){
-  const c = fold(cat);
-  if(c.includes('resto') || c.includes('restaurant')) return 'restaurant';
-  if(c.includes('commerce') || c.includes('market') || c.includes('boutique')) return 'commerce';
-  if(c.includes('logement') || c.includes('heberg') || c.includes('héberg') || c.includes('villa')) return 'logement';
-  if(c.includes('hotel') || c.includes('hôtel')) return 'hotel';
-  if(c.includes('taxi') || c.includes('vtc') || c.includes('driver') || c.includes('chauffeur')) return 'taxi';
-  if(c.includes('bat') || c.includes('bât') || c.includes('construction') || c.includes('artisan')) return 'batiment';
-  if(c.includes('voyage') || c.includes('explore') || c.includes('guide')) return 'voyage';
-  if(c.includes('loisir')) return 'loisir';
-  if(c.includes('notable')) return 'notable';
-  if(c.includes('voiture')) return 'voiture';
-  return 'commerce';
-}
-function getCategoryLabel(category){
-  const labels = {
-    restaurant:'🍽️ Restaurant',
-    commerce:'🏪 Commerce',
-    logement:'🏠 Logement',
-    taxi:'🚕 Taxi/VTC',
-    notable:'👔 Notable',
-    batiment:'🔨 Bâtiment',
-    voiture:'🚗 Voiture',
-    voyage:'✈️ Voyage',
-    loisir:'🎭 Loisir',
-    hotel:'🏨 Hôtel'
-  };
-  return labels[category] || '📍 Service';
-}
-function getRegionLabel(region){
-  return (region||'').toString().replace(/-/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
-}
-
-/* ================================
-   UI HELPERS
-================================ */
-function escapeHTML(str){
-  return (str ?? "").toString()
-    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-}
-function showToast(msg){
-  const t = document.getElementById("toast");
-  document.getElementById("toastMsg").innerHTML = msg;
-  t.style.display = "block";
-  clearTimeout(window.__toastTimer);
-  window.__toastTimer = setTimeout(()=> t.style.display="none", 3200);
-}
-function setMetaTitleDesc(name, cat, city){
-  const title = `${name} — ${cat} • ${city} | DIGIY NDIMBAL`;
-  document.title = title;
-  const meta = document.querySelector('meta[name="description"]');
-  if(meta) meta.setAttribute("content", `Fiche pro : ${name} — ${cat} à ${city}. Horaires, services, contact, localisation.`);
-}
-function showErrorBox(title, detail){
-  // Remplace le skeleton par un message propre
-  const loading = document.getElementById("loading");
-  loading.innerHTML = `
-    <div class="content">
-      <div class="desc" style="padding:14px">
-        <div style="font-weight:950;font-size:16px;margin-bottom:6px">❌ ${escapeHTML(title)}</div>
-        <div style="color:var(--muted);font-weight:700;line-height:1.6">${escapeHTML(detail || "")}</div>
-        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-          <a class="btn btn-outline" href="map.html">🗺️ Retour carte</a>
-          <a class="btn btn-primary" href="https://digiylyfe.com/page-partenaires/" target="_blank" rel="noopener">🔎 Moteur partenaires</a>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* ================================
-   DATA ADAPTER
-================================ */
-function pickLat(p){ return p.latitude ?? p.lat ?? p.gps_lat ?? null; }
-function pickLng(p){ return p.longitude ?? p.lng ?? p.gps_lng ?? null; }
-
-function parseServices(p){
-  const s = p.services;
-  if(Array.isArray(s)) return s.filter(Boolean).map(x=>String(x));
-  if(typeof s === "string"){
-    const t = s.trim();
-    if(!t) return [];
-    try{
-      const j = JSON.parse(t);
-      if(Array.isArray(j)) return j.map(x=>String(x));
-    }catch(e){}
-    return t.split(",").map(x=>x.trim()).filter(Boolean);
-  }
-  if(s && typeof s === "object") return Object.keys(s);
-  return [];
-}
-
-function parsePhotos(p){
-  const out = [];
-  const add = (u)=>{ if(u && typeof u === "string"){ const x=u.trim(); if(x) out.push(x); } };
-
-  add(p.cover_url);
-  add(p.cover);
-  add(p.photo_url);
-
-  const arr = p.photos ?? p.gallery ?? p.images ?? null;
-  if(Array.isArray(arr)) arr.forEach(add);
-  else if(typeof arr === "string"){
-    const t = arr.trim();
-    if(t){
-      try{
-        const j = JSON.parse(t);
-        if(Array.isArray(j)) j.forEach(add);
-        else add(t);
-      }catch(e){
-        t.split(",").forEach(add);
-      }
-    }
-  }
-  return Array.from(new Set(out));
-}
-
-function buildWA(phone, name){
-  const p = String(phone||"").replace(/\s+/g,'');
-  if(!p) return "";
-  const msg = encodeURIComponent(`Salam ${name || ""} — je viens de DIGIY NDIMBAL ♾️`);
-  const cleaned = p.replace(/^00/,'+');
-  const digits = cleaned.startsWith("+") ? cleaned.slice(1) : cleaned;
-  return `https://wa.me/${digits}?text=${msg}`;
-}
-
-function googleMapsLink(lat, lng, name){
-  if(lat==null || lng==null) return "";
-  const q = encodeURIComponent(`${lat},${lng} (${name||"Pro"})`);
-  return `https://www.google.com/maps?q=${q}`;
-}
-
-/* ================================
-   JSON-LD SEO
-================================ */
-function injectJsonLd(p){
-  const name = p.name || "Professionnel";
-  const city = p.city || "";
-  const region = p.region ? getRegionLabel(p.region) : "";
-  const phone = p.phone || "";
-  const email = p.email || "";
-  const hours = p.hours || "";
-  const desc = (p.description || "").slice(0, 300);
-  const photos = p._photos || [];
-  const lat = pickLat(p);
-  const lng = pickLng(p);
-
-  const data = {
-    "@context":"https://schema.org",
-    "@type":"LocalBusiness",
-    "name": name,
-    "description": desc || undefined,
-    "image": photos.length ? photos : undefined,
-    "telephone": phone || undefined,
-    "email": email || undefined,
-    "address":{
-      "@type":"PostalAddress",
-      "addressLocality": city || undefined,
-      "addressRegion": region || undefined,
-      "addressCountry":"SN"
-    },
-    "geo": (lat!=null && lng!=null) ? ({
-      "@type":"GeoCoordinates",
-      "latitude": Number(lat),
-      "longitude": Number(lng)
-    }) : undefined,
-    "openingHours": hours || undefined
-  };
-
-  const clean = JSON.parse(JSON.stringify(data));
-  const s = document.createElement("script");
-  s.type = "application/ld+json";
-  s.textContent = JSON.stringify(clean);
-  document.head.appendChild(s);
-}
-
-/* ================================
-   LOAD LOGIC (PROPRE)
-   1) slug exact
-   2) slug ilike
-   3) id
-================================ */
-async function fetchPro(key){
-  if(!key) return null;
-
-  let q = await SB.from("professionals").select("*").eq("slug", key).maybeSingle();
-  if(!q.error && q.data) return q.data;
-
-  q = await SB.from("professionals").select("*").ilike("slug", key).maybeSingle();
-  if(!q.error && q.data) return q.data;
-
-  q = await SB.from("professionals").select("*").eq("id", key).maybeSingle();
-  if(!q.error && q.data) return q.data;
-
-  return null;
-}
-
-/* ================================
-   RENDER
-================================ */
-function renderPro(p){
-  const name = p.name || "Professionnel";
-  const slug = p.slug || p.id || "—";
-  const city = p.city || "Sénégal";
-  const region = p.region ? getRegionLabel(p.region) : "";
-  const catNorm = normCategory(p.category || p.cat || p.type || "");
-  p._cat = catNorm;
-
-  const rating = (p.rating != null && String(p.rating).trim() !== "") ? String(p.rating) : "5.0";
-  const phone = p.phone || "";
-  const email = p.email || "N/A";
-  const hours = p.hours || p.opening_hours || "N/A";
-
-  const photos = parsePhotos(p);
-  p._photos = photos;
-
-  const services = parseServices(p);
-  const desc = p.description || "—";
-
-  const lat = pickLat(p);
-  const lng = pickLng(p);
-
-  // Cover
-  const coverEl = document.getElementById("coverImg");
-  coverEl.src = photos[0] || "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1600&q=70";
-
-  // Badge
-  const badgeEl = document.getElementById("badge");
-  const badgeText = (p.badge_text || "").trim();
-  if(badgeText){
-    badgeEl.textContent = badgeText;
-    badgeEl.hidden = false;
-    badgeEl.className = "badge ok";
-  }else{
-    if(p.verified === true || p.is_verified === true){
-      badgeEl.textContent = "✅ Vérifié";
-      badgeEl.hidden = false;
-      badgeEl.className = "badge ok";
-    }else{
-      badgeEl.hidden = true;
-    }
+  // 2) #xxx
+  if(!slug){
+    const h = (location.hash || "").replace("#","").trim();
+    if(h && !RESERVED.has(h.toLowerCase())) slug = h;
   }
 
-  // Titles
-  document.getElementById("proName").textContent = name;
-  document.getElementById("proSlug").textContent = slug;
-  document.getElementById("proRating").textContent = rating;
-
-  const meta = `${getCategoryLabel(catNorm)} • 📍 ${city}${region ? " — " + region : ""}`;
-  document.getElementById("proMeta").textContent = meta;
-
-  // Description + services
-  document.getElementById("proDesc").textContent = desc;
-  const sWrap = document.getElementById("proServices");
-  sWrap.innerHTML = "";
-  services.slice(0, 24).forEach(s=>{
-    const span = document.createElement("span");
-    span.className = "tag";
-    span.textContent = s;
-    sWrap.appendChild(span);
-  });
-
-  // Gallery
-  const g = document.getElementById("gallery");
-  g.innerHTML = "";
-  const gal = photos.slice(0, 6);
-  if(gal.length){
-    gal.forEach(u=>{
-      const d = document.createElement("div");
-      d.className = "photo";
-      d.innerHTML = `<img src="${escapeHTML(u)}" alt="Photo ${escapeHTML(name)}" loading="lazy" decoding="async">`;
-      g.appendChild(d);
-    });
-  }else{
-    g.innerHTML = `<div class="desc" style="color:var(--muted)">Aucune photo pour l’instant. Ajoute 3 à 6 images réelles : boutique, équipe, produits, façade…</div>`;
+  // 3) /xxx (dernier segment) — seulement si ce n’est PAS réservé
+  if(!slug){
+    const parts = location.pathname.split("/").filter(Boolean);
+    const last = (parts[parts.length-1] || "").trim();
+    const clean = last.replace(/\.html$/i,"").trim();
+    const low = (clean || "").toLowerCase();
+    if(clean && !RESERVED.has(low)) slug = clean;
   }
 
-  // KVs
-  document.getElementById("kvCategory").textContent = getCategoryLabel(catNorm);
-  document.getElementById("kvRegion").textContent = region || "—";
-  document.getElementById("kvCity").textContent = city || "—";
-  document.getElementById("kvHours").textContent = hours;
-  document.getElementById("kvEmail").textContent = email;
-  document.getElementById("kvPhone").textContent = phone || "N/A";
+  // 4) sécurité finale
+  if(slug && RESERVED.has(slug.toLowerCase())) return "";
 
-  // Location line
-  document.getElementById("locLine").textContent = `📍 ${city}${region ? " — " + region : ""}`;
-
-  const gpsNote = document.getElementById("gpsNote");
-  if(lat!=null && lng!=null){
-    gpsNote.innerHTML = `Coordonnées GPS : <strong>${Number(lat).toFixed(6)}</strong>, <strong>${Number(lng).toFixed(6)}</strong>`;
-  }else{
-    gpsNote.textContent = "⚠️ GPS non renseigné : ajoute latitude/longitude pour un repère parfait sur la carte.";
-  }
-
-  // CTA links
-  const btnCall = document.getElementById("btnCall");
-  btnCall.href = phone ? `tel:${phone}` : "#";
-  btnCall.onclick = (e)=>{ if(!phone){ e.preventDefault(); alert("Numéro non disponible"); } };
-
-  const btnWA = document.getElementById("btnWA");
-  const wa = buildWA(phone, name);
-  btnWA.href = wa || "#";
-  btnWA.onclick = (e)=>{ if(!wa){ e.preventDefault(); alert("WhatsApp indisponible (numéro manquant)"); } };
-
-  const btnOpenMap = document.getElementById("btnOpenMap");
-  const gmap = googleMapsLink(lat, lng, name);
-  btnOpenMap.href = gmap || "#";
-  btnOpenMap.target = "_blank";
-  btnOpenMap.rel = "noopener";
-  btnOpenMap.onclick = (e)=>{ if(!gmap){ e.preventDefault(); alert("GPS manquant pour ouvrir la carte."); } };
-
-  // Share
-  const shareBtn = document.getElementById("btnShare");
-  shareBtn.onclick = async ()=>{
-    const url = window.location.href;
-    try{
-      if(navigator.share){
-        await navigator.share({ title: document.title, text: `${name} — fiche NDIMBAL`, url });
-        showToast(`✅ Partagé : <strong>${escapeHTML(name)}</strong>`);
-      }else{
-        await navigator.clipboard.writeText(url);
-        showToast(`🔗 Lien copié : <strong>${escapeHTML(name)}</strong>`);
-      }
-    }catch(e){
-      try{
-        await navigator.clipboard.writeText(url);
-        showToast(`🔗 Lien copié : <strong>${escapeHTML(name)}</strong>`);
-      }catch(err){
-        alert("Impossible de partager automatiquement. Copie le lien dans la barre d’adresse.");
-      }
-    }
-  };
-
-  // Meta tags + JSON-LD
-  setMetaTitleDesc(name, getCategoryLabel(catNorm), city);
-  injectJsonLd(p);
-
-  // show
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("content").style.display = "grid";
+  return slug;
 }
 
-/* ================================
-   NAV: Retour carte (évite boucle)
-================================ */
-document.getElementById("btnBackMap").addEventListener("click", (e)=>{
+function isUrl(s){
+  try{ new URL(s); return true; }catch(e){ return false; }
+}
+
+function joinList(val){
+  if(!val) return "";
+  if(Array.isArray(val)) return val.filter(Boolean).join(" · ");
+  if(typeof val === "string") return val;
+  if(typeof val === "object"){
+    const entries = Object.entries(val).filter(([k,v])=>v!==null && v!==undefined && (""+v).trim()!=="");
+    return entries.map(([k,v])=>`${k}: ${v}`).join(" · ");
+  }
+  return ""+val;
+}
+
+function buildMapsLink(address, city){
+  const q = encodeURIComponent([address, city].filter(Boolean).join(", "));
+  return "https://www.google.com/maps/search/?api=1&query=" + q;
+}
+
+function showError(msg){
+  $("errorBox").style.display = "block";
+  $("errorBox").textContent = msg;
+}
+
+/* ===== UI ===== */
+$("btnBack").addEventListener("click", (e)=>{
   e.preventDefault();
   if(history.length > 1) history.back();
-  else window.location.href = "map.html"; // <-- change ici si ta carte a un autre fichier
+  else location.href = "./"; // ✅ retourne à la racine du repo (ta MAP)
 });
 
-/* ================================
-   INIT
-================================ */
-(async function init(){
-  // 1) si pas de KEY -> astou direct
-  const finalKey = KEY || DEFAULT_SLUG;
-  if(!KEY){
-    showToast(`ℹ️ Aucun slug fourni — affichage <strong>${escapeHTML(DEFAULT_SLUG)}</strong> (priorité Astou).`);
-  }
-
-  // 2) Charge depuis Supabase
-  let data = null;
+$("btnCopy").addEventListener("click", async (e)=>{
+  e.preventDefault();
   try{
-    data = await fetchPro(finalKey);
-  }catch(e){
-    data = null;
+    await navigator.clipboard.writeText(location.href);
+    $("btnCopy").textContent = "✅ Lien copié";
+    setTimeout(()=> $("btnCopy").textContent = "📋 Copier le lien", 1400);
+  }catch(err){
+    alert("Copie impossible. Tu peux copier l’URL manuellement.");
+  }
+});
+
+/* ===== DATA LOAD ===== */
+async function loadPro(slug){
+  $("loading").style.display = "block";
+  $("loading").textContent = "Chargement…";
+
+  const { data, error } = await SB
+    .from("professionals")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if(error) throw new Error("Supabase: " + error.message);
+  if(!data) throw new Error("Aucun partenaire trouvé pour le slug : " + slug);
+  return data;
+}
+
+function renderPro(p){
+  $("hero").style.display = "block";
+  $("grid").style.display = "grid";
+  $("loading").style.display = "none";
+
+  const name = safeText(p.name, "Partenaire DIGIY");
+  const cat  = safeText(p.category, "");
+  const city = safeText(p.city, "");
+  const zone = safeText(p.zone, "");
+  const sub  = [cat, zone, city].filter(Boolean).join(" · ") || "Partenaire local";
+
+  $("proName").textContent = name;
+  $("proSubtitle").textContent = sub;
+
+  const slug = safeText(p.slug, "");
+  $("slugText").textContent = slug ? slug : "—";
+
+  const cover = p.cover_url && isUrl(p.cover_url) ? p.cover_url : "";
+  $("coverImg").src = cover || "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
+      <defs>
+        <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+          <stop stop-color='#facc15' stop-opacity='.20'/>
+          <stop offset='1' stop-color='#22c55e' stop-opacity='.12'/>
+        </linearGradient>
+      </defs>
+      <rect width='100%' height='100%' fill='#0b1020'/>
+      <rect width='100%' height='100%' fill='url(#g)'/>
+      <text x='50%' y='52%' text-anchor='middle' fill='#e5e7eb' font-family='system-ui' font-size='46' font-weight='900'>${name.replace(/</g,"&lt;")}</text>
+      <text x='50%' y='62%' text-anchor='middle' fill='#9ca3af' font-family='system-ui' font-size='22' font-weight='700'>DIGIYLYFE · 0% commission</text>
+    </svg>`
+  );
+
+  if(p.badge_text){
+    $("badgePill").style.display = "inline-flex";
+    $("badgeText").textContent = safeText(p.badge_text);
+  }
+  if(p.price_text){
+    $("pricePill").style.display = "inline-flex";
+    $("priceText").textContent = safeText(p.price_text);
   }
 
-  if(!data){
-    showErrorBox(
-      "Partenaire introuvable",
-      `Slug/ID demandé : ${finalKey}. Vérifie que la table 'professionals' contient bien ce slug (colonne 'slug').`
+  if(p.is_verified === true) $("verifiedPill").style.display = "inline-flex";
+  if(p.is_online === true) $("statusPill").style.display = "inline-flex";
+
+  const meta = [];
+  if(cat) meta.push(`🏷️ ${cat}`);
+  if(city) meta.push(`📍 ${city}`);
+  if(zone) meta.push(`🧭 ${zone}`);
+  const metaRow = $("metaRow");
+  metaRow.innerHTML = "";
+  meta.forEach(t=>{
+    const el = document.createElement("div");
+    el.className = "pill";
+    el.textContent = t;
+    metaRow.appendChild(el);
+  });
+
+  $("proDesc").textContent = safeText(p.description, "Pas encore de description. (Mais le service est là 😄)");
+
+  const services = joinList(p.services);
+  if(services){
+    $("servicesBox").style.display = "block";
+    $("proServices").textContent = services;
+  }
+
+  const hours = joinList(p.opening_hours || p.hours);
+  if(hours){
+    $("hoursBox").style.display = "block";
+    $("proHours").textContent = hours;
+  }
+
+  let photos = p.photos || p.gallery || p.images;
+  if(typeof photos === "string"){
+    try{ photos = JSON.parse(photos); }catch(e){}
+  }
+  if(Array.isArray(photos) && photos.length){
+    const urls = photos.filter(u=>typeof u==="string" && u.trim() && isUrl(u.trim())).slice(0, 12);
+    if(urls.length){
+      $("galleryBox").style.display = "block";
+      const g = $("gallery");
+      g.innerHTML = "";
+      urls.forEach(u=>{
+        const a = document.createElement("a");
+        a.className = "ph";
+        a.href = u;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.title = "Ouvrir";
+        const img = document.createElement("img");
+        img.src = u;
+        img.alt = "Photo";
+        a.appendChild(img);
+        g.appendChild(a);
+      });
+    }
+  }
+
+  const lines = [];
+  if(cat) lines.push(cat);
+  if(zone || city) lines.push([zone, city].filter(Boolean).join(", "));
+  $("infoLines").innerHTML = lines.length ? lines.map(x=>`• ${x}`).join("<br>") : "• Partenaire local";
+
+  const phone = safeText(p.phone, "");
+  const whatsapp = safeText(p.whatsapp, "");
+  const phoneToUse = whatsapp || phone;
+
+  if(phoneToUse){
+    $("phoneBox").style.display = "block";
+    $("phoneLink").textContent = phoneToUse;
+    $("phoneLink").href = "tel:" + phoneToUse.replace(/\s+/g,"");
+  }
+
+  const address = safeText(p.address, "");
+  if(address){
+    $("addressBox").style.display = "block";
+    $("addressText").textContent = address;
+
+    $("mapBox").style.display = "block";
+    $("mapLink").href = buildMapsLink(address, city);
+  }
+
+  const ctaRow = $("ctaRow");
+  ctaRow.innerHTML = "";
+
+  const cta1Label = safeText(p.cta_primary_label, "");
+  const cta1Url   = safeText(p.cta_primary_url, "");
+  const cta2Label = safeText(p.cta_secondary_label, "");
+  const cta2Url   = safeText(p.cta_secondary_url, "");
+
+  function addBtn(label, url, cls){
+    if(!label || !url) return;
+    const a = document.createElement("a");
+    a.className = "btn " + (cls || "");
+    a.textContent = label;
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    ctaRow.appendChild(a);
+  }
+
+  if(cta1Label && cta1Url && isUrl(cta1Url)){
+    addBtn(cta1Label, cta1Url, "btn-primary");
+  }else{
+    if(phoneToUse){
+      const wa = "https://wa.me/" + phoneToUse.replace(/[^\d]/g,"") +
+        "?text=" + encodeURIComponent("Salam " + name + " je viens de DIGIYLYFE");
+      addBtn("💬 WhatsApp", wa, "btn-primary");
+    }
+  }
+
+  if(cta2Label && cta2Url && isUrl(cta2Url)){
+    addBtn(cta2Label, cta2Url, "");
+  }else{
+    addBtn("🔎 Voir sur partenaires", "https://digiylyfe.com/page-partenaires/", "");
+  }
+
+  if(phoneToUse){
+    const tel = "tel:" + phoneToUse.replace(/\s+/g,"");
+    const a = document.createElement("a");
+    a.className = "btn btn-green";
+    a.textContent = "📞 Appeler";
+    a.href = tel;
+    ctaRow.appendChild(a);
+  }
+
+  document.title = name + " — DIGIYLYFE";
+}
+
+/* ===== BOOT ===== */
+(async function boot(){
+  try{
+    const slug = parseSlug();
+
+    if(!slug){
+      $("infoNoSlug").style.display = "block";
+    }
+
+    const finalSlug = slug || DEFAULT_SLUG;
+
+    const pro = await loadPro(finalSlug);
+    renderPro(pro);
+
+  }catch(err){
+    $("loading").style.display = "none";
+    showError(
+      "Impossible de charger la fiche.\n" +
+      "• Vérifie que le slug existe dans Supabase.\n" +
+      "• Vérifie que la table s’appelle bien 'professionals' et que la colonne 'slug' est remplie.\n\n" +
+      "Détail: " + (err?.message || err)
     );
-    showToast(`⚠️ Introuvable : <strong>${escapeHTML(finalKey)}</strong>`);
-    return;
   }
-
-  if(data.region) data.region = String(data.region);
-  renderPro(data);
 })();
 </script>
-
 </body>
 </html>
