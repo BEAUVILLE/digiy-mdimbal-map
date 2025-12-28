@@ -310,7 +310,12 @@
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient;
+if (typeof window.supabase !== 'undefined') {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} else {
+  console.error('Supabase library not loaded');
+}
 
 // ============================================
 // 🗺️ DIGIY NDIMBAL MAP — Saly QG
@@ -331,7 +336,7 @@ let partners = [];
 
 // Attendre que Leaflet ET Supabase soient chargés
 window.addEventListener('load', function() {
-  if (typeof L === 'undefined' || typeof supabase === 'undefined') {
+  if (typeof L === 'undefined' || typeof window.supabase === 'undefined') {
     console.error('Leaflet ou Supabase non chargé, nouvelle tentative...');
     setTimeout(initApp, 500);
   } else {
@@ -360,7 +365,7 @@ async function loadPartnersFromSupabase() {
     console.log('📥 Chargement des partenaires depuis Supabase...');
     
     // Récupérer les partenaires de la table 'partners'
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('partners')
       .select('*')
       .eq('location', 'Saly') // Filtrer par Saly
