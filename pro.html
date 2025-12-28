@@ -1,439 +1,449 @@
-<!doctype html>
+soit pro.html (Astou en priorité)<!doctype html>
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Fiche NDIMBAL — DIGIYLYFE</title>
-  <meta name="description" content="Fiche partenaire NDIMBAL — photos, horaires, services, contact." />
+  <title>Fiche Pro — DIGIYLYFE</title>
+  <meta name="description" content="Fiche partenaire — photos, horaires, services, contact." />
   <meta name="theme-color" content="#0B1120" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg:#0b1020; --card:#0f172a; --line:rgba(255,255,255,.10);
+      --bg:#0b1020; --card:#0f172a; --card2:#0b1328; --line:rgba(255,255,255,.10);
       --text:#e5e7eb; --muted:#9ca3af;
-      --gold:#facc15; --green:#22c55e; --orange:#f97316; --red:#ef4444;
-      --radius:18px; --shadow:0 18px 60px rgba(0,0,0,.45);
-      --max:1100px;
+      --gold:#facc15; --green:#22c55e; --orange:#f97316; --red:#ef4444; --blue:#60a5fa;
+      --radius:18px; --radius2:22px;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --glow: 0 0 0 1px rgba(250,204,21,.20), 0 18px 80px rgba(250,204,21,.08);
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
       color:var(--text);
       background:
-        radial-gradient(1000px 600px at 10% -10%, rgba(250,204,21,.18), transparent 60%),
-        radial-gradient(900px 500px at 110% 10%, rgba(34,197,94,.14), transparent 55%),
-        linear-gradient(180deg, #070a14, var(--bg));
-      min-height:100svh;
+        radial-gradient(1200px 700px at 12% -10%, rgba(250,204,21,.14), transparent 55%),
+        radial-gradient(1000px 600px at 90% 10%, rgba(34,197,94,.10), transparent 55%),
+        radial-gradient(900px 600px at 50% 120%, rgba(96,165,250,.10), transparent 55%),
+        linear-gradient(180deg, #070b16 0%, #0b1020 45%, #070b16 100%);
+      min-height:100vh;
     }
     a{color:inherit}
-    .wrap{max-width:var(--max); margin:0 auto; padding:18px}
-    .top{
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
-      padding:14px 14px; border:1px solid var(--line); border-radius:var(--radius);
-      background:rgba(255,255,255,.04); backdrop-filter: blur(10px);
+    .wrap{max-width:1080px;margin:0 auto;padding:16px 14px 40px}
+    .topbar{
+      position:sticky;top:0;z-index:10;
+      background:rgba(7,11,22,.62);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    .brand{display:flex; gap:10px; align-items:center}
-    .inf{
-      font-weight:1000; font-size:22px;
-      color:var(--gold);
-      text-shadow: 0 0 22px rgba(250,204,21,.25);
+    .topbar .inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px}
+    .brand{
+      display:flex;align-items:center;gap:10px;min-width:0;
+      font-weight:900;letter-spacing:.3px;
     }
-    .sub{color:var(--muted); font-weight:700; font-size:13px}
+    .brand .mark{
+      width:36px;height:36px;border-radius:12px;
+      display:grid;place-items:center;
+      background: radial-gradient(circle at 30% 30%, rgba(250,204,21,.35), rgba(250,204,21,.08) 55%, rgba(255,255,255,.06) 100%);
+      box-shadow: var(--glow);
+      border:1px solid rgba(250,204,21,.25);
+      font-size:18px;
+    }
+    .brand .txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .spacer{flex:1}
     .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:10px 12px; border-radius:999px; border:1px solid var(--line);
-      background:rgba(255,255,255,.06); color:var(--text);
-      font-weight:900; text-decoration:none; cursor:pointer;
-      transition:transform .15s ease, background .15s ease, border-color .15s ease;
-      white-space:nowrap;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 12px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      text-decoration:none;cursor:pointer;
+      transition:.15s transform ease, .15s background ease, .15s border-color ease;
+      font-weight:800;
+      user-select:none;
     }
-    .btn:hover{transform:translateY(-1px); border-color:rgba(250,204,21,.35); background:rgba(255,255,255,.09)}
-    .btn.primary{background:linear-gradient(135deg, rgba(34,197,94,.95), rgba(13,159,84,.95)); border-color:rgba(34,197,94,.35)}
-    .btn.gold{background:linear-gradient(135deg, rgba(250,204,21,.95), rgba(249,115,22,.95)); color:#0b1020; border-color:rgba(250,204,21,.35)}
-    .grid{
-      display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px;
+    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+    .btn:active{transform:translateY(0)}
+    .btn-primary{
+      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.85));
+      color:#0b1020;border-color:rgba(250,204,21,.35);
+      box-shadow: 0 16px 60px rgba(250,204,21,.18);
     }
-    @media (max-width: 920px){ .grid{grid-template-columns:1fr} }
-
-    .card{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.04);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
+    .btn-primary:hover{background: linear-gradient(135deg, rgba(250,204,21,1), rgba(245,158,11,.92))}
+    .btn-green{
+      background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(16,185,129,.80));
+      color:#04120c;border-color:rgba(34,197,94,.35);
+    }
+    .btn-ghost{background:transparent}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      font-weight:750;
+      max-width:100%;
     }
     .hero{
-      position:relative; height:340px; background:#0a0f1f;
+      margin-top:14px;
+      border-radius:var(--radius2);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      box-shadow: var(--shadow);
     }
-    .hero img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.05) contrast(1.02)}
-    .badge{
-      position:absolute; top:14px; left:14px;
-      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.18);
-      padding:8px 10px; border-radius:999px; font-weight:900; font-size:13px;
-      backdrop-filter: blur(8px);
-      max-width: calc(100% - 28px);
-      overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+    .cover{
+      position:relative;
+      height:240px;
+      background: linear-gradient(135deg, rgba(250,204,21,.14), rgba(34,197,94,.10));
     }
-    .content{padding:14px}
-    .h1{font-size:24px; font-weight:1000; margin:0 0 6px}
-    .meta{display:flex; flex-wrap:wrap; gap:8px; color:var(--muted); font-weight:800; font-size:13px}
-    .pill{
-      display:inline-flex; gap:8px; align-items:center;
-      padding:8px 10px; border-radius:999px;
-      border:1px solid var(--line); background:rgba(255,255,255,.04);
+    .cover img{
+      width:100%;height:100%;object-fit:cover;display:block;
+      filter:saturate(1.05) contrast(1.05);
     }
-    .section{padding:14px; border-top:1px solid var(--line)}
-    .section h2{margin:0 0 10px; font-size:14px; letter-spacing:.4px; text-transform:uppercase; color:var(--muted)}
-    .desc{color:#d1d5db; line-height:1.55; margin:0}
-    .gallery{
-      display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    .cover::after{
+      content:"";
+      position:absolute;inset:0;
+      background: linear-gradient(180deg, rgba(7,11,22,.15), rgba(7,11,22,.75));
+      pointer-events:none;
     }
-    @media (max-width: 600px){ .gallery{grid-template-columns:repeat(2,1fr)} .hero{height:260px} }
-    .gimg{border-radius:14px; overflow:hidden; border:1px solid var(--line); background:#0a0f1f}
-    .gimg img{width:100%; height:120px; object-fit:cover; display:block}
-    .list{display:flex; flex-wrap:wrap; gap:8px}
-    .tag{
-      padding:8px 10px; border-radius:999px;
-      background:rgba(250,204,21,.10); border:1px solid rgba(250,204,21,.18);
-      color:#fde68a; font-weight:900; font-size:13px;
+    .hero-body{padding:14px 14px 16px}
+    .head{
+      display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;
     }
-    .right .card{position:sticky; top:14px}
-    .krow{display:flex; flex-direction:column; gap:10px}
-    .k{display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-weight:800; font-size:13px}
-    .k b{color:var(--text)}
-    .ctaCol{display:flex; flex-direction:column; gap:10px; margin-top:10px}
-    .notice{
-      padding:12px 12px; border-radius:14px;
-      border:1px dashed rgba(255,255,255,.18);
-      color:var(--muted); font-weight:700; background:rgba(255,255,255,.03);
+    .title{
+      font-size:22px;line-height:1.15;font-weight:950;letter-spacing:.2px;
+      margin:0;
     }
-    .loading, .err{
-      max-width:var(--max); margin:30px auto; padding:14px 16px;
-      border:1px solid var(--line); border-radius:var(--radius);
-      background:rgba(255,255,255,.04);
+    .subtitle{
+      margin:6px 0 0;color:var(--muted);font-weight:650
     }
-    .err{border-color:rgba(239,68,68,.35)}
+    .metaRow{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
+    }
+    .ctaRow{
+      display:flex;gap:10px;flex-wrap:wrap;margin-top:14px
+    }
 
-    /* ===========================
-       🧵 BOUTIQUE ASTOU (FICHE)
-       =========================== */
-    .shop{
-      border:1px solid rgba(250,204,21,.18);
-      background: radial-gradient(900px 400px at 10% 0%, rgba(250,204,21,.10), transparent 60%),
-                  radial-gradient(900px 400px at 110% 10%, rgba(249,115,22,.10), transparent 60%),
-                  rgba(255,255,255,.03);
-      border-radius:18px;
-      padding:14px;
+    .grid{
+      display:grid;grid-template-columns: 1.25fr .75fr;gap:14px;
+      margin-top:14px;
+    }
+    .card{
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      border-radius: var(--radius2);
+      box-shadow: 0 12px 40px rgba(0,0,0,.30);
       overflow:hidden;
     }
-    .shopTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
-    .shopTitle{font-weight:1000; font-size:16px}
-    .shopSub{color:var(--muted); font-weight:800; font-size:13px; margin-top:3px}
-    .shopBadge{
-      background:rgba(0,0,0,.45);
-      border:1px solid rgba(255,255,255,.14);
-      padding:7px 10px; border-radius:999px;
-      font-weight:1000; font-size:12px;
-      white-space:nowrap;
+    .card .hd{
+      padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .shopGrid{
-      display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
-      margin-top:12px;
-    }
-    @media (max-width:600px){ .shopGrid{grid-template-columns:1fr} }
+    .card .hd b{font-size:14px;letter-spacing:.25px}
+    .card .bd{padding:12px 14px}
+    .kv{display:flex;gap:10px;flex-wrap:wrap}
+    .kv .k{color:var(--muted);font-weight:700}
+    .kv .v{font-weight:850}
+    .list{display:grid;gap:10px}
     .item{
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.22);
-      border-radius:16px;
+      padding:10px 12px;border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+    .item .t{font-weight:900}
+    .item .s{color:var(--muted);margin-top:4px;font-weight:650}
+
+    .gallery{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    .ph{
+      position:relative;
+      border-radius:18px;
       overflow:hidden;
-      display:grid; grid-template-columns:96px 1fr;
-      min-height:96px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      aspect-ratio: 4 / 3;
     }
-    .itemImg{background:#0a0f1f}
-    .itemImg img{width:100%; height:100%; object-fit:cover; display:block}
-    .itemBody{padding:10px}
-    .itemName{font-weight:1000; font-size:13px; margin:0 0 4px}
-    .itemDesc{color:var(--muted); font-weight:800; font-size:12px; margin:0 0 8px; line-height:1.25}
-    .itemRow{display:flex; align-items:center; justify-content:space-between; gap:10px}
-    .price{
-      font-weight:1000; font-size:13px;
-      color:#0b1020;
-      background:linear-gradient(135deg, rgba(250,204,21,.95), rgba(249,115,22,.95));
-      padding:6px 9px; border-radius:999px;
-      white-space:nowrap;
+    .ph img{width:100%;height:100%;object-fit:cover;display:block}
+    .ph::after{
+      content:"";
+      position:absolute;inset:0;
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,.28));
+      pointer-events:none;
     }
-    .miniBtn{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:var(--text);
-      border-radius:999px;
-      padding:6px 9px;
-      font-weight:1000;
-      font-size:12px;
-      text-decoration:none;
-      display:inline-flex; align-items:center; gap:6px;
-      transition:transform .15s ease, border-color .15s ease, background .15s ease;
-      white-space:nowrap;
+
+    .note{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px dashed rgba(250,204,21,.32);
+      background: rgba(250,204,21,.06);
+      color: rgba(255,255,255,.92);
+      font-weight:700;
     }
-    .miniBtn:hover{transform:translateY(-1px); border-color:rgba(250,204,21,.35); background:rgba(255,255,255,.10)}
-    .shopNote{
-      margin-top:12px;
-      color:var(--muted);
+
+    .err{
+      margin:18px 0;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid rgba(239,68,68,.35);
+      background: rgba(239,68,68,.08);
+      color: rgba(255,255,255,.95);
       font-weight:800;
-      font-size:13px;
-      border-top:1px solid rgba(255,255,255,.10);
-      padding-top:10px;
+    }
+
+    .foot{
+      margin-top:18px;
+      padding:14px 2px 0;
+      color: rgba(255,255,255,.55);
+      font-weight:650;
+      text-align:center;
+    }
+
+    @media (max-width: 900px){
+      .grid{grid-template-columns:1fr}
+      .cover{height:220px}
+    }
+    @media (max-width: 560px){
+      .cover{height:210px}
+      .gallery{grid-template-columns: repeat(2, 1fr)}
+      .btn{flex:1}
+      .ctaRow .btn{flex:1}
     }
   </style>
 </head>
 
 <body>
-  <div class="wrap">
-    <div class="top">
-      <div class="brand">
-        <div class="inf">∞</div>
-        <div>
-          <div style="font-weight:1000">NDIMBAL — Fiche partenaire</div>
-          <div class="sub" id="subline">Chargement…</div>
-        </div>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="inner">
+      <a class="btn btn-ghost" id="btnBack" href="#" title="Retour">← Retour</a>
+
+      <div class="brand" title="DIGIYLYFE">
+        <div class="mark">∞</div>
+        <div class="txt">DIGIYLYFE · Fiche Pro</div>
       </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <a class="btn" href="https://beauville.github.io/digiy-mdimbal-map/">🗺️ Retour carte</a>
-        <a class="btn" href="https://beauville.github.io/digiy-hub/">🏠 HUB</a>
-      </div>
-    </div>
 
-    <div id="state" class="loading">⏳ Je prépare la fiche…</div>
+      <div class="spacer"></div>
 
-    <div id="ui" hidden>
-      <div class="grid">
-        <!-- LEFT -->
-        <div class="left">
-          <div class="card">
-            <div class="hero">
-              <img id="cover" alt="" />
-              <div class="badge" id="badge"></div>
-            </div>
-            <div class="content">
-              <h1 class="h1" id="name">—</h1>
-              <div class="meta">
-                <span class="pill" id="catPill">🏷️ —</span>
-                <span class="pill" id="locPill">📍 —</span>
-                <span class="pill" id="ratePill">⭐ —</span>
-              </div>
-            </div>
-
-            <div class="section">
-              <h2>Histoire & présentation</h2>
-              <p class="desc" id="desc">—</p>
-            </div>
-
-            <!-- ✅ BOUTIQUE ASTOU (injectée seulement pour astou-boutique) -->
-            <div class="section" id="astouShopSec" hidden>
-              <h2>🧵 Boutique Astou</h2>
-              <div id="astouShop"></div>
-            </div>
-
-            <div class="section" id="galSec" hidden>
-              <h2>Photos</h2>
-              <div class="gallery" id="gallery"></div>
-            </div>
-
-            <div class="section" id="servSec" hidden>
-              <h2>Services</h2>
-              <div class="list" id="services"></div>
-            </div>
-
-            <div class="section" id="hoursSec" hidden>
-              <h2>Horaires</h2>
-              <div class="krow" id="hours"></div>
-            </div>
-
-            <div class="section" id="mapSec" hidden>
-              <h2>Aller jusqu’au pro</h2>
-              <div class="ctaCol">
-                <a class="btn gold" id="btnMaps" target="_blank" rel="noopener">🧭 Itinéraire</a>
-              </div>
-              <div class="notice" style="margin-top:10px" id="gpsNote"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- RIGHT -->
-        <div class="right">
-          <div class="card">
-            <div class="content">
-              <div style="font-weight:1000; font-size:16px">Contact direct (0% commission)</div>
-              <div class="sub" style="margin-top:4px">Le pro reste propriétaire de sa clientèle.</div>
-
-              <div class="ctaCol">
-                <a class="btn primary" id="btnWhatsApp" target="_blank" rel="noopener">💬 WhatsApp</a>
-                <a class="btn" id="btnCall">📞 Appeler</a>
-                <a class="btn gold" id="btnSite" target="_blank" rel="noopener" hidden>🔎 Voir le site</a>
-              </div>
-
-              <div style="margin-top:12px" class="krow">
-                <div class="k"><span>♾️ Slug</span> <b id="slug">—</b></div>
-                <div class="k"><span>📧 Email</span> <b id="email">—</b></div>
-                <div class="k"><span>⏰ Statut</span> <b id="openNow">—</b></div>
-              </div>
-
-              <div class="notice" style="margin-top:12px">
-                ✅ Cette fiche est faite pour les moteurs de recherche + pour le client.<br/>
-                🔒 Et elle appartient au pro (pas aux OTA).
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <a class="btn" id="btnSearch" href="https://digiylyfe.com/page-partenaires/" target="_blank" rel="noopener">
+        🔎 Moteur
+      </a>
+      <a class="btn btn-primary" id="btnHub" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">
+        🏠 HUB
+      </a>
     </div>
   </div>
 
+  <div class="wrap">
+
+    <div id="loading" class="note" style="display:none">Chargement…</div>
+    <div id="infoNoSlug" class="note" style="display:none">
+      Aucun <b>slug</b> dans l’URL → on t’affiche <b>Astou</b> par défaut. (Astou d’abord 😄)
+    </div>
+    <div id="errorBox" class="err" style="display:none"></div>
+
+    <!-- HERO -->
+    <section class="hero" id="hero" style="display:none">
+      <div class="cover" id="cover">
+        <img id="coverImg" alt="Couverture" />
+      </div>
+
+      <div class="hero-body">
+        <div class="head">
+          <div style="flex:1;min-width:260px">
+            <h1 class="title" id="proName">—</h1>
+            <div class="subtitle" id="proSubtitle">—</div>
+
+            <div class="metaRow" id="metaRow"></div>
+
+            <div class="ctaRow" id="ctaRow"></div>
+          </div>
+
+          <div style="min-width:220px;display:grid;gap:10px;align-content:start">
+            <div class="pill" id="badgePill" style="display:none">🏷️ <span id="badgeText">—</span></div>
+            <div class="pill" id="pricePill" style="display:none">💰 <span id="priceText">—</span></div>
+            <div class="pill" id="slugPill">🔗 <span id="slugText">—</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRID -->
+    <section class="grid" id="grid" style="display:none">
+
+      <!-- LEFT -->
+      <div class="card">
+        <div class="hd">
+          <b>🧾 Présentation</b>
+          <span class="pill" id="verifiedPill" style="display:none">✅ Vérifié</span>
+        </div>
+        <div class="bd">
+          <div class="item">
+            <div class="t">Description</div>
+            <div class="s" id="proDesc">—</div>
+          </div>
+
+          <div class="item" id="servicesBox" style="display:none">
+            <div class="t">Services</div>
+            <div class="s" id="proServices">—</div>
+          </div>
+
+          <div class="item" id="hoursBox" style="display:none">
+            <div class="t">Horaires</div>
+            <div class="s" id="proHours">—</div>
+          </div>
+
+          <div class="item" id="galleryBox" style="display:none">
+            <div class="t">Photos</div>
+            <div class="s" style="margin-bottom:10px;color:var(--muted)">Tape une photo pour zoomer (si ton navigateur gère).</div>
+            <div class="gallery" id="gallery"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="card">
+        <div class="hd">
+          <b>📍 Contact</b>
+          <span class="pill" id="statusPill" style="display:none">🟢 En ligne</span>
+        </div>
+        <div class="bd">
+          <div class="list">
+
+            <div class="item">
+              <div class="t">Infos</div>
+              <div class="s" id="infoLines">—</div>
+            </div>
+
+            <div class="item" id="phoneBox" style="display:none">
+              <div class="t">Téléphone</div>
+              <div class="s"><a id="phoneLink" href="#" rel="nofollow">—</a></div>
+            </div>
+
+            <div class="item" id="addressBox" style="display:none">
+              <div class="t">Adresse</div>
+              <div class="s" id="addressText">—</div>
+            </div>
+
+            <div class="item" id="mapBox" style="display:none">
+              <div class="t">Carte</div>
+              <div class="s"><a id="mapLink" href="#" target="_blank" rel="noopener">Ouvrir Google Maps</a></div>
+            </div>
+
+            <div class="item" id="shareBox">
+              <div class="t">Partager</div>
+              <div class="s">
+                <a class="btn" href="#" id="btnCopy">📋 Copier le lien</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div class="foot">© DIGIYLYFE · 0% commission · Paiement direct au pro</div>
+  </div>
+
 <script>
-/* 🔐 SUPABASE — DÉJÀ POSÉ */
+/* ✅ SUPABASE — intégré */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 
-/* utils */
+const SB = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ===== UTIL ===== */
 const $ = (id)=>document.getElementById(id);
-const pick = (o,...keys)=>{ for(const k of keys){ const v=o?.[k]; if(v!=null && String(v).trim()!=="") return v; } return ""; };
-const safe = (s)=> (s??"").toString();
-function getParam(name){ return new URL(location.href).searchParams.get(name); }
 
-function normalizeWhatsApp(val){
-  const phone = safe(val).trim();
-  if(!phone) return "";
-  if(phone.includes("wa.me/")){
-    const m = phone.match(/wa\.me\/(\d+)/);
-    return m ? m[1] : "";
-  }
-  return phone.replace(/\D/g,'');
+function safeText(v, fallback="—"){
+  if(v===null || v===undefined) return fallback;
+  const s = (""+v).trim();
+  return s ? s : fallback;
 }
 
-function toArray(val){
-  if(Array.isArray(val)) return val.filter(Boolean);
-  if(!val) return [];
-  try{
-    const j = JSON.parse(val);
-    return Array.isArray(j) ? j.filter(Boolean) : [];
-  }catch(e){
-    return safe(val).split(",").map(s=>s.trim()).filter(Boolean);
-  }
-}
+function parseSlug(){
+  // 1) ?slug=xxx
+  const q = new URLSearchParams(location.search);
+  let slug = (q.get("slug") || "").trim();
 
-function getGPS(p){
-  const lat = pick(p,'latitude','lat','gps_lat');
-  const lng = pick(p,'longitude','lng','gps_lng');
-  const la = lat!=="" ? Number(lat) : null;
-  const lo = lng!=="" ? Number(lng) : null;
-  if(Number.isFinite(la) && Number.isFinite(lo)) return {lat:la, lng:lo};
-  return null;
-}
-
-function hoursToRows(hoursVal){
-  if(!hoursVal) return [];
-  if(typeof hoursVal === 'object' && !Array.isArray(hoursVal)){
-    const order = ["mon","tue","wed","thu","fri","sat","sun"];
-    const fr = {mon:"Lundi",tue:"Mardi",wed:"Mercredi",thu:"Jeudi",fri:"Vendredi",sat:"Samedi",sun:"Dimanche"};
-    return order.filter(k => hoursVal[k]).map(k => ({ day: fr[k], val: String(hoursVal[k]) }));
-  }
-  return [{ day:"Horaires", val: safe(hoursVal) }];
-}
-
-function computeOpenNow(hoursVal){
-  if(!hoursVal) return "—";
-  return "Voir horaires";
-}
-
-/* ===========================
-   🧵 BOUTIQUE ASTOU (HTML)
-   =========================== */
-function renderAstouShop(p){
-  // si tu as déjà des champs prix/stock/produits dans Supabase, on pourra les brancher.
-  // Là: une jolie vitrine surprise (vite à changer ensuite).
-  const waPhone = normalizeWhatsApp(p.cta_primary_url || p.whatsapp_url || p.phone);
-  const waLink = waPhone ? ("https://wa.me/" + waPhone + "?text=" + encodeURIComponent("Salam Astou 🙏 je viens de DIGIYLYFE. Je veux commander : ")) : "";
-  const shopCover = pick(p, "cover_url") || "https://digiylyfe.com/wp-content/uploads/2025/06/ASTOU-BOUTIK.png";
-
-  const items = [
-    {
-      name:"Torchons & serviettes",
-      desc:"Couture propre • finitions nettes",
-      price:"Sur demande",
-      img: shopCover,
-      msg:"Torchons & serviettes"
-    },
-    {
-      name:"Draps & housses",
-      desc:"Sur mesure • qualité durable",
-      price:"Sur demande",
-      img: shopCover,
-      msg:"Draps & housses"
-    },
-    {
-      name:"Rideaux & voilages",
-      desc:"Maison & appart • style local",
-      price:"Sur demande",
-      img: shopCover,
-      msg:"Rideaux & voilages"
-    },
-    {
-      name:"Couture maison",
-      desc:"Personnalisation • réparations",
-      price:"Sur demande",
-      img: shopCover,
-      msg:"Couture maison"
-    }
-  ];
-
-  const itemHTML = items.map(it => `
-    <div class="item">
-      <div class="itemImg"><img src="${safe(it.img)}" alt="${safe(it.name)}" loading="lazy" decoding="async"></div>
-      <div class="itemBody">
-        <p class="itemName">🧵 ${safe(it.name)}</p>
-        <p class="itemDesc">${safe(it.desc)}</p>
-        <div class="itemRow">
-          <span class="price">💰 ${safe(it.price)}</span>
-          ${waLink ? `<a class="miniBtn" href="${waLink + encodeURIComponent(it.msg)}" target="_blank" rel="noopener">💬 Commander</a>` : `<span class="miniBtn" style="opacity:.6; cursor:not-allowed;">💬 WhatsApp</span>`}
-        </div>
-      </div>
-    </div>
-  `).join("");
-
-  return `
-    <div class="shop">
-      <div class="shopTop">
-        <div>
-          <div class="shopTitle">Bienvenue chez Astou ✨</div>
-          <div class="shopSub">Linge de maison & couture sur mesure • Saly</div>
-        </div>
-        <div class="shopBadge">🛍️ Promo locale</div>
-      </div>
-
-      <div class="shopGrid">
-        ${itemHTML}
-      </div>
-
-      <div class="shopNote">
-        💡 Astou répond vite sur WhatsApp. Dis-lui ce que tu veux + la taille (ex: 2m x 1,8m) et elle te fait le prix.
-      </div>
-    </div>
-  `;
-}
-
-/* main */
-(async function(){
-  const slug = (getParam("slug") || getParam("pro") || "").trim();
+  // 2) #xxx
   if(!slug){
-    $("state").className="err";
-    $("state").textContent="⚠️ Aucun slug fourni. Utilise ?slug=astou-boutique";
-    return;
+    const h = (location.hash || "").replace("#","").trim();
+    if(h) slug = h;
   }
 
-  $("subline").textContent = "Slug : " + slug;
+  // 3) /xxx (dernier segment)
+  if(!slug){
+    const parts = location.pathname.split("/").filter(Boolean);
+    const last = parts[parts.length-1] || "";
+    const clean = last.replace(/\.html$/i,"").trim();
+    if(clean && !["pro","index"].includes(clean.toLowerCase())) slug = clean;
+  }
+
+  return slug;
+}
+
+function isUrl(s){
+  try{ new URL(s); return true; }catch(e){ return false; }
+}
+
+function joinList(val){
+  if(!val) return "";
+  if(Array.isArray(val)) return val.filter(Boolean).join(" · ");
+  if(typeof val === "string") return val;
+  if(typeof val === "object"){
+    // JSON object -> pretty key: value
+    const entries = Object.entries(val).filter(([k,v])=>v!==null && v!==undefined && (""+v).trim()!=="");
+    return entries.map(([k,v])=>`${k}: ${v}`).join(" · ");
+  }
+  return ""+val;
+}
+
+function buildMapsLink(address, city){
+  const q = encodeURIComponent([address, city].filter(Boolean).join(", "));
+  return "https://www.google.com/maps/search/?api=1&query=" + q;
+}
+
+function showError(msg){
+  $("errorBox").style.display = "block";
+  $("errorBox").textContent = msg;
+}
+
+/* ===== UI ===== */
+$("btnBack").addEventListener("click", (e)=>{
+  e.preventDefault();
+  if(history.length > 1) history.back();
+  else location.href = "https://beauville.github.io/digiy-hub/";
+});
+
+$("btnCopy").addEventListener("click", async (e)=>{
+  e.preventDefault();
+  try{
+    await navigator.clipboard.writeText(location.href);
+    $("btnCopy").textContent = "✅ Lien copié";
+    setTimeout(()=> $("btnCopy").textContent = "📋 Copier le lien", 1400);
+  }catch(err){
+    alert("Copie impossible. Tu peux copier l’URL manuellement.");
+  }
+});
+
+/* ===== DATA LOAD ===== */
+async function loadPro(slug){
+  $("loading").style.display = "block";
+  $("loading").textContent = "Chargement…";
+
+  // Table attendue : professionals
+  // Colonnes utilisées si dispo :
+  // name, slug, category, city, zone, badge_text, price_text,
+  // cover_url, description, services, opening_hours, photos,
+  // phone, whatsapp, address, is_verified, is_online,
+  // cta_primary_label, cta_primary_url, cta_secondary_label, cta_secondary_url
 
   const { data, error } = await SB
     .from("professionals")
@@ -441,130 +451,231 @@ function renderAstouShop(p){
     .eq("slug", slug)
     .maybeSingle();
 
-  if(error || !data){
-    $("state").className="err";
-    $("state").textContent = "❌ Fiche introuvable pour ce slug : " + slug;
-    return;
+  if(error){
+    throw new Error("Supabase: " + error.message);
+  }
+  if(!data){
+    throw new Error("Aucun partenaire trouvé pour le slug : " + slug);
+  }
+  return data;
+}
+
+function renderPro(p){
+  $("hero").style.display = "block";
+  $("grid").style.display = "grid";
+  $("loading").style.display = "none";
+
+  const name = safeText(p.name, "Partenaire DIGIY");
+  const cat  = safeText(p.category, "");
+  const city = safeText(p.city, "");
+  const zone = safeText(p.zone, "");
+  const sub  = [cat, zone, city].filter(Boolean).join(" · ") || "Partenaire local";
+
+  $("proName").textContent = name;
+  $("proSubtitle").textContent = sub;
+
+  const slug = safeText(p.slug, "");
+  $("slugText").textContent = slug ? slug : "—";
+
+  // Cover
+  const cover = p.cover_url && isUrl(p.cover_url) ? p.cover_url : "";
+  $("coverImg").src = cover || "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
+      <defs>
+        <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+          <stop stop-color='#facc15' stop-opacity='.20'/>
+          <stop offset='1' stop-color='#22c55e' stop-opacity='.12'/>
+        </linearGradient>
+      </defs>
+      <rect width='100%' height='100%' fill='#0b1020'/>
+      <rect width='100%' height='100%' fill='url(#g)'/>
+      <text x='50%' y='52%' text-anchor='middle' fill='#e5e7eb' font-family='system-ui' font-size='46' font-weight='900'>${name.replace(/</g,"&lt;")}</text>
+      <text x='50%' y='62%' text-anchor='middle' fill='#9ca3af' font-family='system-ui' font-size='22' font-weight='700'>DIGIYLYFE · 0% commission</text>
+    </svg>`
+  );
+
+  // Badge + Price
+  if(p.badge_text){
+    $("badgePill").style.display = "inline-flex";
+    $("badgeText").textContent = safeText(p.badge_text);
+  }
+  if(p.price_text){
+    $("pricePill").style.display = "inline-flex";
+    $("priceText").textContent = safeText(p.price_text);
   }
 
-  const p = data;
+  // Verified / Online
+  if(p.is_verified === true) $("verifiedPill").style.display = "inline-flex";
+  if(p.is_online === true) $("statusPill").style.display = "inline-flex";
 
-  // base fields
-  const name = pick(p,"name","title") || "Partenaire";
-  const city = pick(p,"city");
-  const region = pick(p,"region");
-  const cat = pick(p,"category","cat","type") || "service";
-  const desc = pick(p,"description","about") || "—";
-  const badge = pick(p,"badge_text","badge") || "✨ Partenaire vérifié";
-  const rating = pick(p,"rating") || "5.0";
-  const phone = pick(p,"phone");
-  const email = pick(p,"email");
-  const site = pick(p,"cta_secondary_url","page_url","website","url","link");
-  const cover = pick(p,"cover_url","photo_url","image_url") || "https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png";
+  // Meta row
+  const meta = [];
+  if(cat) meta.push(`🏷️ ${cat}`);
+  if(city) meta.push(`📍 ${city}`);
+  if(zone) meta.push(`🧭 ${zone}`);
+  const metaRow = $("metaRow");
+  metaRow.innerHTML = "";
+  meta.forEach(t=>{
+    const el = document.createElement("div");
+    el.className = "pill";
+    el.textContent = t;
+    metaRow.appendChild(el);
+  });
 
-  // gallery/services/hours (flex)
-  const gallery = toArray(p.gallery_urls || p.gallery || p.photos || p.images);
-  const services = toArray(p.services || p.service_list || p.tags || p.keywords);
-  const hoursRows = hoursToRows(p.hours_json || p.hours);
-
-  // SEO title update
-  document.title = name + " — Fiche NDIMBAL | DIGIYLYFE";
-  const metaDesc = document.querySelector('meta[name="description"]');
-  if(metaDesc) metaDesc.setAttribute("content", (desc || "").slice(0, 140));
-
-  // fill UI
-  $("cover").src = cover;
-  $("cover").alt = name;
-  $("badge").textContent = badge;
-
-  $("name").textContent = name;
-  $("catPill").textContent = "🏷️ " + cat;
-  $("locPill").textContent = "📍 " + ([city, region].filter(Boolean).join(" • ") || "—");
-  $("ratePill").textContent = "⭐ " + rating;
-
-  $("desc").textContent = desc;
-
-  $("slug").textContent = slug;
-  $("email").textContent = email || "—";
-  $("openNow").textContent = computeOpenNow(p.hours_json || p.hours);
-
-  // CTAs
-  const waPhone = normalizeWhatsApp(p.cta_primary_url || p.whatsapp_url || phone);
-  if(waPhone){
-    $("btnWhatsApp").href = "https://wa.me/" + waPhone + "?text=" + encodeURIComponent("Salam, je viens de DIGIYLYFE 🙏");
-  }else{
-    $("btnWhatsApp").style.display = "none";
-  }
-
-  if(phone){
-    $("btnCall").href = "tel:" + safe(phone).replace(/\s+/g,"");
-  }else{
-    $("btnCall").style.display = "none";
-  }
-
-  if(site && site.startsWith("http")){
-    $("btnSite").href = site;
-    $("btnSite").hidden = false;
-  }
-
-  // ✅ BOUTIQUE ASTOU : seulement pour astou-boutique
-  if(String(slug).toLowerCase() === "astou-boutique"){
-    $("astouShopSec").hidden = false;
-    $("astouShop").innerHTML = renderAstouShop(p);
-  }
-
-  // Gallery
-  if(gallery.length){
-    $("galSec").hidden = false;
-    const g = $("gallery");
-    g.innerHTML = "";
-    gallery.slice(0,9).forEach(url=>{
-      const box = document.createElement("div");
-      box.className="gimg";
-      box.innerHTML = `<img src="${safe(url)}" alt="${name} photo" loading="lazy" decoding="async">`;
-      g.appendChild(box);
-    });
-  }
+  // Description
+  $("proDesc").textContent = safeText(p.description, "Pas encore de description. (Mais le service est là 😄)");
 
   // Services
-  if(services.length){
-    $("servSec").hidden = false;
-    const s = $("services");
-    s.innerHTML = "";
-    services.slice(0,18).forEach(t=>{
-      const tag = document.createElement("div");
-      tag.className="tag";
-      tag.textContent = String(t);
-      s.appendChild(tag);
-    });
+  const services = joinList(p.services);
+  if(services){
+    $("servicesBox").style.display = "block";
+    $("proServices").textContent = services;
   }
 
   // Hours
-  if(hoursRows.length){
-    $("hoursSec").hidden = false;
-    const h = $("hours");
-    h.innerHTML = "";
-    hoursRows.forEach(r=>{
-      const row = document.createElement("div");
-      row.className="k";
-      row.innerHTML = `<span>${r.day}</span><b>${r.val}</b>`;
-      h.appendChild(row);
-    });
+  const hours = joinList(p.opening_hours || p.hours);
+  if(hours){
+    $("hoursBox").style.display = "block";
+    $("proHours").textContent = hours;
   }
 
-  // GPS / itinerary
-  const gps = getGPS(p);
-  $("mapSec").hidden = false;
-  if(gps){
-    $("gpsNote").textContent = "📍 GPS : " + gps.lat.toFixed(6) + ", " + gps.lng.toFixed(6);
-    $("btnMaps").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(gps.lat + "," + gps.lng)}`;
+  // Gallery (photos)
+  let photos = p.photos || p.gallery || p.images;
+  if(typeof photos === "string"){
+    // si c'est une string JSON
+    try{ photos = JSON.parse(photos); }catch(e){}
+  }
+  if(Array.isArray(photos) && photos.length){
+    const urls = photos.filter(u=>typeof u==="string" && u.trim() && isUrl(u.trim())).slice(0, 12);
+    if(urls.length){
+      $("galleryBox").style.display = "block";
+      const g = $("gallery");
+      g.innerHTML = "";
+      urls.forEach(u=>{
+        const a = document.createElement("a");
+        a.className = "ph";
+        a.href = u;
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.title = "Ouvrir";
+        const img = document.createElement("img");
+        img.src = u;
+        img.alt = "Photo";
+        a.appendChild(img);
+        g.appendChild(a);
+      });
+    }
+  }
+
+  // Contact info
+  const lines = [];
+  if(cat) lines.push(cat);
+  if(zone || city) lines.push([zone, city].filter(Boolean).join(", "));
+  $("infoLines").innerHTML = lines.length ? lines.map(x=>`• ${x}`).join("<br>") : "• Partenaire local";
+
+  // Phone / WhatsApp
+  const phone = safeText(p.phone, "");
+  const whatsapp = safeText(p.whatsapp, "");
+  const phoneToUse = whatsapp || phone;
+
+  if(phoneToUse){
+    $("phoneBox").style.display = "block";
+    $("phoneLink").textContent = phoneToUse;
+    $("phoneLink").href = "tel:" + phoneToUse.replace(/\s+/g,"");
+  }
+
+  // Address + Map
+  const address = safeText(p.address, "");
+  if(address){
+    $("addressBox").style.display = "block";
+    $("addressText").textContent = address;
+
+    $("mapBox").style.display = "block";
+    $("mapLink").href = buildMapsLink(address, city);
+  }
+
+  // CTA buttons (priorité: cta_primary, sinon WhatsApp auto)
+  const ctaRow = $("ctaRow");
+  ctaRow.innerHTML = "";
+
+  const cta1Label = safeText(p.cta_primary_label, "");
+  const cta1Url   = safeText(p.cta_primary_url, "");
+  const cta2Label = safeText(p.cta_secondary_label, "");
+  const cta2Url   = safeText(p.cta_secondary_url, "");
+
+  function addBtn(label, url, cls){
+    if(!label || !url) return;
+    const a = document.createElement("a");
+    a.className = "btn " + (cls || "");
+    a.textContent = label;
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    ctaRow.appendChild(a);
+  }
+
+  if(cta1Label && cta1Url && isUrl(cta1Url)){
+    addBtn(cta1Label, cta1Url, "btn-primary");
   }else{
-    $("gpsNote").textContent = "⚠️ Ce pro n’a pas encore de coordonnées GPS. (À compléter dans sa fiche.)";
-    $("btnMaps").href = "https://www.google.com/maps";
+    // fallback WhatsApp si dispo
+    if(phoneToUse){
+      const wa = "https://wa.me/" + phoneToUse.replace(/[^\d]/g,"") +
+        "?text=" + encodeURIComponent("Salam " + name + " je viens de DIGIYLYFE");
+      addBtn("💬 WhatsApp", wa, "btn-primary");
+    }
   }
 
-  $("state").remove();
-  $("ui").hidden = false;
+  if(cta2Label && cta2Url && isUrl(cta2Url)){
+    addBtn(cta2Label, cta2Url, "");
+  }else{
+    // fallback: ouvrir page partenaires
+    addBtn("🔎 Voir sur partenaires", "https://digiylyfe.com/page-partenaires/", "");
+  }
+
+  // bouton appel rapide
+  if(phoneToUse){
+    const tel = "tel:" + phoneToUse.replace(/\s+/g,"");
+    const a = document.createElement("a");
+    a.className = "btn btn-green";
+    a.textContent = "📞 Appeler";
+    a.href = tel;
+    ctaRow.appendChild(a);
+  }
+
+  // titre onglet
+  document.title = name + " — DIGIYLYFE";
+}
+
+/* ===== BOOT ===== */
+(async function boot(){
+  try{
+    const slug = parseSlug();
+    const defaultSlug = "astou-boutique"; // ✅ priorité Astou
+
+    if(!slug){
+      $("infoNoSlug").style.display = "block";
+    }
+
+    const finalSlug = slug || defaultSlug;
+
+    // Nettoyer l’URL si slug absent et garder la trace (facultatif)
+    if(!slug){
+      // on ne force pas, mais on pourrait :
+      // const u = new URL(location.href); u.searchParams.set("slug", finalSlug); history.replaceState(null, "", u.toString());
+    }
+
+    const pro = await loadPro(finalSlug);
+    renderPro(pro);
+
+  }catch(err){
+    $("loading").style.display = "none";
+    showError(
+      "Impossible de charger la fiche.\n" +
+      "• Vérifie que le slug existe dans Supabase.\n" +
+      "• Vérifie que la table s’appelle bien 'professionals' et que la colonne 'slug' est remplie.\n\n" +
+      "Détail: " + (err?.message || err)
+    );
+  }
 })();
 </script>
 </body>
