@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Fiche NDIMBAL — DIGIYLYFE</title>
+  <meta name="description" content="Fiche partenaire NDIMBAL — photos, horaires, services, contact." />
+  <meta name="theme-color" content="#0B1120" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    :root{
+      --bg:#0b1020; --card:#0f172a; --line:rgba(255,255,255,.10);
+      --text:#e5e7eb; --muted:#9ca3af;
+      --gold:#facc15; --green:#22c55e; --orange:#f97316; --red:#ef4444;
+      --radius:18px; --shadow:0 18px 60px rgba(0,0,0,.45);
+      --max:1100px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 600px at 10% -10%, rgba(250,204,21,.18), transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, rgba(34,197,94,.14), transparent 55%),
+        linear-gradient(180deg, #070a14, var(--bg));
+      min-height:100svh;
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:18px}
+    .top{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
+      padding:14px 14px; border:1px solid var(--line); border-radius:var(--radius);
+      background:rgba(255,255,255,.04); backdrop-filter: blur(10px);
+    }
+    .brand{display:flex; gap:10px; align-items:center}
+    .inf{
+      font-weight:1000; font-size:22px;
+      color:var(--gold);
+      text-shadow: 0 0 22px rgba(250,204,21,.25);
+    }
+    .sub{color:var(--muted); font-weight:700; font-size:13px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; border-radius:999px; border:1px solid var(--line);
+      background:rgba(255,255,255,.06); color:var(--text);
+      font-weight:900; text-decoration:none; cursor:pointer;
+      transition:transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{transform:translateY(-1px); border-color:rgba(250,204,21,.35); background:rgba(255,255,255,.09)}
+    .btn.primary{background:linear-gradient(135deg, rgba(34,197,94,.95), rgba(13,159,84,.95)); border-color:rgba(34,197,94,.35)}
+    .btn.gold{background:linear-gradient(135deg, rgba(250,204,21,.95), rgba(249,115,22,.95)); color:#0b1020; border-color:rgba(250,204,21,.35)}
+    .grid{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px;
+    }
+    @media (max-width: 920px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .hero{
+      position:relative; height:340px; background:#0a0f1f;
+    }
+    .hero img{width:100%; height:100%; object-fit:cover; display:block; filter:saturate(1.05) contrast(1.02)}
+    .badge{
+      position:absolute; top:14px; left:14px;
+      background:rgba(0,0,0,.55); border:1px solid rgba(255,255,255,.18);
+      padding:8px 10px; border-radius:999px; font-weight:900; font-size:13px;
+      backdrop-filter: blur(8px);
+      max-width: calc(100% - 28px);
+      overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+    }
+    .content{padding:14px}
+    .h1{font-size:24px; font-weight:1000; margin:0 0 6px}
+    .meta{display:flex; flex-wrap:wrap; gap:8px; color:var(--muted); font-weight:800; font-size:13px}
+    .pill{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:8px 10px; border-radius:999px;
+      border:1px solid var(--line); background:rgba(255,255,255,.04);
+    }
+    .section{padding:14px; border-top:1px solid var(--line)}
+    .section h2{margin:0 0 10px; font-size:14px; letter-spacing:.4px; text-transform:uppercase; color:var(--muted)}
+    .desc{color:#d1d5db; line-height:1.55; margin:0}
+    .gallery{
+      display:grid; grid-template-columns:repeat(3,1fr); gap:10px;
+    }
+    @media (max-width: 600px){ .gallery{grid-template-columns:repeat(2,1fr)} .hero{height:260px} }
+    .gimg{border-radius:14px; overflow:hidden; border:1px solid var(--line); background:#0a0f1f}
+    .gimg img{width:100%; height:120px; object-fit:cover; display:block}
+    .list{display:flex; flex-wrap:wrap; gap:8px}
+    .tag{
+      padding:8px 10px; border-radius:999px;
+      background:rgba(250,204,21,.10); border:1px solid rgba(250,204,21,.18);
+      color:#fde68a; font-weight:900; font-size:13px;
+    }
+    .right .card{position:sticky; top:14px}
+    .krow{display:flex; flex-direction:column; gap:10px}
+    .k{display:flex; justify-content:space-between; gap:10px; color:var(--muted); font-weight:800; font-size:13px}
+    .k b{color:var(--text)}
+    .ctaCol{display:flex; flex-direction:column; gap:10px; margin-top:10px}
+    .notice{
+      padding:12px 12px; border-radius:14px;
+      border:1px dashed rgba(255,255,255,.18);
+      color:var(--muted); font-weight:700; background:rgba(255,255,255,.03);
+    }
+    .loading, .err{
+      max-width:var(--max); margin:30px auto; padding:14px 16px;
+      border:1px solid var(--line); border-radius:var(--radius);
+      background:rgba(255,255,255,.04);
+    }
+    .err{border-color:rgba(239,68,68,.35)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand">
+        <div class="inf">∞</div>
+        <div>
+          <div style="font-weight:1000">NDIMBAL — Fiche partenaire</div>
+          <div class="sub" id="subline">Chargement…</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <a class="btn" href="https://beauville.github.io/digiy-mdimbal-map/">🗺️ Retour carte</a>
+        <a class="btn" href="https://beauville.github.io/digiy-hub/">🏠 HUB</a>
+      </div>
+    </div>
+
+    <div id="state" class="loading">⏳ Je prépare la fiche…</div>
+
+    <div id="ui" hidden>
+      <div class="grid">
+        <!-- LEFT -->
+        <div class="left">
+          <div class="card">
+            <div class="hero">
+              <img id="cover" alt="" />
+              <div class="badge" id="badge"></div>
+            </div>
+            <div class="content">
+              <h1 class="h1" id="name">—</h1>
+              <div class="meta">
+                <span class="pill" id="catPill">🏷️ —</span>
+                <span class="pill" id="locPill">📍 —</span>
+                <span class="pill" id="ratePill">⭐ —</span>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2>Histoire & présentation</h2>
+              <p class="desc" id="desc">—</p>
+            </div>
+
+            <div class="section" id="galSec" hidden>
+              <h2>Photos</h2>
+              <div class="gallery" id="gallery"></div>
+            </div>
+
+            <div class="section" id="servSec" hidden>
+              <h2>Services</h2>
+              <div class="list" id="services"></div>
+            </div>
+
+            <div class="section" id="hoursSec" hidden>
+              <h2>Horaires</h2>
+              <div class="krow" id="hours"></div>
+            </div>
+
+            <div class="section" id="mapSec" hidden>
+              <h2>Aller jusqu’au pro</h2>
+              <div class="ctaCol">
+                <a class="btn gold" id="btnMaps" target="_blank" rel="noopener">🧭 Itinéraire</a>
+              </div>
+              <div class="notice" style="margin-top:10px" id="gpsNote"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="right">
+          <div class="card">
+            <div class="content">
+              <div style="font-weight:1000; font-size:16px">Contact direct (0% commission)</div>
+              <div class="sub" style="margin-top:4px">Le pro reste propriétaire de sa clientèle.</div>
+
+              <div class="ctaCol">
+                <a class="btn primary" id="btnWhatsApp" target="_blank" rel="noopener">💬 WhatsApp</a>
+                <a class="btn" id="btnCall">📞 Appeler</a>
+                <a class="btn gold" id="btnSite" target="_blank" rel="noopener" hidden>🔎 Voir le site</a>
+              </div>
+
+              <div style="margin-top:12px" class="krow">
+                <div class="k"><span>♾️ Slug</span> <b id="slug">—</b></div>
+                <div class="k"><span>📧 Email</span> <b id="email">—</b></div>
+                <div class="k"><span>⏰ Statut</span> <b id="openNow">—</b></div>
+              </div>
+
+              <div class="notice" style="margin-top:12px">
+                ✅ Cette fiche est faite pour les moteurs de recherche + pour le client.<br/>
+                🔒 Et elle appartient au pro (pas aux OTA).
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* 🔐 SUPABASE — DÉJÀ POSÉ */
+const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* utils */
+const $ = (id)=>document.getElementById(id);
+const pick = (o,...keys)=>{ for(const k of keys){ const v=o?.[k]; if(v!=null && String(v).trim()!=="") return v; } return ""; };
+const safe = (s)=> (s??"").toString();
+function getParam(name){ return new URL(location.href).searchParams.get(name); }
+
+function normalizeWhatsApp(val){
+  const phone = safe(val).trim();
+  if(!phone) return "";
+  if(phone.includes("wa.me/")){
+    const m = phone.match(/wa\.me\/(\d+)/);
+    return m ? m[1] : "";
+  }
+  return phone.replace(/\D/g,'');
+}
+
+function toArray(val){
+  if(Array.isArray(val)) return val.filter(Boolean);
+  if(!val) return [];
+  try{
+    const j = JSON.parse(val);
+    return Array.isArray(j) ? j.filter(Boolean) : [];
+  }catch(e){
+    // peut être "a,b,c"
+    return safe(val).split(",").map(s=>s.trim()).filter(Boolean);
+  }
+}
+
+function getGPS(p){
+  const lat = pick(p,'latitude','lat','gps_lat');
+  const lng = pick(p,'longitude','lng','gps_lng');
+  const la = lat!=="" ? Number(lat) : null;
+  const lo = lng!=="" ? Number(lng) : null;
+  if(Number.isFinite(la) && Number.isFinite(lo)) return {lat:la, lng:lo};
+  return null;
+}
+
+function hoursToRows(hoursVal){
+  // accepte: hours_json (objet), ou "Lun-Sam 8h-20h" (string)
+  if(!hoursVal) return [];
+  if(typeof hoursVal === 'object' && !Array.isArray(hoursVal)){
+    // { mon:"08:00-18:00", tue:"...", ... }
+    const order = ["mon","tue","wed","thu","fri","sat","sun"];
+    const fr = {mon:"Lundi",tue:"Mardi",wed:"Mercredi",thu:"Jeudi",fri:"Vendredi",sat:"Samedi",sun:"Dimanche"};
+    return order
+      .filter(k => hoursVal[k])
+      .map(k => ({ day: fr[k], val: String(hoursVal[k]) }));
+  }
+  // string fallback
+  return [{ day:"Horaires", val: safe(hoursVal) }];
+}
+
+function computeOpenNow(hoursVal){
+  // version simple : si pas structuré -> "Voir horaires"
+  if(!hoursVal) return "—";
+  if(typeof hoursVal === 'object') return "Voir horaires";
+  return "Voir horaires";
+}
+
+/* main */
+(async function(){
+  const slug = (getParam("slug") || getParam("pro") || "").trim();
+  if(!slug){
+    $("state").className="err";
+    $("state").textContent="⚠️ Aucun slug fourni. Utilise ?slug=astou-boutique";
+    return;
+  }
+
+  $("subline").textContent = "Slug : " + slug;
+
+  const { data, error } = await SB
+    .from("professionals")
+    .select("*")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if(error || !data){
+    $("state").className="err";
+    $("state").textContent = "❌ Fiche introuvable pour ce slug : " + slug;
+    return;
+  }
+
+  const p = data;
+
+  // base fields
+  const name = pick(p,"name","title") || "Partenaire";
+  const city = pick(p,"city");
+  const region = pick(p,"region");
+  const cat = pick(p,"category","cat","type") || "service";
+  const desc = pick(p,"description","about") || "—";
+  const badge = pick(p,"badge_text","badge") || "✨ Partenaire vérifié";
+  const rating = pick(p,"rating") || "5.0";
+  const phone = pick(p,"phone");
+  const email = pick(p,"email");
+  const site = pick(p,"cta_secondary_url","page_url","website","url","link");
+  const cover = pick(p,"cover_url","photo_url","image_url") || "https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png";
+
+  // gallery/services/hours (flex)
+  const gallery = toArray(p.gallery_urls || p.gallery || p.photos || p.images);
+  const services = toArray(p.services || p.service_list || p.tags || p.keywords);
+  const hoursRows = hoursToRows(p.hours_json || p.hours);
+
+  // SEO title update
+  document.title = name + " — Fiche NDIMBAL | DIGIYLYFE";
+  const metaDesc = document.querySelector('meta[name="description"]');
+  if(metaDesc) metaDesc.setAttribute("content", (desc || "").slice(0, 140));
+
+  // fill UI
+  $("cover").src = cover;
+  $("cover").alt = name;
+  $("badge").textContent = badge;
+
+  $("name").textContent = name;
+  $("catPill").textContent = "🏷️ " + cat;
+  $("locPill").textContent = "📍 " + [city, region].filter(Boolean).join(" • ") || "—";
+  $("ratePill").textContent = "⭐ " + rating;
+
+  $("desc").textContent = desc;
+
+  $("slug").textContent = slug;
+  $("email").textContent = email || "—";
+  $("openNow").textContent = computeOpenNow(p.hours_json || p.hours);
+
+  // CTAs
+  const waPhone = normalizeWhatsApp(p.cta_primary_url || p.whatsapp_url || phone);
+  if(waPhone){
+    $("btnWhatsApp").href = "https://wa.me/" + waPhone + "?text=" + encodeURIComponent("Salam, je viens de DIGIYLYFE 🙏");
+  }else{
+    $("btnWhatsApp").style.display = "none";
+  }
+
+  if(phone){
+    $("btnCall").href = "tel:" + safe(phone).replace(/\s+/g,"");
+  }else{
+    $("btnCall").style.display = "none";
+  }
+
+  if(site && site.startsWith("http")){
+    $("btnSite").href = site;
+    $("btnSite").hidden = false;
+  }
+
+  // Gallery
+  if(gallery.length){
+    $("galSec").hidden = false;
+    const g = $("gallery");
+    g.innerHTML = "";
+    gallery.slice(0,9).forEach(url=>{
+      const box = document.createElement("div");
+      box.className="gimg";
+      box.innerHTML = `<img src="${safe(url)}" alt="${name} photo" loading="lazy" decoding="async">`;
+      g.appendChild(box);
+    });
+  }
+
+  // Services
+  if(services.length){
+    $("servSec").hidden = false;
+    const s = $("services");
+    s.innerHTML = "";
+    services.slice(0,18).forEach(t=>{
+      const tag = document.createElement("div");
+      tag.className="tag";
+      tag.textContent = String(t);
+      s.appendChild(tag);
+    });
+  }
+
+  // Hours
+  if(hoursRows.length){
+    $("hoursSec").hidden = false;
+    const h = $("hours");
+    h.innerHTML = "";
+    hoursRows.forEach(r=>{
+      const row = document.createElement("div");
+      row.className="k";
+      row.innerHTML = `<span>${r.day}</span><b>${r.val}</b>`;
+      h.appendChild(row);
+    });
+  }
+
+  // GPS / itinerary
+  const gps = getGPS(p);
+  if(gps){
+    $("mapSec").hidden = false;
+    $("gpsNote").textContent = "📍 GPS : " + gps.lat.toFixed(6) + ", " + gps.lng.toFixed(6);
+    $("btnMaps").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(gps.lat + "," + gps.lng)}`;
+  }else{
+    $("mapSec").hidden = false;
+    $("gpsNote").textContent = "⚠️ Ce pro n’a pas encore de coordonnées GPS. (À compléter dans sa fiche.)";
+    $("btnMaps").href = "https://www.google.com/maps";
+  }
+
+  $("state").remove();
+  $("ui").hidden = false;
+})();
+</script>
+</body>
+</html>
