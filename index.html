@@ -20,14 +20,10 @@
       --line:rgba(255,255,255,.10);
       --text:#e5e7eb;
       --muted:#9ca3af;
-
       --gold:#facc15;
       --green:#22c55e;
       --orange:#f97316;
-
       --r-xl:22px;
-      --r-lg:18px;
-      --r-md:14px;
       --shadow: 0 18px 60px rgba(0,0,0,.45);
     }
     *{box-sizing:border-box}
@@ -51,11 +47,8 @@
       border-bottom:1px solid rgba(255,255,255,.08);
     }
     .topbar .inner{
-      max-width:1200px;
-      margin:0 auto;
-      display:flex;
-      align-items:center;
-      gap:10px;
+      max-width:1200px; margin:0 auto;
+      display:flex; align-items:center; gap:10px;
       padding:10px 14px;
     }
     .brand{display:flex; align-items:center; gap:10px; min-width:0}
@@ -83,7 +76,7 @@
       text-decoration:none;
       font-weight:900;
       font-size:13px;
-      transition: .15s transform ease, .15s background ease, .15s border-color ease;
+      transition: .15s transform ease, .15s border-color ease;
       user-select:none;
       white-space:nowrap;
     }
@@ -102,9 +95,7 @@
       gap:14px;
       align-items:stretch;
     }
-    @media (max-width: 980px){
-      .layout{grid-template-columns:1fr}
-    }
+    @media (max-width: 980px){ .layout{grid-template-columns:1fr} }
 
     .mapCard{
       border:1px solid rgba(255,255,255,.10);
@@ -158,28 +149,18 @@
     }
 
     /* ✅ PAVÉ */
-    .pave{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
+    .pave{display:flex;flex-wrap:wrap;gap:8px}
     .chip{
       display:inline-flex;align-items:center;gap:8px;
-      padding:9px 10px;
-      border-radius:999px;
+      padding:9px 10px;border-radius:999px;
       border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
-      font-weight:900;
-      font-size:12px;
-      cursor:pointer;
-      user-select:none;
+      font-weight:900;font-size:12px;
+      cursor:pointer;user-select:none;
       transition:.15s transform ease,.15s border-color ease,.15s background ease;
     }
     .chip:hover{transform:translateY(-1px);border-color:rgba(250,204,21,.45)}
-    .chip.active{
-      background: rgba(250,204,21,.18);
-      border-color: rgba(250,204,21,.55);
-    }
+    .chip.active{background: rgba(250,204,21,.18); border-color: rgba(250,204,21,.55)}
     .chip.strong{
       background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.88));
       border-color: rgba(250,204,21,.35);
@@ -207,6 +188,7 @@
       font-size:12px;
       white-space:nowrap;
       cursor:pointer;
+      color:inherit;
     }
     .mini:hover{border-color:rgba(250,204,21,.45)}
     .mini-gold{
@@ -226,6 +208,7 @@
       font-size:12px;
       line-height:1.5;
       white-space:pre-wrap;
+      display:none;
     }
 
     .toast{
@@ -273,7 +256,6 @@
 
       <div class="side">
 
-        <!-- ✅ PAVÉ VILLES/ZONES -->
         <div class="panel">
           <div class="hd">
             <b>🧱 Pavé (choix rapide)</b>
@@ -282,13 +264,12 @@
           <div class="bd">
             <div class="pave" id="pave"></div>
             <div class="rowBtns" style="margin-top:10px">
-              <button class="mini mini-gold" id="btnAll">✨ Tout afficher</button>
-              <button class="mini" id="btnNear">📍 Centrer Saly</button>
+              <button class="mini mini-gold" id="btnAll" type="button">✨ Tout afficher</button>
+              <button class="mini" id="btnNear" type="button">📍 Centrer Saly</button>
             </div>
           </div>
         </div>
 
-        <!-- Rechercher -->
         <div class="panel">
           <div class="hd">
             <b>🎯 Rechercher</b>
@@ -311,11 +292,10 @@
               </select>
             </div>
 
-            <div class="debug" id="debugBox" style="display:none"></div>
+            <div class="debug" id="debugBox"></div>
           </div>
         </div>
 
-        <!-- Liste -->
         <div class="panel">
           <div class="hd"><b>📌 Partenaires</b><span style="color:var(--muted);font-weight:800;font-size:12px">Clique → fiche</span></div>
           <div class="bd">
@@ -334,7 +314,7 @@
 
 <script>
 /* ================================
-   SUPABASE (tes clés)
+   SUPABASE
 ================================ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -350,6 +330,7 @@ function showToast(msg){
   clearTimeout(window.__toastTimer);
   window.__toastTimer = setTimeout(()=> t.style.display="none", 3200);
 }
+
 function fold(s){
   return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 }
@@ -371,33 +352,60 @@ function catEmoji(c){
   return m[c] || "📍";
 }
 function safe(v, fb=""){ return (v==null?fb:String(v)).trim(); }
+function escapeHTML(str){
+  return (str ?? "").toString()
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
 
 function pickLat(p){ return p.latitude ?? p.lat ?? p.gps_lat ?? null; }
 function pickLng(p){ return p.longitude ?? p.lng ?? p.gps_lng ?? null; }
 
 function proUrl(slug){
-  return `./pro.html?slug=${encodeURIComponent(slug)}`;
+  return "./pro.html?slug=" + encodeURIComponent(slug);
 }
 
 let MAP, layerPins;
 let ALL = [];
-
-let filterPave = ""; // ville/zone sélectionnée
+let filterPave = "";
 
 async function loadProfessionals(){
-  // On tente large. Si Supabase ne renvoie que 2 → c’est côté DB/RLS.
   const { data, error } = await SB.from("professionals").select("*").limit(2000);
   if(error) throw error;
   return data || [];
 }
 
 function initMap(){
-  MAP = L.map("map", { zoomControl:true }).setView([14.439, -17.004], 10); // zone Saly/Dakar
+  MAP = L.map("map", { zoomControl:true }).setView([14.439, -17.004], 10);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
   }).addTo(MAP);
   layerPins = L.layerGroup().addTo(MAP);
+}
+
+/* ✅ POPUP SAFE (zéro template string) */
+function popupHTML(p){
+  const slug = safe(p.slug);
+  const name = escapeHTML(safe(p.name, "Partenaire"));
+  const city = escapeHTML(safe(p.city));
+  const zone = escapeHTML(safe(p.zone));
+  const cat = normCategory(p.category || p.cat || p.type || "");
+  const em = catEmoji(cat);
+
+  const line = [city, zone].filter(Boolean).join(" · ");
+  const hrefFiche = slug ? proUrl(slug) : "#";
+
+  return (
+    '<div style="font-family:system-ui;min-width:220px">' +
+      '<div style="font-weight:900;margin-bottom:6px">' + em + ' ' + name + '</div>' +
+      '<div style="color:#334155;font-weight:700;font-size:12px">' + escapeHTML(line || "—") + '</div>' +
+      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
+        '<a href="' + hrefFiche + '" style="padding:8px 10px;border-radius:999px;background:#facc15;color:#0b1020;font-weight:900;text-decoration:none;border:1px solid rgba(245,158,11,.35)">👀 Voir fiche</a>' +
+        '<a href="./index.html" style="padding:8px 10px;border-radius:999px;background:#0b1120;color:#fff;font-weight:900;text-decoration:none;border:1px solid rgba(2,6,23,.2)">🗺️ Map</a>' +
+      '</div>' +
+    '</div>'
+  );
 }
 
 function drawPins(list){
@@ -407,27 +415,9 @@ function drawPins(list){
   list.forEach(p=>{
     const lat = pickLat(p);
     const lng = pickLng(p);
-    if(lat==null || lng==null) return; // map a besoin du GPS
+    if(lat==null || lng==null) return;
 
-    const slug = safe(p.slug);
-    const name = safe(p.name, "Partenaire");
-    const city = safe(p.city);
-    const zone = safe(p.zone);
-    const cat = normCategory(p.category || p.cat || p.type || "");
-    const em = catEmoji(cat);
-
-    const html = `
-      <div style="font-family:system-ui;min-width:220px">
-        <div style="font-weight:900;margin-bottom:6px">${em} ${name}</div>
-        <div style="color:#334155;font-weight:700;font-size:12px">${[city, zone].filter(Boolean).join(" · ")}</div>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-          <a href="${proUrl(slug)}" style="padding:8px 10px;border-radius:999px;background:#facc15;color:#0b1020;font-weight:900;text-decoration:none;border:1px solid rgba(245,158,11,.35)">👀 Voir fiche</a>
-          <a href="./index.html" style="padding:8px 10px;border-radius:999px;background:#0b1120;color:#fff;font-weight:900;text-decoration:none;border:1px solid rgba(2,6,23,.2)">🗺️ Map</a>
-        </div>
-      </div>
-    `;
-
-    const m = L.marker([Number(lat), Number(lng)]).bindPopup(html);
+    const m = L.marker([Number(lat), Number(lng)]).bindPopup(popupHTML(p));
     m.addTo(layerPins);
     bounds.push([Number(lat), Number(lng)]);
   });
@@ -438,12 +428,12 @@ function drawPins(list){
 }
 
 function renderList(list){
-  $("countLabel").textContent = `${list.length} résultat(s)`;
+  $("countLabel").textContent = list.length + " résultat(s)";
   const box = $("list");
   box.innerHTML = "";
 
   if(!list.length){
-    box.innerHTML = `<div class="item"><h3>😅 Rien trouvé</h3><p>Essaie un autre mot-clé ou enlève les filtres.</p></div>`;
+    box.innerHTML = '<div class="item"><h3>😅 Rien trouvé</h3><p>Essaie un autre mot-clé ou enlève les filtres.</p></div>';
     return;
   }
 
@@ -457,30 +447,39 @@ function renderList(list){
 
     const el = document.createElement("div");
     el.className = "item";
-    el.innerHTML = `
-      <div class="itemTop">
-        <div>
-          <h3>${em} ${name}</h3>
-          <p>${[safe(p.category||""), city, zone].filter(Boolean).join(" · ") || "Partenaire local"}</p>
-          <p style="color:rgba(156,163,175,.85)">slug: <b>${slug || "—"}</b></p>
-        </div>
-        <a class="mini mini-gold" href="${slug ? proUrl(slug) : '#'}" onclick="${slug ? '' : 'event.preventDefault();alert(\\'Slug manquant en base\\')'}">👀 Fiche</a>
-      </div>
-      <div class="rowBtns">
-        <a class="mini" href="${slug ? proUrl(slug) : '#'}" onclick="${slug ? '' : 'event.preventDefault();alert(\\'Slug manquant\\')'}">♾️ Ouvrir</a>
-        <button class="mini" onclick="focusOn('${slug.replace(/'/g,"\\'")}')">📍 Centrer</button>
-      </div>
-    `;
+
+    const meta = [safe(p.category||""), city, zone].filter(Boolean).join(" · ") || "Partenaire local";
+    const ficheHref = slug ? proUrl(slug) : "#";
+
+    el.innerHTML =
+      '<div class="itemTop">' +
+        '<div>' +
+          '<h3>' + em + ' ' + escapeHTML(name) + '</h3>' +
+          '<p>' + escapeHTML(meta) + '</p>' +
+          '<p style="color:rgba(156,163,175,.85)">slug: <b>' + escapeHTML(slug || "—") + '</b></p>' +
+        '</div>' +
+        '<a class="mini mini-gold" href="' + ficheHref + '" ' + (slug ? '' : 'onclick="event.preventDefault();alert(\\\'Slug manquant en base\\\')"') + '>👀 Fiche</a>' +
+      '</div>' +
+      '<div class="rowBtns">' +
+        '<a class="mini" href="' + ficheHref + '" ' + (slug ? '' : 'onclick="event.preventDefault();alert(\\\'Slug manquant\\\')"') + '>♾️ Ouvrir</a>' +
+        '<button class="mini" type="button" data-slug="' + escapeHTML(slug) + '">📍 Centrer</button>' +
+      '</div>';
+
+    el.querySelector('button[data-slug]').addEventListener('click', ()=>{
+      focusOn(slug);
+    });
+
     box.appendChild(el);
   });
 }
 
 function focusOn(slug){
   const p = ALL.find(x=>safe(x.slug)===slug);
-  if(!p) return showToast(`⚠️ Introuvable : <b>${slug}</b>`);
+  if(!p) return showToast("⚠️ Introuvable : <b>" + escapeHTML(slug) + "</b>");
   const lat = pickLat(p), lng = pickLng(p);
   if(lat==null || lng==null) return showToast("⚠️ GPS manquant pour centrer (lat/lng vides).");
   MAP.setView([Number(lat), Number(lng)], 16);
+
   layerPins.eachLayer(layer=>{
     const ll = layer.getLatLng?.();
     if(ll && Math.abs(ll.lat-Number(lat))<1e-6 && Math.abs(ll.lng-Number(lng))<1e-6){
@@ -490,57 +489,44 @@ function focusOn(slug){
 }
 
 function buildPave(){
-  // Pavé = villes (et zones si tu veux). On prend city prioritaire.
   const cities = Array.from(new Set(ALL.map(p=>safe(p.city)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
   const zones  = Array.from(new Set(ALL.map(p=>safe(p.zone)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
 
   const pave = $("pave");
   pave.innerHTML = "";
 
-  const addChip = (label, value, type)=>{
+  function addChip(label, value, type){
     const c = document.createElement("button");
     c.className = "chip";
     c.type = "button";
     c.textContent = label;
     c.dataset.value = value;
     c.dataset.type = type;
-    c.onclick = ()=>{
-      // toggle
+    c.addEventListener("click", ()=>{
       const v = c.dataset.value;
-      if(filterPave === `${type}:${v}`){
-        filterPave = "";
-      }else{
-        filterPave = `${type}:${v}`;
-      }
+      const key = type + ":" + v;
+      filterPave = (filterPave === key) ? "" : key;
       refreshPaveActive();
       applyFilters();
-    };
+    });
     pave.appendChild(c);
-  };
+  }
 
-  // Chips "Top" (si existent)
   const top = ["Saly","Dakar","Mbour","Thiès"];
   top.forEach(t=>{
-    const has = cities.some(c=>fold(c)===fold(t));
-    if(has) addChip("📍 " + t, cities.find(c=>fold(c)===fold(t)), "city");
+    const found = cities.find(c=>fold(c)===fold(t));
+    if(found) addChip("📍 " + t, found, "city");
   });
 
-  // Un séparateur léger (si on a de la matière)
-  if(cities.length){
-    cities.forEach(c=>{
-      if(top.some(t=>fold(t)===fold(c))) return;
-      addChip("🏙️ " + c, c, "city");
-    });
-  }
+  cities.forEach(c=>{
+    if(top.some(t=>fold(t)===fold(c))) return;
+    addChip("🏙️ " + c, c, "city");
+  });
 
-  // Zones (optionnel) — si tu veux, ça donne le “pavé terrain”
   if(zones.length){
-    zones.slice(0, 18).forEach(z=>{
-      addChip("🧭 " + z, z, "zone");
-    });
+    zones.slice(0, 18).forEach(z=> addChip("🧭 " + z, z, "zone"));
   }
 
-  // Si rien
   if(!pave.children.length){
     const d = document.createElement("div");
     d.style.color = "rgba(156,163,175,.9)";
@@ -557,7 +543,7 @@ function refreshPaveActive(){
   document.querySelectorAll(".chip").forEach(ch=>{
     const type = ch.dataset.type;
     const val  = ch.dataset.value;
-    const key  = `${type}:${val}`;
+    const key  = type + ":" + val;
     if(filterPave === key) ch.classList.add("active");
     else ch.classList.remove("active");
   });
@@ -575,10 +561,7 @@ function applyFilters(){
   }
 
   const filtered = ALL.filter(p=>{
-    const blob = fold([
-      p.name, p.slug, p.category, p.city, p.zone, p.region, p.description
-    ].filter(Boolean).join(" "));
-
+    const blob = fold([p.name,p.slug,p.category,p.city,p.zone,p.region,p.description].filter(Boolean).join(" "));
     const okQ = !q || blob.includes(q);
 
     const pc = normCategory(p.category || p.cat || p.type || "");
@@ -594,18 +577,17 @@ function applyFilters(){
   renderList(filtered);
   drawPins(filtered);
 
-  // debug
   const dbg = $("debugBox");
   dbg.style.display = "block";
   const slugs = filtered.slice(0, 25).map(x=>safe(x.slug)||"(slug vide)").join(", ");
   const total = ALL.length;
   const gpsCount = ALL.filter(p=>pickLat(p)!=null && pickLng(p)!=null).length;
   dbg.textContent =
-    `DEBUG:\n` +
-    `- Supabase a renvoyé: ${total} partenaire(s)\n` +
-    `- Avec GPS (lat/lng): ${gpsCount}\n` +
-    `- Affichés après filtres: ${filtered.length}\n` +
-    `- Slugs (échantillon): ${slugs}`;
+    "DEBUG:\n" +
+    "- Supabase a renvoyé: " + total + " partenaire(s)\n" +
+    "- Avec GPS (lat/lng): " + gpsCount + "\n" +
+    "- Affichés après filtres: " + filtered.length + "\n" +
+    "- Slugs (échantillon): " + slugs;
 }
 
 (async function boot(){
@@ -615,7 +597,6 @@ function applyFilters(){
 
     ALL = await loadProfessionals();
 
-    // ✅ si ALL.length = 2 => ce n'est PAS l'UI: c'est la DB/RLS ou la table.
     if(ALL.length <= 2){
       showToast("⚠️ Seulement " + ALL.length + " partenaire(s) reçus. Ça sent RLS/policy ou table vide.");
     }else{
@@ -625,8 +606,8 @@ function applyFilters(){
     buildPave();
     applyFilters();
 
-    $("q").addEventListener("input", ()=>applyFilters());
-    $("cat").addEventListener("change", ()=>applyFilters());
+    $("q").addEventListener("input", applyFilters);
+    $("cat").addEventListener("change", applyFilters);
 
     $("btnAll").addEventListener("click", ()=>{
       filterPave = "";
@@ -637,7 +618,6 @@ function applyFilters(){
     });
 
     $("btnNear").addEventListener("click", ()=>{
-      // centre Saly approx
       MAP.setView([14.441, -17.006], 13);
       showToast("📍 Centré sur Saly (approx).");
     });
@@ -645,16 +625,14 @@ function applyFilters(){
   }catch(e){
     console.error(e);
     showToast("❌ Erreur Supabase. Probable RLS/policy.");
-    $("list").innerHTML = `
-      <div class="item">
-        <h3>❌ Impossible de charger les partenaires</h3>
-        <p>Cause fréquente : RLS bloque le SELECT public sur <b>professionals</b>.</p>
-        <p style="color:var(--muted)">Détail: ${String(e?.message||e)}</p>
-      </div>
-    `;
+    $("list").innerHTML =
+      '<div class="item">' +
+        '<h3>❌ Impossible de charger les partenaires</h3>' +
+        '<p>Cause fréquente : RLS bloque le SELECT public sur <b>professionals</b>.</p>' +
+        '<p style="color:var(--muted)">Détail: ' + escapeHTML(String(e?.message||e)) + '</p>' +
+      '</div>';
   }
 })();
 </script>
 </body>
 </html>
-
