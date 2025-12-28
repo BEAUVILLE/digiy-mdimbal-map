@@ -132,6 +132,7 @@
     .marker-loisir{background:var(--color-loisir)}
     .marker-hotel{background:var(--color-hotel)}
 
+    /* Modal (on le garde au cas où) */
     .modal{
       display:none; position:fixed; z-index:2000; inset:0;
       background:rgba(0,0,0,.85); backdrop-filter: blur(5px);
@@ -265,6 +266,7 @@
 
 </div>
 
+<!-- Modal (gardé, mais NDIMBAL => fiche) -->
 <div id="detailsModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
@@ -291,6 +293,20 @@ window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const SB = window.SB;
 
 /* ================================
+   ✅ NDIMBAL FICHE (IMPORTANT)
+   pro.html doit être dans le même repo/dossier que index.html
+   sinon mets un chemin absolu.
+================================ */
+const PRO_PAGE = "pro.html";
+function openProPage(slugOrId){
+  const key = decodeURIComponent(String(slugOrId || "")).trim();
+  if(!key) return;
+  // ✅ on supporte les 2 params, comme ça tu peux coder pro.html comme tu veux
+  const url = `${PRO_PAGE}?slug=${encodeURIComponent(key)}&pro=${encodeURIComponent(key)}`;
+  window.open(url, "_blank");
+}
+
+/* ================================
    GLOBALS
 ================================ */
 let map, markerCluster;
@@ -302,10 +318,6 @@ let currentRegion = 'all';
 const categoryIcons = {
   restaurant:'🍽️', commerce:'🏪', logement:'🏠', taxi:'🚕', notable:'👔',
   batiment:'🔨', voiture:'🚗', voyage:'✈️', loisir:'🎭', hotel:'🏨'
-};
-const categoryColors = {
-  restaurant:'#FF6B35', commerce:'#4ECDC4', logement:'#FFD93D', taxi:'#95E1D3',
-  notable:'#9B59B6', batiment:'#E67E22', voiture:'#3498DB', voyage:'#1ABC9C', loisir:'#E91E63', hotel:'#FF9800'
 };
 
 /* ================================
@@ -326,9 +338,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   setupEventListeners();
   document.getElementById('loader').classList.add('hidden');
 
-  // ✅ Focus si slug demandé (y compris demo-xx)
+  // ✅ si ?pro=xxx => ouvrir la fiche directement (au lieu du modal)
   if(slugWanted){
-    await focusBySlug(slugWanted);
+    openProPage(slugWanted);
   }
 });
 
@@ -494,11 +506,19 @@ function displayMarkers(pros){
     marker._digiy_slug = String(pro.slug || "");
 
     marker.bindPopup(createPopupContent(pro));
+
+    // ✅ clic direct sur le point => fiche pro (plus de froid)
+    marker.on("click", ()=>{
+      // on laisse le popup s'ouvrir normalement, mais tu peux aussi ouvrir direct:
+      // openProPage(pro.slug || pro.id);
+    });
+
     markerCluster.addLayer(marker);
   });
 }
 
 function createPopupContent(pro){
+  const key = String(pro.slug || pro.id || "");
   return `
     <div class="popup-header">
       <div class="popup-title">${escapeHTML(pro.name || "Professionnel")}</div>
@@ -509,8 +529,9 @@ function createPopupContent(pro){
       <div class="popup-info">⭐ ${escapeHTML(pro.rating || "5.0")} • 📞 ${escapeHTML(pro.phone || "N/A")}</div>
       <div class="popup-description">${escapeHTML((pro.description || "Service professionnel").slice(0,110))}${(pro.description||"").length>110?'…':''}</div>
       <div class="popup-actions">
-        <button class="popup-btn popup-btn-primary" onclick='openDetailsModal("${escapeAttr(String(pro.slug || pro.id))}")'>👁️ Détails</button>
-        <button class="popup-btn popup-btn-secondary" onclick='contactPro("${escapeAttr(String(pro.slug || pro.id))}")'>📞 Contact</button>
+        <!-- ✅ NDIMBAL => ouvre la FICHE -->
+        <button class="popup-btn popup-btn-primary" onclick='openProPage("${escapeAttr(key)}")'>👁️ Fiche</button>
+        <button class="popup-btn popup-btn-secondary" onclick='contactPro("${escapeAttr(key)}")'>📞 Contact</button>
       </div>
     </div>
   `;
@@ -550,9 +571,7 @@ function updateCounts(){
 }
 
 /* ================================
-   MODAL + ACTIONS
-   ✅ no fetch manual
-   ✅ slug/id accepted
+   MODAL + ACTIONS (gardé)
 ================================ */
 function findLocalProBySlugOrId(key){
   const k = String(key || "").trim();
@@ -562,75 +581,11 @@ function findLocalProBySlugOrId(key){
          null;
 }
 
+/* ✅ IMPORTANT : maintenant, "Détails" = fiche pro
+   Si tu veux encore le modal quelque part, tu peux créer un bouton "Aperçu".
+*/
 async function openDetailsModal(slugOrId){
-  const key = decodeURIComponent(String(slugOrId || ""));
-  let pro = findLocalProBySlugOrId(key);
-
-  // si pas dans le cache, on tente Supabase (via SB) — SAFE
-  if(!pro){
-    const { data, error } = await SB
-      .from("professionals")
-      .select("*")
-      .eq("slug", key)
-      .maybeSingle();
-
-    if(!error && data){
-      pro = {
-        ...data,
-        region: normRegion(data.region, data.city),
-        category: normCategory(data.category || data.cat || data.type || '')
-      };
-      allProfessionals.push(pro);
-    }
-  }
-
-  if(!pro){
-    alert("Pro introuvable : " + key);
-    return;
-  }
-
-  const lat = pro.latitude ?? pro.lat ?? pro.gps_lat;
-  const lng = pro.longitude ?? pro.lng ?? pro.gps_lng;
-
-  const modalBody = document.getElementById('modalBody');
-  modalBody.innerHTML = `
-    <h2>${escapeHTML(pro.name || "")}</h2>
-    <p style="color:var(--secondary); margin-bottom: 1rem; font-weight:900;">${getCategoryLabel(pro.category)}</p>
-
-    <div class="modal-info-grid">
-      <div class="info-card"><div class="info-label">♾️ Slug</div><div class="info-value">${escapeHTML(pro.slug || "N/A")}</div></div>
-      <div class="info-card"><div class="info-label">📍 Localisation</div><div class="info-value">${escapeHTML(pro.city || "")}${pro.region? ", "+escapeHTML(getRegionLabel(pro.region)):""}</div></div>
-      <div class="info-card"><div class="info-label">⭐ Note</div><div class="info-value">${escapeHTML(pro.rating || "5.0")} / 5</div></div>
-      <div class="info-card"><div class="info-label">📞 Téléphone</div><div class="info-value">${escapeHTML(pro.phone || "N/A")}</div></div>
-      <div class="info-card"><div class="info-label">📧 Email</div><div class="info-value">${escapeHTML(pro.email || "N/A")}</div></div>
-      <div class="info-card"><div class="info-label">⏰ Horaires</div><div class="info-value">${escapeHTML(pro.hours || "N/A")}</div></div>
-    </div>
-
-    <div style="margin-bottom:1rem;">
-      <div style="color:var(--muted); font-size:.85rem; margin-bottom:.5rem;">📝 Description</div>
-      <p style="color:var(--text); line-height:1.6;">${escapeHTML(pro.description || "")}</p>
-    </div>
-
-    <div style="margin-bottom:1.2rem;">
-      <div style="color:var(--muted); font-size:.85rem; margin-bottom:.5rem;">🏷️ Services</div>
-      <div style="display:flex; flex-wrap:wrap; gap:.5rem;">
-        ${(pro.services || []).map(s=>`<span style="background:rgba(78,205,196,.2); color:var(--secondary); padding:.4rem 1rem; border-radius:999px; font-size:.85rem; font-weight:800;">${escapeHTML(s)}</span>`).join('')}
-      </div>
-    </div>
-
-    <div style="display:flex; gap:1rem;">
-      <button onclick="contactPro('${escapeAttr(String(pro.slug||pro.id))}')" style="flex:1; padding:1rem; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:900; cursor:pointer;">
-        📞 Contacter
-      </button>
-      <button onclick="viewOnMap('${escapeAttr(String(pro.slug||pro.id))}')" style="flex:1; padding:1rem; background:var(--secondary); color:var(--dark); border:none; border-radius:12px; font-weight:900; cursor:pointer;">
-        🗺️ Voir sur la carte
-      </button>
-    </div>
-
-    ${(lat==null || lng==null) ? `<div style="margin-top:1rem; color:#ffd93d; font-weight:900;">⚠️ Ce pro n’a pas encore de coordonnées GPS, donc pas de marqueur sur la carte.</div>` : ``}
-  `;
-
-  document.getElementById('detailsModal').style.display = 'block';
+  openProPage(slugOrId);
 }
 
 function closeModal(){ document.getElementById('detailsModal').style.display = 'none'; }
@@ -640,74 +595,6 @@ function contactPro(slugOrId){
   const pro = findLocalProBySlugOrId(key);
   if(!pro || !pro.phone) return alert("Numéro non disponible");
   window.location.href = `tel:${pro.phone}`;
-}
-
-function viewOnMap(slugOrId){
-  const key = decodeURIComponent(String(slugOrId||""));
-  const pro = findLocalProBySlugOrId(key);
-  const lat = pro?.latitude ?? pro?.lat ?? pro?.gps_lat;
-  const lng = pro?.longitude ?? pro?.lng ?? pro?.gps_lng;
-  if(!pro || lat==null || lng==null) return alert("Coordonnées GPS manquantes pour ce pro.");
-  closeModal();
-  map.setView([Number(lat), Number(lng)], 15);
-}
-
-/* ================================
-   SLUG FOCUS (stable)
-================================ */
-async function focusBySlug(slug){
-  const s = decodeURIComponent(String(slug||"")).trim();
-  if(!s) return;
-
-  let pro = findLocalProBySlugOrId(s);
-
-  // si pas dans cache et pas demo, tente SB
-  if(!pro && !s.startsWith("demo-")){
-    const { data, error } = await SB
-      .from("professionals")
-      .select("*")
-      .eq("slug", s)
-      .maybeSingle();
-
-    if(!error && data){
-      pro = {
-        ...data,
-        region: normRegion(data.region, data.city),
-        category: normCategory(data.category || data.cat || data.type || '')
-      };
-      allProfessionals.push(pro);
-      filteredProfessionals = [...allProfessionals];
-      displayMarkers(filteredProfessionals);
-      updateCounts();
-    }
-  }
-
-  if(!pro){
-    document.getElementById('searchInput').value = s;
-    filterProfessionals();
-    alert("Pro introuvable via ce slug : " + s);
-    return;
-  }
-
-  const lat = pro.latitude ?? pro.lat ?? pro.gps_lat;
-  const lng = pro.longitude ?? pro.lng ?? pro.gps_lng;
-
-  if(lat!=null && lng!=null){
-    map.setView([Number(lat), Number(lng)], 15);
-  }
-
-  let targetMarker = null;
-  markerCluster.eachLayer(layer=>{
-    if(layer && String(layer._digiy_slug||"") === String(pro.slug||"")) targetMarker = layer;
-  });
-
-  if(targetMarker){
-    markerCluster.zoomToShowLayer(targetMarker, ()=>{
-      targetMarker.openPopup();
-    });
-  }
-
-  setTimeout(()=> openDetailsModal(String(pro.slug || pro.id)), 350);
 }
 
 /* ================================
