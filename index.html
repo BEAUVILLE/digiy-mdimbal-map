@@ -30,7 +30,6 @@
       --r-md:14px;
       --shadow: 0 18px 60px rgba(0,0,0,.45);
     }
-
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -118,10 +117,7 @@
     }
     #map{height:100%; min-height:520px}
 
-    .side{
-      display:grid; gap:14px;
-      align-content:start;
-    }
+    .side{display:grid; gap:14px; align-content:start;}
 
     .panel{
       border:1px solid rgba(255,255,255,.10);
@@ -139,12 +135,9 @@
     .panel .hd b{font-size:14px;letter-spacing:.2px}
     .panel .bd{padding:12px 14px}
 
-    .search{
-      display:flex; gap:8px; flex-wrap:wrap;
-    }
+    .search{display:flex; gap:8px; flex-wrap:wrap;}
     .search input{
-      flex:1;
-      min-width: 220px;
+      flex:1; min-width: 220px;
       padding:12px 12px;
       border-radius: 14px;
       border:1px solid rgba(255,255,255,.12);
@@ -162,6 +155,35 @@
       color:var(--text);
       outline:none;
       font-weight:900;
+    }
+
+    /* ✅ PAVÉ */
+    .pave{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:9px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-weight:900;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      transition:.15s transform ease,.15s border-color ease,.15s background ease;
+    }
+    .chip:hover{transform:translateY(-1px);border-color:rgba(250,204,21,.45)}
+    .chip.active{
+      background: rgba(250,204,21,.18);
+      border-color: rgba(250,204,21,.55);
+    }
+    .chip.strong{
+      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.88));
+      border-color: rgba(250,204,21,.35);
+      color:#0b1020;
     }
 
     .list{display:grid; gap:10px}
@@ -184,12 +206,26 @@
       font-weight:900;
       font-size:12px;
       white-space:nowrap;
+      cursor:pointer;
     }
     .mini:hover{border-color:rgba(250,204,21,.45)}
     .mini-gold{
       background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.88));
       border-color: rgba(250,204,21,.35);
       color:#0b1020;
+    }
+
+    .debug{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px dashed rgba(250,204,21,.35);
+      background: rgba(250,204,21,.08);
+      color: rgba(255,255,255,.92);
+      font-weight:850;
+      font-size:12px;
+      line-height:1.5;
+      white-space:pre-wrap;
     }
 
     .toast{
@@ -237,10 +273,26 @@
 
       <div class="side">
 
+        <!-- ✅ PAVÉ VILLES/ZONES -->
+        <div class="panel">
+          <div class="hd">
+            <b>🧱 Pavé (choix rapide)</b>
+            <span style="color:var(--muted);font-weight:850;font-size:12px" id="countLabel">—</span>
+          </div>
+          <div class="bd">
+            <div class="pave" id="pave"></div>
+            <div class="rowBtns" style="margin-top:10px">
+              <button class="mini mini-gold" id="btnAll">✨ Tout afficher</button>
+              <button class="mini" id="btnNear">📍 Centrer Saly</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rechercher -->
         <div class="panel">
           <div class="hd">
             <b>🎯 Rechercher</b>
-            <span style="color:var(--muted);font-weight:800;font-size:12px" id="countLabel">—</span>
+            <span style="color:var(--muted);font-weight:800;font-size:12px">Texte + catégorie</span>
           </div>
           <div class="bd">
             <div class="search">
@@ -258,9 +310,12 @@
                 <option value="notable">Notable</option>
               </select>
             </div>
+
+            <div class="debug" id="debugBox" style="display:none"></div>
           </div>
         </div>
 
+        <!-- Liste -->
         <div class="panel">
           <div class="hd"><b>📌 Partenaires</b><span style="color:var(--muted);font-weight:800;font-size:12px">Clique → fiche</span></div>
           <div class="bd">
@@ -284,7 +339,6 @@
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-
 const SB = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const $ = (id)=>document.getElementById(id);
@@ -313,13 +367,11 @@ function normCategory(cat){
   return cat ? 'commerce' : '';
 }
 function catEmoji(c){
-  const m = {
-    commerce:"🏪", restaurant:"🍽️", logement:"🏠", taxi:"🚕", hotel:"🏨",
-    batiment:"🔨", voyage:"✈️", loisir:"🎭", notable:"👔"
-  };
+  const m = { commerce:"🏪", restaurant:"🍽️", logement:"🏠", taxi:"🚕", hotel:"🏨", batiment:"🔨", voyage:"✈️", loisir:"🎭", notable:"👔" };
   return m[c] || "📍";
 }
 function safe(v, fb=""){ return (v==null?fb:String(v)).trim(); }
+
 function pickLat(p){ return p.latitude ?? p.lat ?? p.gps_lat ?? null; }
 function pickLng(p){ return p.longitude ?? p.lng ?? p.gps_lng ?? null; }
 
@@ -330,15 +382,17 @@ function proUrl(slug){
 let MAP, layerPins;
 let ALL = [];
 
+let filterPave = ""; // ville/zone sélectionnée
+
 async function loadProfessionals(){
-  // ⚠️ si RLS bloque, il faudra une policy SELECT public (on voit après)
+  // On tente large. Si Supabase ne renvoie que 2 → c’est côté DB/RLS.
   const { data, error } = await SB.from("professionals").select("*").limit(2000);
   if(error) throw error;
   return data || [];
 }
 
 function initMap(){
-  MAP = L.map("map", { zoomControl:true }).setView([14.439, -17.004], 10); // Saly/Dakar zone
+  MAP = L.map("map", { zoomControl:true }).setView([14.439, -17.004], 10); // zone Saly/Dakar
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap'
@@ -353,7 +407,7 @@ function drawPins(list){
   list.forEach(p=>{
     const lat = pickLat(p);
     const lng = pickLng(p);
-    if(lat==null || lng==null) return;
+    if(lat==null || lng==null) return; // map a besoin du GPS
 
     const slug = safe(p.slug);
     const name = safe(p.name, "Partenaire");
@@ -389,11 +443,11 @@ function renderList(list){
   box.innerHTML = "";
 
   if(!list.length){
-    box.innerHTML = `<div class="item"><h3>😅 Rien trouvé</h3><p>Essaie un autre mot-clé ou enlève la catégorie.</p></div>`;
+    box.innerHTML = `<div class="item"><h3>😅 Rien trouvé</h3><p>Essaie un autre mot-clé ou enlève les filtres.</p></div>`;
     return;
   }
 
-  list.slice(0, 80).forEach(p=>{
+  list.slice(0, 120).forEach(p=>{
     const slug = safe(p.slug);
     const name = safe(p.name, "Partenaire");
     const city = safe(p.city);
@@ -408,12 +462,13 @@ function renderList(list){
         <div>
           <h3>${em} ${name}</h3>
           <p>${[safe(p.category||""), city, zone].filter(Boolean).join(" · ") || "Partenaire local"}</p>
+          <p style="color:rgba(156,163,175,.85)">slug: <b>${slug || "—"}</b></p>
         </div>
-        <a class="mini mini-gold" href="${proUrl(slug)}">👀 Fiche</a>
+        <a class="mini mini-gold" href="${slug ? proUrl(slug) : '#'}" onclick="${slug ? '' : 'event.preventDefault();alert(\\'Slug manquant en base\\')'}">👀 Fiche</a>
       </div>
       <div class="rowBtns">
-        <a class="mini" href="${proUrl(slug)}">♾️ Ouvrir</a>
-        <a class="mini" href="./index.html" onclick="event.preventDefault();window.__focusSlug='${slug}';focusOn('${slug}');">📍 Centrer</a>
+        <a class="mini" href="${slug ? proUrl(slug) : '#'}" onclick="${slug ? '' : 'event.preventDefault();alert(\\'Slug manquant\\')'}">♾️ Ouvrir</a>
+        <button class="mini" onclick="focusOn('${slug.replace(/'/g,"\\'")}')">📍 Centrer</button>
       </div>
     `;
     box.appendChild(el);
@@ -424,9 +479,8 @@ function focusOn(slug){
   const p = ALL.find(x=>safe(x.slug)===slug);
   if(!p) return showToast(`⚠️ Introuvable : <b>${slug}</b>`);
   const lat = pickLat(p), lng = pickLng(p);
-  if(lat==null || lng==null) return showToast("⚠️ GPS manquant pour centrer.");
+  if(lat==null || lng==null) return showToast("⚠️ GPS manquant pour centrer (lat/lng vides).");
   MAP.setView([Number(lat), Number(lng)], 16);
-  // ouvre popup si possible
   layerPins.eachLayer(layer=>{
     const ll = layer.getLatLng?.();
     if(ll && Math.abs(ll.lat-Number(lat))<1e-6 && Math.abs(ll.lng-Number(lng))<1e-6){
@@ -435,47 +489,162 @@ function focusOn(slug){
   });
 }
 
+function buildPave(){
+  // Pavé = villes (et zones si tu veux). On prend city prioritaire.
+  const cities = Array.from(new Set(ALL.map(p=>safe(p.city)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+  const zones  = Array.from(new Set(ALL.map(p=>safe(p.zone)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+
+  const pave = $("pave");
+  pave.innerHTML = "";
+
+  const addChip = (label, value, type)=>{
+    const c = document.createElement("button");
+    c.className = "chip";
+    c.type = "button";
+    c.textContent = label;
+    c.dataset.value = value;
+    c.dataset.type = type;
+    c.onclick = ()=>{
+      // toggle
+      const v = c.dataset.value;
+      if(filterPave === `${type}:${v}`){
+        filterPave = "";
+      }else{
+        filterPave = `${type}:${v}`;
+      }
+      refreshPaveActive();
+      applyFilters();
+    };
+    pave.appendChild(c);
+  };
+
+  // Chips "Top" (si existent)
+  const top = ["Saly","Dakar","Mbour","Thiès"];
+  top.forEach(t=>{
+    const has = cities.some(c=>fold(c)===fold(t));
+    if(has) addChip("📍 " + t, cities.find(c=>fold(c)===fold(t)), "city");
+  });
+
+  // Un séparateur léger (si on a de la matière)
+  if(cities.length){
+    cities.forEach(c=>{
+      if(top.some(t=>fold(t)===fold(c))) return;
+      addChip("🏙️ " + c, c, "city");
+    });
+  }
+
+  // Zones (optionnel) — si tu veux, ça donne le “pavé terrain”
+  if(zones.length){
+    zones.slice(0, 18).forEach(z=>{
+      addChip("🧭 " + z, z, "zone");
+    });
+  }
+
+  // Si rien
+  if(!pave.children.length){
+    const d = document.createElement("div");
+    d.style.color = "rgba(156,163,175,.9)";
+    d.style.fontWeight = "850";
+    d.style.fontSize = "12px";
+    d.textContent = "Aucune ville/zone trouvée (colonne city/zone vide ?)";
+    pave.appendChild(d);
+  }
+
+  refreshPaveActive();
+}
+
+function refreshPaveActive(){
+  document.querySelectorAll(".chip").forEach(ch=>{
+    const type = ch.dataset.type;
+    const val  = ch.dataset.value;
+    const key  = `${type}:${val}`;
+    if(filterPave === key) ch.classList.add("active");
+    else ch.classList.remove("active");
+  });
+}
+
 function applyFilters(){
   const q = fold($("q").value);
   const cat = $("cat").value;
+
+  let type="", val="";
+  if(filterPave){
+    const parts = filterPave.split(":");
+    type = parts[0] || "";
+    val = parts.slice(1).join(":") || "";
+  }
 
   const filtered = ALL.filter(p=>{
     const blob = fold([
       p.name, p.slug, p.category, p.city, p.zone, p.region, p.description
     ].filter(Boolean).join(" "));
+
     const okQ = !q || blob.includes(q);
+
     const pc = normCategory(p.category || p.cat || p.type || "");
     const okC = !cat || pc === cat;
-    return okQ && okC;
+
+    let okP = true;
+    if(type==="city") okP = !val || fold(safe(p.city)) === fold(val);
+    if(type==="zone") okP = !val || fold(safe(p.zone)) === fold(val);
+
+    return okQ && okC && okP;
   });
 
   renderList(filtered);
   drawPins(filtered);
+
+  // debug
+  const dbg = $("debugBox");
+  dbg.style.display = "block";
+  const slugs = filtered.slice(0, 25).map(x=>safe(x.slug)||"(slug vide)").join(", ");
+  const total = ALL.length;
+  const gpsCount = ALL.filter(p=>pickLat(p)!=null && pickLng(p)!=null).length;
+  dbg.textContent =
+    `DEBUG:\n` +
+    `- Supabase a renvoyé: ${total} partenaire(s)\n` +
+    `- Avec GPS (lat/lng): ${gpsCount}\n` +
+    `- Affichés après filtres: ${filtered.length}\n` +
+    `- Slugs (échantillon): ${slugs}`;
 }
 
 (async function boot(){
   try{
     initMap();
-    showToast("♾️ NDIMBAL Map prête. Chargement partenaires…");
+    showToast("♾️ NDIMBAL Map prête. Chargement…");
 
     ALL = await loadProfessionals();
-    // si focus=slug dans l'URL, on centre
-    const u = new URL(location.href);
-    const focus = (u.searchParams.get("focus") || "").trim();
 
+    // ✅ si ALL.length = 2 => ce n'est PAS l'UI: c'est la DB/RLS ou la table.
+    if(ALL.length <= 2){
+      showToast("⚠️ Seulement " + ALL.length + " partenaire(s) reçus. Ça sent RLS/policy ou table vide.");
+    }else{
+      showToast("✅ " + ALL.length + " partenaire(s) chargés.");
+    }
+
+    buildPave();
     applyFilters();
 
     $("q").addEventListener("input", ()=>applyFilters());
     $("cat").addEventListener("change", ()=>applyFilters());
 
-    if(focus){
-      setTimeout(()=>focusOn(focus), 400);
-    }
+    $("btnAll").addEventListener("click", ()=>{
+      filterPave = "";
+      $("q").value = "";
+      $("cat").value = "";
+      refreshPaveActive();
+      applyFilters();
+    });
 
-    showToast(`✅ ${ALL.length} partenaire(s) chargés.`);
+    $("btnNear").addEventListener("click", ()=>{
+      // centre Saly approx
+      MAP.setView([14.441, -17.006], 13);
+      showToast("📍 Centré sur Saly (approx).");
+    });
+
   }catch(e){
     console.error(e);
-    showToast("❌ Erreur chargement Supabase. Vérifie RLS/policies ou connexion.");
+    showToast("❌ Erreur Supabase. Probable RLS/policy.");
     $("list").innerHTML = `
       <div class="item">
         <h3>❌ Impossible de charger les partenaires</h3>
@@ -488,3 +657,4 @@ function applyFilters(){
 </script>
 </body>
 </html>
+
