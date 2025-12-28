@@ -268,7 +268,6 @@
     .toast small{display:block; margin-top:6px; color: var(--muted); font-weight:700}
   </style>
 
-  <!-- Leaflet (map mini optionnel, sans charger une carte complète si inutile) -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -284,7 +283,7 @@
       </div>
     </div>
     <div class="actions">
-      <a class="btn btn-outline" id="btnBackMap" href="./index.html">🗺️ Retour carte</a>
+      <a class="btn btn-outline" id="btnBackMap" href="#">🗺️ Retour carte</a>
       <a class="btn btn-outline" id="btnHub" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">🏠 HUB</a>
     </div>
   </div>
@@ -424,7 +423,6 @@
 <script>
 /* ================================
    CONFIG SUPABASE (UNIQUE)
-   ✅ même keys que ta MAP
 ================================ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -434,17 +432,38 @@ window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const SB = window.SB;
 
 /* ================================
-   PARAMS
+   PRIORITÉ ASTOU (si pas de slug)
 ================================ */
-function getParam(name){
-  const url = new URL(window.location.href);
-  return url.searchParams.get(name);
-}
-function canon(x){ return String(x ?? "").trim(); }
-function canonLower(x){ return canon(x).toLowerCase(); }
+const DEFAULT_SLUG = "astou-boutique";
 
-// Supporte ?slug=xxx ou ?pro=xxx (comme ta MAP)
-const KEY = canon(getParam("slug") || getParam("pro") || "");
+/* ================================
+   PARAMS (robuste)
+   - ?slug=xxx
+   - ?pro=xxx
+   - #xxx
+   - /xxx (dernier segment)
+================================ */
+function canon(x){ return String(x ?? "").trim(); }
+
+function parseKey(){
+  const u = new URL(window.location.href);
+  const qs = canon(u.searchParams.get("slug") || u.searchParams.get("pro") || "");
+
+  if(qs) return qs;
+
+  const h = canon((window.location.hash || "").replace("#",""));
+  if(h) return h;
+
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  const last = canon(parts[parts.length - 1] || "");
+  const clean = canon(last.replace(/\.html$/i,""));
+  // évite de prendre "index" comme slug
+  if(clean && clean.toLowerCase() !== "index") return clean;
+
+  return "";
+}
+
+const KEY = parseKey();
 
 /* ================================
    CATEGORY LABELS
@@ -506,20 +525,33 @@ function setMetaTitleDesc(name, cat, city){
   const meta = document.querySelector('meta[name="description"]');
   if(meta) meta.setAttribute("content", `Fiche pro : ${name} — ${cat} à ${city}. Horaires, services, contact, localisation.`);
 }
+function showErrorBox(title, detail){
+  // Remplace le skeleton par un message propre
+  const loading = document.getElementById("loading");
+  loading.innerHTML = `
+    <div class="content">
+      <div class="desc" style="padding:14px">
+        <div style="font-weight:950;font-size:16px;margin-bottom:6px">❌ ${escapeHTML(title)}</div>
+        <div style="color:var(--muted);font-weight:700;line-height:1.6">${escapeHTML(detail || "")}</div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn btn-outline" href="map.html">🗺️ Retour carte</a>
+          <a class="btn btn-primary" href="https://digiylyfe.com/page-partenaires/" target="_blank" rel="noopener">🔎 Moteur partenaires</a>
+        </div>
+      </div>
+    </div>
+  `;
+}
 
 /* ================================
    DATA ADAPTER
-   -> supporte plusieurs colonnes possibles
 ================================ */
 function pickLat(p){ return p.latitude ?? p.lat ?? p.gps_lat ?? null; }
 function pickLng(p){ return p.longitude ?? p.lng ?? p.gps_lng ?? null; }
 
 function parseServices(p){
-  // Supabase peut renvoyer text, json, array…
   const s = p.services;
   if(Array.isArray(s)) return s.filter(Boolean).map(x=>String(x));
   if(typeof s === "string"){
-    // ex: "a,b,c" ou "['a','b']"
     const t = s.trim();
     if(!t) return [];
     try{
@@ -528,17 +560,12 @@ function parseServices(p){
     }catch(e){}
     return t.split(",").map(x=>x.trim()).filter(Boolean);
   }
-  if(s && typeof s === "object"){
-    // ex: {a:true}
-    return Object.keys(s);
-  }
+  if(s && typeof s === "object") return Object.keys(s);
   return [];
 }
 
 function parsePhotos(p){
-  // champs possibles : photos, gallery, images, cover_url
   const out = [];
-
   const add = (u)=>{ if(u && typeof u === "string"){ const x=u.trim(); if(x) out.push(x); } };
 
   add(p.cover_url);
@@ -555,12 +582,10 @@ function parsePhotos(p){
         if(Array.isArray(j)) j.forEach(add);
         else add(t);
       }catch(e){
-        // split
         t.split(",").forEach(add);
       }
     }
   }
-  // dédoublonne
   return Array.from(new Set(out));
 }
 
@@ -568,7 +593,6 @@ function buildWA(phone, name){
   const p = String(phone||"").replace(/\s+/g,'');
   if(!p) return "";
   const msg = encodeURIComponent(`Salam ${name || ""} — je viens de DIGIY NDIMBAL ♾️`);
-  // accepte +221...
   const cleaned = p.replace(/^00/,'+');
   const digits = cleaned.startsWith("+") ? cleaned.slice(1) : cleaned;
   return `https://wa.me/${digits}?text=${msg}`;
@@ -584,9 +608,7 @@ function googleMapsLink(lat, lng, name){
    JSON-LD SEO
 ================================ */
 function injectJsonLd(p){
-  // LocalBusiness / Organization minimal, safe
   const name = p.name || "Professionnel";
-  const cat = getCategoryLabel(p._cat || normCategory(p.category || p.cat || p.type || ""));
   const city = p.city || "";
   const region = p.region ? getRegionLabel(p.region) : "";
   const phone = p.phone || "";
@@ -619,7 +641,7 @@ function injectJsonLd(p){
     "openingHours": hours || undefined
   };
 
-  const clean = JSON.parse(JSON.stringify(data)); // retire undefined
+  const clean = JSON.parse(JSON.stringify(data));
   const s = document.createElement("script");
   s.type = "application/ld+json";
   s.textContent = JSON.stringify(clean);
@@ -627,55 +649,24 @@ function injectJsonLd(p){
 }
 
 /* ================================
-   LOAD LOGIC
-   1) try slug exact
-   2) try slug case-insensitive (fallback)
-   3) try id
-   4) fallback demo
+   LOAD LOGIC (PROPRE)
+   1) slug exact
+   2) slug ilike
+   3) id
 ================================ */
 async function fetchPro(key){
   if(!key) return null;
 
-  // slug exact
   let q = await SB.from("professionals").select("*").eq("slug", key).maybeSingle();
   if(!q.error && q.data) return q.data;
 
-  // slug case-insensitive (fallback)
-  // Supabase/PostgREST : ilike possible via .ilike
   q = await SB.from("professionals").select("*").ilike("slug", key).maybeSingle();
   if(!q.error && q.data) return q.data;
 
-  // id
   q = await SB.from("professionals").select("*").eq("id", key).maybeSingle();
   if(!q.error && q.data) return q.data;
 
   return null;
-}
-
-function demoPro(key){
-  const i = key && key.startsWith("demo-") ? Number(key.replace("demo-","")) : 1;
-  const name = `Pro Démo ${isFinite(i)?(i+1):"1"}`;
-  return {
-    id: key || "demo-1",
-    slug: key || "demo-1",
-    name,
-    category: "commerce",
-    region: "thies",
-    city: "Saly",
-    description: "🧪 Ceci est une fiche démo NDIMBAL. Quand tu ajoutes les vraies infos (photos, histoire, horaires, services), la fiche devient vivante et SEO-friendly.",
-    phone: "+221770000000",
-    email: "contact@digiylyfe.com",
-    rating: (4 + Math.random()).toFixed(1),
-    hours: "Lun-Sam 08h-20h",
-    services: ["Service 1", "Service 2", "Service 3"],
-    cover_url: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=70",
-    photos: [
-      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=70",
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=70",
-      "https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1600&q=70"
-    ],
-    badge_text: "🧪 Démo"
-  };
 }
 
 /* ================================
@@ -692,7 +683,7 @@ function renderPro(p){
   const rating = (p.rating != null && String(p.rating).trim() !== "") ? String(p.rating) : "5.0";
   const phone = p.phone || "";
   const email = p.email || "N/A";
-  const hours = p.hours || "N/A";
+  const hours = p.hours || p.opening_hours || "N/A";
 
   const photos = parsePhotos(p);
   p._photos = photos;
@@ -715,8 +706,7 @@ function renderPro(p){
     badgeEl.hidden = false;
     badgeEl.className = "badge ok";
   }else{
-    // si tu veux : badge “vérifié” quand un champ verified=true existe
-    if(p.verified === true){
+    if(p.verified === true || p.is_verified === true){
       badgeEl.textContent = "✅ Vérifié";
       badgeEl.hidden = false;
       badgeEl.className = "badge ok";
@@ -768,8 +758,7 @@ function renderPro(p){
   document.getElementById("kvPhone").textContent = phone || "N/A";
 
   // Location line
-  const loc = `📍 ${city}${region ? " — " + region : ""}`;
-  document.getElementById("locLine").textContent = loc;
+  document.getElementById("locLine").textContent = `📍 ${city}${region ? " — " + region : ""}`;
 
   const gpsNote = document.getElementById("gpsNote");
   if(lat!=null && lng!=null){
@@ -817,10 +806,8 @@ function renderPro(p){
     }
   };
 
-  // Meta tags
+  // Meta tags + JSON-LD
   setMetaTitleDesc(name, getCategoryLabel(catNorm), city);
-
-  // JSON-LD
   injectJsonLd(p);
 
   // show
@@ -829,38 +816,41 @@ function renderPro(p){
 }
 
 /* ================================
+   NAV: Retour carte (évite boucle)
+================================ */
+document.getElementById("btnBackMap").addEventListener("click", (e)=>{
+  e.preventDefault();
+  if(history.length > 1) history.back();
+  else window.location.href = "map.html"; // <-- change ici si ta carte a un autre fichier
+});
+
+/* ================================
    INIT
 ================================ */
 (async function init(){
-  // Si pas de KEY, on évite page vide
+  // 1) si pas de KEY -> astou direct
+  const finalKey = KEY || DEFAULT_SLUG;
   if(!KEY){
-    const fallback = demoPro("demo-1");
-    showToast("⚠️ Aucun slug/id fourni — affichage démo.");
-    renderPro(fallback);
-    return;
+    showToast(`ℹ️ Aucun slug fourni — affichage <strong>${escapeHTML(DEFAULT_SLUG)}</strong> (priorité Astou).`);
   }
 
-  // Charge depuis Supabase
+  // 2) Charge depuis Supabase
   let data = null;
   try{
-    data = await fetchPro(KEY);
+    data = await fetchPro(finalKey);
   }catch(e){
     data = null;
   }
 
   if(!data){
-    // si c’est un demo-xx -> ok
-    if(KEY.startsWith("demo-")){
-      renderPro(demoPro(KEY));
-      return;
-    }
-    // sinon fallback démo (mais on le dit clairement)
-    showToast(`⚠️ Pro introuvable (<strong>${escapeHTML(KEY)}</strong>) — affichage démo.`);
-    renderPro(demoPro("demo-1"));
+    showErrorBox(
+      "Partenaire introuvable",
+      `Slug/ID demandé : ${finalKey}. Vérifie que la table 'professionals' contient bien ce slug (colonne 'slug').`
+    );
+    showToast(`⚠️ Introuvable : <strong>${escapeHTML(finalKey)}</strong>`);
     return;
   }
 
-  // normalize region display: si déjà "thies" etc. on garde
   if(data.region) data.region = String(data.region);
   renderPro(data);
 })();
