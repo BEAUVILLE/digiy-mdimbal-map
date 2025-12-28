@@ -1,158 +1,197 @@
-soit pro.html (Astou en priorité)<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Fiche Pro — DIGIYLYFE</title>
-  <meta name="description" content="Fiche partenaire — photos, horaires, services, contact." />
-  <meta name="theme-color" content="#0B1120" />
+  <meta charset="UTF-8">
+  <title>Fiche Pro — DIGIYLYFE ♾️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Fiche partenaire DIGIYLYFE — premium, lisible, contact direct." />
+  <meta name="theme-color" content="#ffffff">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     :root{
-      --bg:#0b1020; --card:#0f172a; --card2:#0b1328; --line:rgba(255,255,255,.10);
-      --text:#e5e7eb; --muted:#9ca3af;
-      --gold:#facc15; --green:#22c55e; --orange:#f97316; --red:#ef4444; --blue:#60a5fa;
-      --radius:18px; --radius2:22px;
-      --shadow: 0 18px 50px rgba(0,0,0,.45);
-      --glow: 0 0 0 1px rgba(250,204,21,.20), 0 18px 80px rgba(250,204,21,.08);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Helvetica Neue",Arial;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 12% -10%, rgba(250,204,21,.14), transparent 55%),
-        radial-gradient(1000px 600px at 90% 10%, rgba(34,197,94,.10), transparent 55%),
-        radial-gradient(900px 600px at 50% 120%, rgba(96,165,250,.10), transparent 55%),
-        linear-gradient(180deg, #070b16 0%, #0b1020 45%, #070b16 100%);
-      min-height:100vh;
-    }
-    a{color:inherit}
-    .wrap{max-width:1080px;margin:0 auto;padding:16px 14px 40px}
-    .topbar{
-      position:sticky;top:0;z-index:10;
-      background:rgba(7,11,22,.62);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .topbar .inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 14px}
-    .brand{
-      display:flex;align-items:center;gap:10px;min-width:0;
-      font-weight:900;letter-spacing:.3px;
-    }
-    .brand .mark{
-      width:36px;height:36px;border-radius:12px;
-      display:grid;place-items:center;
-      background: radial-gradient(circle at 30% 30%, rgba(250,204,21,.35), rgba(250,204,21,.08) 55%, rgba(255,255,255,.06) 100%);
-      box-shadow: var(--glow);
-      border:1px solid rgba(250,204,21,.25);
-      font-size:18px;
-    }
-    .brand .txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .spacer{flex:1}
-    .btn{
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-      padding:10px 12px;border-radius:14px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.06);
-      text-decoration:none;cursor:pointer;
-      transition:.15s transform ease, .15s background ease, .15s border-color ease;
-      font-weight:800;
-      user-select:none;
-    }
-    .btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
-    .btn:active{transform:translateY(0)}
-    .btn-primary{
-      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.85));
-      color:#0b1020;border-color:rgba(250,204,21,.35);
-      box-shadow: 0 16px 60px rgba(250,204,21,.18);
-    }
-    .btn-primary:hover{background: linear-gradient(135deg, rgba(250,204,21,1), rgba(245,158,11,.92))}
-    .btn-green{
-      background: linear-gradient(135deg, rgba(34,197,94,.95), rgba(16,185,129,.80));
-      color:#04120c;border-color:rgba(34,197,94,.35);
-    }
-    .btn-ghost{background:transparent}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.05);
-      color:var(--muted);
-      font-weight:750;
-      max-width:100%;
-    }
-    .hero{
-      margin-top:14px;
-      border-radius:var(--radius2);
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      box-shadow: var(--shadow);
-    }
-    .cover{
-      position:relative;
-      height:240px;
-      background: linear-gradient(135deg, rgba(250,204,21,.14), rgba(34,197,94,.10));
-    }
-    .cover img{
-      width:100%;height:100%;object-fit:cover;display:block;
-      filter:saturate(1.05) contrast(1.05);
-    }
-    .cover::after{
-      content:"";
-      position:absolute;inset:0;
-      background: linear-gradient(180deg, rgba(7,11,22,.15), rgba(7,11,22,.75));
-      pointer-events:none;
-    }
-    .hero-body{padding:14px 14px 16px}
-    .head{
-      display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;
-    }
-    .title{
-      font-size:22px;line-height:1.15;font-weight:950;letter-spacing:.2px;
-      margin:0;
-    }
-    .subtitle{
-      margin:6px 0 0;color:var(--muted);font-weight:650
-    }
-    .metaRow{
-      display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
-    }
-    .ctaRow{
-      display:flex;gap:10px;flex-wrap:wrap;margin-top:14px
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --ink:#0f172a;        /* ✅ écriture noir */
+      --muted:#475569;
+      --line:rgba(15,23,42,.10);
+
+      --gold:#facc15;
+      --gold2:#f59e0b;
+      --green:#16a34a;
+      --blue:#0ea5e9;
+
+      --shadow:0 14px 40px rgba(2,6,23,.10);
+      --shadow2:0 10px 26px rgba(2,6,23,.08);
+
+      --r-xl:22px;
+      --r-lg:18px;
+      --r-md:14px;
     }
 
-    .grid{
-      display:grid;grid-template-columns: 1.25fr .75fr;gap:14px;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(1100px 600px at 12% -8%, rgba(250,204,21,.18), transparent 55%),
+        radial-gradient(900px 520px at 92% 0%, rgba(22,163,74,.12), transparent 55%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 55%, #ffffff 100%);
+    }
+    a{color:inherit;text-decoration:none}
+
+    .topbar{
+      position:sticky;top:0;z-index:50;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px) saturate(140%);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar .inner{
+      max-width:1120px;margin:0 auto;
+      padding:10px 14px;
+      display:flex;align-items:center;gap:10px;
+    }
+    .brand{display:flex;align-items:center;gap:10px;min-width:0}
+    .mark{
+      width:38px;height:38px;border-radius:14px;
+      display:grid;place-items:center;
+      font-weight:1000;
+      color:#111827;
+      background: radial-gradient(circle at 35% 35%, rgba(250,204,21,.95), rgba(245,158,11,.75));
+      box-shadow: 0 10px 26px rgba(245,158,11,.22);
+      border:1px solid rgba(245,158,11,.35);
+    }
+    .brand .txt{min-width:0}
+    .brand b{display:block;font-size:13px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand small{display:block;color:var(--muted);font-weight:750;font-size:12px}
+    .spacer{flex:1}
+
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+      padding:10px 12px;border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.85);
+      box-shadow: var(--shadow2);
+      font-weight:900;
+      font-size:13px;
+      transition:.15s transform ease,.15s background ease,.15s border-color ease;
+      white-space:nowrap;
+      user-select:none;
+      cursor:pointer;
+    }
+    .btn:hover{transform:translateY(-1px);border-color:rgba(245,158,11,.40)}
+    .btn:active{transform:translateY(0)}
+    .btn-dark{background:#0b1120;color:#fff;border-color:rgba(2,6,23,.2)}
+    .btn-gold{
+      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.90));
+      border-color: rgba(245,158,11,.35);
+      color:#111827;
+    }
+    .btn-wa{
+      background: linear-gradient(135deg, #25D366, #16a34a);
+      border-color: rgba(22,163,74,.35);
+      color:#052e16;
+    }
+    .btn-call{
+      background: linear-gradient(135deg, rgba(14,165,233,.95), rgba(59,130,246,.88));
+      border-color: rgba(59,130,246,.35);
+      color:#06151f;
+    }
+
+    .wrap{max-width:1120px;margin:0 auto;padding:14px 14px 44px}
+
+    .hero{
       margin-top:14px;
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .media{
+      position:relative;
+      height:340px;
+      background:#0b1120;
+    }
+    .media img{
+      width:100%;height:100%;
+      object-fit:cover;
+      object-position: center var(--focusY, 28%); /* ✅ centrer */
+      display:block;
+      filter:saturate(1.05) contrast(1.05);
+    }
+    .shade{
+      position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(2,6,23,.05) 0%, rgba(2,6,23,.40) 62%, rgba(2,6,23,.62) 100%);
+      pointer-events:none;
+    }
+
+    .heroBody{
+      padding:14px 14px 16px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:12px;
+      align-items:start;
+    }
+    .title{margin:0;font-size:28px;font-weight:1000;letter-spacing:.2px}
+    .subtitle{margin:8px 0 0;color:var(--muted);font-weight:800;line-height:1.45}
+
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid rgba(2,6,23,.10);
+      background: rgba(250,204,21,.12);
+      color:#0f172a;
+      font-weight:900;font-size:12px;
+    }
+
+    .pillCol{display:grid;gap:10px;align-content:start}
+    .pill{
+      display:flex;gap:10px;align-items:flex-start;
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(2,6,23,.10);
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 10px 22px rgba(2,6,23,.06);
+    }
+    .pill b{display:block;font-size:13px}
+    .pill small{display:block;color:var(--muted);font-weight:800;margin-top:2px;line-height:1.35}
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
     }
     .card{
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      border-radius: var(--radius2);
-      box-shadow: 0 12px 40px rgba(0,0,0,.30);
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow);
       overflow:hidden;
     }
     .card .hd{
-      padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);
+      padding:12px 14px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(250,204,21,.10), transparent);
       display:flex;align-items:center;justify-content:space-between;gap:10px;
     }
-    .card .hd b{font-size:14px;letter-spacing:.25px}
+    .card .hd b{font-size:14px;letter-spacing:.2px}
     .card .bd{padding:12px 14px}
-    .kv{display:flex;gap:10px;flex-wrap:wrap}
-    .kv .k{color:var(--muted);font-weight:700}
-    .kv .v{font-weight:850}
-    .list{display:grid;gap:10px}
+
     .item{
-      padding:10px 12px;border-radius:16px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.04);
+      padding:12px 12px;
+      border-radius:16px;
+      border:1px solid rgba(2,6,23,.08);
+      background: rgba(2,6,23,.02);
+      margin-bottom:10px;
     }
-    .item .t{font-weight:900}
-    .item .s{color:var(--muted);margin-top:4px;font-weight:650}
+    .item .t{font-weight:950}
+    .item .s{color:var(--muted);font-weight:800;margin-top:6px;line-height:1.65}
 
     .gallery{
       display:grid;
@@ -160,127 +199,139 @@ soit pro.html (Astou en priorité)<!doctype html>
       gap:10px;
     }
     .ph{
-      position:relative;
       border-radius:18px;
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
+      border:1px solid rgba(2,6,23,.10);
       aspect-ratio: 4 / 3;
+      background:#eef2ff;
+      position:relative;
     }
     .ph img{width:100%;height:100%;object-fit:cover;display:block}
     .ph::after{
-      content:"";
-      position:absolute;inset:0;
-      background: linear-gradient(180deg, transparent, rgba(0,0,0,.28));
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(180deg, transparent 55%, rgba(2,6,23,.22));
       pointer-events:none;
     }
 
     .note{
       margin-top:10px;
-      padding:10px 12px;
+      padding:12px 12px;
       border-radius:16px;
-      border:1px dashed rgba(250,204,21,.32);
-      background: rgba(250,204,21,.06);
-      color: rgba(255,255,255,.92);
-      font-weight:700;
+      border:1px dashed rgba(245,158,11,.45);
+      background: rgba(250,204,21,.14);
+      color:#111827;
+      font-weight:900;
+      line-height:1.55;
+    }
+
+    .mapEmbed{
+      width:100%;
+      height:320px;
+      border:0;
+      border-radius:16px;
     }
 
     .err{
-      margin:18px 0;
+      margin-top:14px;
       padding:14px 14px;
       border-radius:18px;
       border:1px solid rgba(239,68,68,.35);
-      background: rgba(239,68,68,.08);
-      color: rgba(255,255,255,.95);
-      font-weight:800;
+      background: rgba(239,68,68,.10);
+      color:#7f1d1d;
+      font-weight:900;
+      white-space:pre-line;
     }
 
     .foot{
-      margin-top:18px;
-      padding:14px 2px 0;
-      color: rgba(255,255,255,.55);
-      font-weight:650;
+      margin-top:16px;
       text-align:center;
+      color: rgba(15,23,42,.55);
+      font-weight:900;
+      font-size:12px;
     }
 
-    @media (max-width: 900px){
+    @media (max-width: 980px){
+      .heroBody{grid-template-columns:1fr}
       .grid{grid-template-columns:1fr}
-      .cover{height:220px}
+      .media{height:280px}
     }
     @media (max-width: 560px){
-      .cover{height:210px}
-      .gallery{grid-template-columns: repeat(2, 1fr)}
+      .media{height:240px}
+      .gallery{grid-template-columns:repeat(2,1fr)}
       .btn{flex:1}
-      .ctaRow .btn{flex:1}
     }
   </style>
 </head>
 
 <body>
-  <!-- TOPBAR -->
   <div class="topbar">
     <div class="inner">
-      <a class="btn btn-ghost" id="btnBack" href="#" title="Retour">← Retour</a>
+      <a class="btn" href="./index.html">🗺️ NDIMBAL Map</a>
 
-      <div class="brand" title="DIGIYLYFE">
+      <div class="brand">
         <div class="mark">∞</div>
-        <div class="txt">DIGIYLYFE · Fiche Pro</div>
+        <div class="txt">
+          <b id="brandTitle">DIGIYLYFE · Fiche Premium</b>
+          <small id="brandSub">Contact direct · 0% commission</small>
+        </div>
       </div>
 
       <div class="spacer"></div>
 
-      <a class="btn" id="btnSearch" href="https://digiylyfe.com/page-partenaires/" target="_blank" rel="noopener">
-        🔎 Moteur
-      </a>
-      <a class="btn btn-primary" id="btnHub" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">
-        🏠 HUB
-      </a>
+      <a class="btn" href="https://digiylyfe.com/page-partenaires/" target="_blank" rel="noopener">🔎 Moteur</a>
+      <a class="btn btn-gold" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">🏠 HUB</a>
     </div>
   </div>
 
   <div class="wrap">
-
-    <div id="loading" class="note" style="display:none">Chargement…</div>
-    <div id="infoNoSlug" class="note" style="display:none">
-      Aucun <b>slug</b> dans l’URL → on t’affiche <b>Astou</b> par défaut. (Astou d’abord 😄)
-    </div>
     <div id="errorBox" class="err" style="display:none"></div>
 
-    <!-- HERO -->
-    <section class="hero" id="hero" style="display:none">
-      <div class="cover" id="cover">
-        <img id="coverImg" alt="Couverture" />
+    <section class="hero" aria-label="Fiche partenaire">
+      <div class="media">
+        <img id="coverImg" alt="Couverture partenaire" loading="eager" decoding="async" />
+        <div class="shade"></div>
       </div>
 
-      <div class="hero-body">
-        <div class="head">
-          <div style="flex:1;min-width:260px">
-            <h1 class="title" id="proName">—</h1>
-            <div class="subtitle" id="proSubtitle">—</div>
+      <div class="heroBody">
+        <div>
+          <h1 class="title" id="proName">—</h1>
+          <div class="subtitle" id="proSubtitle">—</div>
 
-            <div class="metaRow" id="metaRow"></div>
+          <div class="chips" id="chips"></div>
+        </div>
 
-            <div class="ctaRow" id="ctaRow"></div>
+        <div class="pillCol">
+          <div class="pill">
+            <div>⚡</div>
+            <div>
+              <b>Contact direct</b>
+              <small>WhatsApp / Appel</small>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                <a class="btn btn-wa" id="btnWA" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
+                <a class="btn btn-call" id="btnCall" href="#">📞 Appeler</a>
+              </div>
+            </div>
           </div>
 
-          <div style="min-width:220px;display:grid;gap:10px;align-content:start">
-            <div class="pill" id="badgePill" style="display:none">🏷️ <span id="badgeText">—</span></div>
-            <div class="pill" id="pricePill" style="display:none">💰 <span id="priceText">—</span></div>
-            <div class="pill" id="slugPill">🔗 <span id="slugText">—</span></div>
+          <div class="pill">
+            <div>🧭</div>
+            <div>
+              <b>Localisation</b>
+              <small id="locText">—</small>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                <a class="btn btn-dark" id="btnMaps" href="#" target="_blank" rel="noopener">🗺️ Google Maps</a>
+                <a class="btn" id="btnRoute" href="#" target="_blank" rel="noopener">🧭 Itinéraire</a>
+              </div>
+            </div>
           </div>
+
         </div>
       </div>
     </section>
 
-    <!-- GRID -->
-    <section class="grid" id="grid" style="display:none">
-
-      <!-- LEFT -->
-      <div class="card">
-        <div class="hd">
-          <b>🧾 Présentation</b>
-          <span class="pill" id="verifiedPill" style="display:none">✅ Vérifié</span>
-        </div>
+    <section class="grid">
+      <article class="card">
+        <div class="hd"><b>🧾 Présentation</b><span class="chip">✅ Validé DIGIY</span></div>
         <div class="bd">
           <div class="item">
             <div class="t">Description</div>
@@ -297,117 +348,107 @@ soit pro.html (Astou en priorité)<!doctype html>
             <div class="s" id="proHours">—</div>
           </div>
 
-          <div class="item" id="galleryBox" style="display:none">
-            <div class="t">Photos</div>
-            <div class="s" style="margin-bottom:10px;color:var(--muted)">Tape une photo pour zoomer (si ton navigateur gère).</div>
-            <div class="gallery" id="gallery"></div>
+          <div class="note">
+            💎 Astuce premium : envoie une photo / une idée sur WhatsApp — le pro te propose le bon combo.
           </div>
         </div>
-      </div>
+      </article>
 
-      <!-- RIGHT -->
-      <div class="card">
-        <div class="hd">
-          <b>📍 Contact</b>
-          <span class="pill" id="statusPill" style="display:none">🟢 En ligne</span>
-        </div>
+      <aside class="card">
+        <div class="hd"><b>📸 Galerie</b><span style="color:var(--muted);font-weight:900;font-size:12px" id="slugPill">—</span></div>
         <div class="bd">
-          <div class="list">
-
-            <div class="item">
-              <div class="t">Infos</div>
-              <div class="s" id="infoLines">—</div>
-            </div>
-
-            <div class="item" id="phoneBox" style="display:none">
-              <div class="t">Téléphone</div>
-              <div class="s"><a id="phoneLink" href="#" rel="nofollow">—</a></div>
-            </div>
-
-            <div class="item" id="addressBox" style="display:none">
-              <div class="t">Adresse</div>
-              <div class="s" id="addressText">—</div>
-            </div>
-
-            <div class="item" id="mapBox" style="display:none">
-              <div class="t">Carte</div>
-              <div class="s"><a id="mapLink" href="#" target="_blank" rel="noopener">Ouvrir Google Maps</a></div>
-            </div>
-
-            <div class="item" id="shareBox">
-              <div class="t">Partager</div>
-              <div class="s">
-                <a class="btn" href="#" id="btnCopy">📋 Copier le lien</a>
-              </div>
-            </div>
-
-          </div>
+          <div class="gallery" id="gallery"></div>
+          <div style="height:10px"></div>
+          <iframe class="mapEmbed" id="mapEmbed" loading="lazy" title="Carte Google Maps"></iframe>
         </div>
-      </div>
-
+      </aside>
     </section>
 
-    <div class="foot">© DIGIYLYFE · 0% commission · Paiement direct au pro</div>
+    <div class="foot">© DIGIYLYFE · 0% commission · Paiement direct au pro · ∞</div>
   </div>
 
 <script>
-/* ✅ SUPABASE — intégré */
+/* ================================
+   SUPABASE (tes clés)
+================================ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-
 const SB = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ===== UTIL ===== */
 const $ = (id)=>document.getElementById(id);
+const DEFAULT_SLUG = "astou-boutique";
 
-function safeText(v, fallback="—"){
-  if(v===null || v===undefined) return fallback;
-  const s = (""+v).trim();
-  return s ? s : fallback;
+/* ================================
+   helpers
+================================ */
+function safe(v, fb=""){
+  return (v==null?fb:String(v)).trim();
 }
-
+function fold(s){
+  return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function normCategory(cat){
+  const c = fold(cat);
+  if(c.includes('resto') || c.includes('restaurant')) return 'restaurant';
+  if(c.includes('commerce') || c.includes('market') || c.includes('boutique')) return 'commerce';
+  if(c.includes('logement') || c.includes('heberg') || c.includes('héberg') || c.includes('villa')) return 'logement';
+  if(c.includes('hotel') || c.includes('hôtel')) return 'hotel';
+  if(c.includes('taxi') || c.includes('vtc') || c.includes('driver') || c.includes('chauffeur')) return 'taxi';
+  if(c.includes('bat') || c.includes('bât') || c.includes('construction') || c.includes('artisan')) return 'batiment';
+  if(c.includes('voyage') || c.includes('explore') || c.includes('guide')) return 'voyage';
+  if(c.includes('loisir')) return 'loisir';
+  if(c.includes('notable')) return 'notable';
+  return cat ? 'commerce' : '';
+}
+function catEmoji(c){
+  const m = {
+    commerce:"🏪", restaurant:"🍽️", logement:"🏠", taxi:"🚕", hotel:"🏨",
+    batiment:"🔨", voyage:"✈️", loisir:"🎭", notable:"👔"
+  };
+  return m[c] || "📍";
+}
 function parseSlug(){
-  // 1) ?slug=xxx
-  const q = new URLSearchParams(location.search);
-  let slug = (q.get("slug") || "").trim();
-
-  // 2) #xxx
+  const u = new URL(location.href);
+  let slug = (u.searchParams.get("slug") || "").trim();
   if(!slug){
     const h = (location.hash || "").replace("#","").trim();
     if(h) slug = h;
   }
-
-  // 3) /xxx (dernier segment)
-  if(!slug){
-    const parts = location.pathname.split("/").filter(Boolean);
-    const last = parts[parts.length-1] || "";
-    const clean = last.replace(/\.html$/i,"").trim();
-    if(clean && !["pro","index"].includes(clean.toLowerCase())) slug = clean;
-  }
-
   return slug;
 }
-
 function isUrl(s){
   try{ new URL(s); return true; }catch(e){ return false; }
 }
-
 function joinList(val){
   if(!val) return "";
   if(Array.isArray(val)) return val.filter(Boolean).join(" · ");
   if(typeof val === "string") return val;
   if(typeof val === "object"){
-    // JSON object -> pretty key: value
-    const entries = Object.entries(val).filter(([k,v])=>v!==null && v!==undefined && (""+v).trim()!=="");
+    const entries = Object.entries(val).filter(([k,v])=>v!=null && String(v).trim()!=="");
     return entries.map(([k,v])=>`${k}: ${v}`).join(" · ");
   }
-  return ""+val;
+  return String(val);
 }
-
-function buildMapsLink(address, city){
-  const q = encodeURIComponent([address, city].filter(Boolean).join(", "));
+function buildWA(phone, name){
+  const p = String(phone||"").replace(/\s+/g,'');
+  if(!p) return "";
+  const msg = encodeURIComponent(`Salam ${name || ""} — je viens de DIGIYLYFE ♾️`);
+  const cleaned = p.replace(/^00/,'+');
+  const digits = cleaned.startsWith("+") ? cleaned.slice(1) : cleaned;
+  return `https://wa.me/${digits}?text=${msg}`;
+}
+function mapsSearch(name, city){
+  const q = encodeURIComponent([name, city].filter(Boolean).join(" "));
   return "https://www.google.com/maps/search/?api=1&query=" + q;
+}
+function mapsDir(name, city){
+  const q = encodeURIComponent([name, city].filter(Boolean).join(" "));
+  return "https://www.google.com/maps/dir/?api=1&destination=" + q;
+}
+function mapsEmbed(name, city){
+  const q = encodeURIComponent([name, city].filter(Boolean).join(" "));
+  return "https://www.google.com/maps?q=" + q + "&output=embed";
 }
 
 function showError(msg){
@@ -415,264 +456,170 @@ function showError(msg){
   $("errorBox").textContent = msg;
 }
 
-/* ===== UI ===== */
-$("btnBack").addEventListener("click", (e)=>{
-  e.preventDefault();
-  if(history.length > 1) history.back();
-  else location.href = "https://beauville.github.io/digiy-hub/";
-});
-
-$("btnCopy").addEventListener("click", async (e)=>{
-  e.preventDefault();
-  try{
-    await navigator.clipboard.writeText(location.href);
-    $("btnCopy").textContent = "✅ Lien copié";
-    setTimeout(()=> $("btnCopy").textContent = "📋 Copier le lien", 1400);
-  }catch(err){
-    alert("Copie impossible. Tu peux copier l’URL manuellement.");
-  }
-});
-
-/* ===== DATA LOAD ===== */
+/* ================================
+   data
+================================ */
 async function loadPro(slug){
-  $("loading").style.display = "block";
-  $("loading").textContent = "Chargement…";
-
-  // Table attendue : professionals
-  // Colonnes utilisées si dispo :
-  // name, slug, category, city, zone, badge_text, price_text,
-  // cover_url, description, services, opening_hours, photos,
-  // phone, whatsapp, address, is_verified, is_online,
-  // cta_primary_label, cta_primary_url, cta_secondary_label, cta_secondary_url
-
   const { data, error } = await SB
     .from("professionals")
     .select("*")
     .eq("slug", slug)
     .maybeSingle();
 
-  if(error){
-    throw new Error("Supabase: " + error.message);
-  }
-  if(!data){
-    throw new Error("Aucun partenaire trouvé pour le slug : " + slug);
-  }
+  if(error) throw new Error("Supabase: " + error.message);
+  if(!data) throw new Error("Aucun partenaire trouvé pour le slug : " + slug);
   return data;
 }
 
-function renderPro(p){
-  $("hero").style.display = "block";
-  $("grid").style.display = "grid";
-  $("loading").style.display = "none";
-
-  const name = safeText(p.name, "Partenaire DIGIY");
-  const cat  = safeText(p.category, "");
-  const city = safeText(p.city, "");
-  const zone = safeText(p.zone, "");
-  const sub  = [cat, zone, city].filter(Boolean).join(" · ") || "Partenaire local";
+function renderPro(p, slugUsed){
+  const name = safe(p.name, "Partenaire DIGIY");
+  const city = safe(p.city, "Sénégal");
+  const zone = safe(p.zone, "");
+  const catRaw = safe(p.category, "");
+  const cat = normCategory(catRaw);
 
   $("proName").textContent = name;
-  $("proSubtitle").textContent = sub;
+  $("proSubtitle").textContent = [catRaw, zone, city].filter(Boolean).join(" · ") || "Partenaire local";
+  $("brandTitle").textContent = "DIGIYLYFE · " + name;
+  $("slugPill").textContent = "♾️ " + safe(p.slug, slugUsed);
 
-  const slug = safeText(p.slug, "");
-  $("slugText").textContent = slug ? slug : "—";
+  // chips
+  const chips = $("chips");
+  chips.innerHTML = "";
+  const base = [
+    `${catEmoji(cat)} ${catRaw || "Service"}`,
+    `📍 ${city}${zone ? " · " + zone : ""}`
+  ];
+  if(p.badge_text) base.push(`🏷️ ${safe(p.badge_text)}`);
+  if(p.price_text) base.push(`💰 ${safe(p.price_text)}`);
+  base.forEach(t=>{
+    const s = document.createElement("span");
+    s.className = "chip";
+    s.textContent = t;
+    chips.appendChild(s);
+  });
 
-  // Cover
-  const cover = p.cover_url && isUrl(p.cover_url) ? p.cover_url : "";
-  $("coverImg").src = cover || "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+  // cover
+  const cover = (p.cover_url && isUrl(p.cover_url)) ? p.cover_url : "";
+  $("coverImg").src = cover || ("data:image/svg+xml;charset=utf-8," + encodeURIComponent(
     `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='700'>
       <defs>
         <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-          <stop stop-color='#facc15' stop-opacity='.20'/>
-          <stop offset='1' stop-color='#22c55e' stop-opacity='.12'/>
+          <stop stop-color='#facc15' stop-opacity='.24'/>
+          <stop offset='1' stop-color='#16a34a' stop-opacity='.14'/>
         </linearGradient>
       </defs>
-      <rect width='100%' height='100%' fill='#0b1020'/>
+      <rect width='100%' height='100%' fill='#0b1120'/>
       <rect width='100%' height='100%' fill='url(#g)'/>
-      <text x='50%' y='52%' text-anchor='middle' fill='#e5e7eb' font-family='system-ui' font-size='46' font-weight='900'>${name.replace(/</g,"&lt;")}</text>
-      <text x='50%' y='62%' text-anchor='middle' fill='#9ca3af' font-family='system-ui' font-size='22' font-weight='700'>DIGIYLYFE · 0% commission</text>
+      <text x='50%' y='52%' text-anchor='middle' fill='#111827' font-family='system-ui' font-size='46' font-weight='900'>${name.replace(/</g,"&lt;")}</text>
+      <text x='50%' y='62%' text-anchor='middle' fill='#334155' font-family='system-ui' font-size='22' font-weight='800'>DIGIYLYFE · 0% commission</text>
     </svg>`
+  ));
+
+  // ✅ centrage spécial Astou (tu peux ajouter d’autres cas)
+  if(safe(p.slug) === "astou-boutique"){
+    document.documentElement.style.setProperty("--focusY", "28%");
+  }else{
+    document.documentElement.style.setProperty("--focusY", "35%");
+  }
+
+  // desc
+  $("proDesc").textContent = safe(p.description,
+    "Linge de maison : draps, housses, taies, serviettes, peignoirs, rideaux. " +
+    "Nombreuses couleurs (pastels & vives). Collection de robes : prêt-à-porter & personnalisables. " +
+    "Besoin d’un conseil ? On t’aide à choisir le bon combo — sans blabla."
   );
 
-  // Badge + Price
-  if(p.badge_text){
-    $("badgePill").style.display = "inline-flex";
-    $("badgeText").textContent = safeText(p.badge_text);
-  }
-  if(p.price_text){
-    $("pricePill").style.display = "inline-flex";
-    $("priceText").textContent = safeText(p.price_text);
-  }
-
-  // Verified / Online
-  if(p.is_verified === true) $("verifiedPill").style.display = "inline-flex";
-  if(p.is_online === true) $("statusPill").style.display = "inline-flex";
-
-  // Meta row
-  const meta = [];
-  if(cat) meta.push(`🏷️ ${cat}`);
-  if(city) meta.push(`📍 ${city}`);
-  if(zone) meta.push(`🧭 ${zone}`);
-  const metaRow = $("metaRow");
-  metaRow.innerHTML = "";
-  meta.forEach(t=>{
-    const el = document.createElement("div");
-    el.className = "pill";
-    el.textContent = t;
-    metaRow.appendChild(el);
-  });
-
-  // Description
-  $("proDesc").textContent = safeText(p.description, "Pas encore de description. (Mais le service est là 😄)");
-
-  // Services
+  // services
   const services = joinList(p.services);
   if(services){
     $("servicesBox").style.display = "block";
     $("proServices").textContent = services;
   }
 
-  // Hours
+  // hours
   const hours = joinList(p.opening_hours || p.hours);
   if(hours){
     $("hoursBox").style.display = "block";
     $("proHours").textContent = hours;
   }
 
-  // Gallery (photos)
+  // contact
+  const phone = safe(p.phone, "");
+  const waField = safe(p.whatsapp, "");
+  const phoneToUse = waField || phone;
+
+  const wa = buildWA(phoneToUse, name);
+  $("btnWA").href = wa || "#";
+  $("btnWA").onclick = (e)=>{ if(!wa){ e.preventDefault(); alert("WhatsApp indisponible (numéro manquant)"); } };
+
+  $("btnCall").href = phoneToUse ? `tel:${phoneToUse.replace(/\s+/g,"")}` : "#";
+  $("btnCall").onclick = (e)=>{ if(!phoneToUse){ e.preventDefault(); alert("Numéro non disponible"); } };
+
+  $("locText").textContent = `${city}${zone ? " · " + zone : ""}`;
+
+  const maps1 = mapsSearch(name, city);
+  const maps2 = mapsDir(name, city);
+
+  $("btnMaps").href = maps1;
+  $("btnRoute").href = maps2;
+
+  $("mapEmbed").src = mapsEmbed(name, city);
+
+  // gallery : si pas de photos en DB -> set premium par défaut pour Astou
   let photos = p.photos || p.gallery || p.images;
   if(typeof photos === "string"){
-    // si c'est une string JSON
     try{ photos = JSON.parse(photos); }catch(e){}
   }
-  if(Array.isArray(photos) && photos.length){
-    const urls = photos.filter(u=>typeof u==="string" && u.trim() && isUrl(u.trim())).slice(0, 12);
-    if(urls.length){
-      $("galleryBox").style.display = "block";
-      const g = $("gallery");
-      g.innerHTML = "";
-      urls.forEach(u=>{
-        const a = document.createElement("a");
-        a.className = "ph";
-        a.href = u;
-        a.target = "_blank";
-        a.rel = "noopener";
-        a.title = "Ouvrir";
-        const img = document.createElement("img");
-        img.src = u;
-        img.alt = "Photo";
-        a.appendChild(img);
-        g.appendChild(a);
-      });
-    }
+  let urls = [];
+  if(Array.isArray(photos)){
+    urls = photos.filter(u=>typeof u==="string" && u.trim() && isUrl(u.trim())).slice(0, 12);
   }
 
-  // Contact info
-  const lines = [];
-  if(cat) lines.push(cat);
-  if(zone || city) lines.push([zone, city].filter(Boolean).join(", "));
-  $("infoLines").innerHTML = lines.length ? lines.map(x=>`• ${x}`).join("<br>") : "• Partenaire local";
-
-  // Phone / WhatsApp
-  const phone = safeText(p.phone, "");
-  const whatsapp = safeText(p.whatsapp, "");
-  const phoneToUse = whatsapp || phone;
-
-  if(phoneToUse){
-    $("phoneBox").style.display = "block";
-    $("phoneLink").textContent = phoneToUse;
-    $("phoneLink").href = "tel:" + phoneToUse.replace(/\s+/g,"");
+  // fallback premium cohérent (linge/robes) si vide
+  if(!urls.length){
+    urls = [
+      "https://digiylyfe.com/wp-content/uploads/2025/06/ASTOU-BOUTIK.png",
+      "https://images.unsplash.com/photo-1759264244764-2cb80f1a67bd?fm=jpg&ixlib=rb-4.1.0&q=80&w=1600",
+      "https://images.unsplash.com/photo-1635353059173-461b9c459f2a?fm=jpg&ixlib=rb-4.1.0&q=80&w=1600",
+      "https://images.unsplash.com/photo-1762834923135-f125e65b88eb?fm=jpg&ixlib=rb-4.1.0&q=80&w=1600",
+      "https://images.unsplash.com/photo-1761090617068-f1b3257d27ad?fm=jpg&ixlib=rb-4.1.0&q=80&w=1600"
+    ];
   }
 
-  // Address + Map
-  const address = safeText(p.address, "");
-  if(address){
-    $("addressBox").style.display = "block";
-    $("addressText").textContent = address;
-
-    $("mapBox").style.display = "block";
-    $("mapLink").href = buildMapsLink(address, city);
-  }
-
-  // CTA buttons (priorité: cta_primary, sinon WhatsApp auto)
-  const ctaRow = $("ctaRow");
-  ctaRow.innerHTML = "";
-
-  const cta1Label = safeText(p.cta_primary_label, "");
-  const cta1Url   = safeText(p.cta_primary_url, "");
-  const cta2Label = safeText(p.cta_secondary_label, "");
-  const cta2Url   = safeText(p.cta_secondary_url, "");
-
-  function addBtn(label, url, cls){
-    if(!label || !url) return;
+  const g = $("gallery");
+  g.innerHTML = "";
+  urls.slice(0, 9).forEach(u=>{
     const a = document.createElement("a");
-    a.className = "btn " + (cls || "");
-    a.textContent = label;
-    a.href = url;
+    a.className = "ph";
+    a.href = u;
     a.target = "_blank";
     a.rel = "noopener";
-    ctaRow.appendChild(a);
-  }
+    const img = document.createElement("img");
+    img.src = u;
+    img.alt = "Photo";
+    a.appendChild(img);
+    g.appendChild(a);
+  });
 
-  if(cta1Label && cta1Url && isUrl(cta1Url)){
-    addBtn(cta1Label, cta1Url, "btn-primary");
-  }else{
-    // fallback WhatsApp si dispo
-    if(phoneToUse){
-      const wa = "https://wa.me/" + phoneToUse.replace(/[^\d]/g,"") +
-        "?text=" + encodeURIComponent("Salam " + name + " je viens de DIGIYLYFE");
-      addBtn("💬 WhatsApp", wa, "btn-primary");
-    }
-  }
-
-  if(cta2Label && cta2Url && isUrl(cta2Url)){
-    addBtn(cta2Label, cta2Url, "");
-  }else{
-    // fallback: ouvrir page partenaires
-    addBtn("🔎 Voir sur partenaires", "https://digiylyfe.com/page-partenaires/", "");
-  }
-
-  // bouton appel rapide
-  if(phoneToUse){
-    const tel = "tel:" + phoneToUse.replace(/\s+/g,"");
-    const a = document.createElement("a");
-    a.className = "btn btn-green";
-    a.textContent = "📞 Appeler";
-    a.href = tel;
-    ctaRow.appendChild(a);
-  }
-
-  // titre onglet
-  document.title = name + " — DIGIYLYFE";
+  document.title = `${name} — DIGIYLYFE ♾️`;
 }
 
-/* ===== BOOT ===== */
+/* ================================
+   boot
+================================ */
 (async function boot(){
   try{
     const slug = parseSlug();
-    const defaultSlug = "astou-boutique"; // ✅ priorité Astou
-
-    if(!slug){
-      $("infoNoSlug").style.display = "block";
-    }
-
-    const finalSlug = slug || defaultSlug;
-
-    // Nettoyer l’URL si slug absent et garder la trace (facultatif)
-    if(!slug){
-      // on ne force pas, mais on pourrait :
-      // const u = new URL(location.href); u.searchParams.set("slug", finalSlug); history.replaceState(null, "", u.toString());
-    }
-
+    const finalSlug = slug || DEFAULT_SLUG;
     const pro = await loadPro(finalSlug);
-    renderPro(pro);
-
+    renderPro(pro, finalSlug);
   }catch(err){
-    $("loading").style.display = "none";
     showError(
       "Impossible de charger la fiche.\n" +
       "• Vérifie que le slug existe dans Supabase.\n" +
-      "• Vérifie que la table s’appelle bien 'professionals' et que la colonne 'slug' est remplie.\n\n" +
+      "• Vérifie que la table s’appelle bien 'professionals' et que la colonne 'slug' est remplie.\n" +
+      "• Vérifie que RLS n’empêche pas le SELECT public.\n\n" +
       "Détail: " + (err?.message || err)
     );
   }
