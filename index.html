@@ -1,638 +1,695 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>DIGIY NDIMBAL — Map ♾️</title>
-  <meta name="description" content="Carte des partenaires DIGIY NDIMBAL — 0% commission, contact direct." />
-  <meta name="theme-color" content="#0B1120" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DIGIY NDIMBAL MAP — Saly QG ∞ (Supabase)</title>
 
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
-  <style>
-    :root{
-      --bg:#0b1020;
-      --panel:#0f172a;
-      --card:#111a2f;
-      --line:rgba(255,255,255,.10);
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --gold:#facc15;
-      --green:#22c55e;
-      --orange:#f97316;
-      --r-xl:22px;
-      --shadow: 0 18px 60px rgba(0,0,0,.45);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 12% -10%, rgba(250,204,21,.14), transparent 55%),
-        radial-gradient(1000px 600px at 90% 10%, rgba(34,197,94,.10), transparent 55%),
-        linear-gradient(180deg, #070b16 0%, var(--bg) 45%, #070b16 100%);
-      overflow-x:hidden;
-    }
-    a{color:inherit}
+<style>
+  /* ============================================ */
+  /* 🎨 THÈME SABLE & OR — DIGIYLYFE Premium */
+  /* ============================================ */
+  :root{
+    --bg-1: #f7f3ea;
+    --bg-2: #efe7d6;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --card: #ffffff;
+    --line: rgba(31,41,55,.08);
+    --shadow: 0 10px 30px rgba(0,0,0,.06);
 
-    .topbar{
-      position:sticky; top:0; z-index:50;
-      background: rgba(7,11,22,.62);
-      backdrop-filter: blur(10px) saturate(140%);
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .topbar .inner{
-      max-width:1200px; margin:0 auto;
-      display:flex; align-items:center; gap:10px;
-      padding:10px 14px;
-    }
-    .brand{display:flex; align-items:center; gap:10px; min-width:0}
-    .mark{
-      width:38px;height:38px;border-radius:14px;
-      display:grid; place-items:center;
-      font-weight:1000;
-      color:#0b1020;
-      background: radial-gradient(circle at 30% 30%, rgba(250,204,21,.95), rgba(245,158,11,.80));
-      box-shadow: 0 16px 60px rgba(250,204,21,.18);
-      border:1px solid rgba(250,204,21,.35);
-    }
-    .brand .txt{min-width:0}
-    .brand b{display:block;font-size:13px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .brand small{display:block;color:var(--muted);font-weight:750;font-size:12px}
-    .spacer{flex:1}
+    --gold-1: #d1b464;
+    --gold-2: #b89231;
+    --gold-3: #f3e6b3;
 
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.07);
-      box-shadow: 0 10px 26px rgba(0,0,0,.25);
-      text-decoration:none;
-      font-weight:900;
-      font-size:13px;
-      transition: .15s transform ease, .15s border-color ease;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .btn:hover{transform:translateY(-1px);border-color:rgba(250,204,21,.45)}
-    .btn:active{transform:translateY(0)}
-    .btn-gold{
-      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.88));
-      border-color: rgba(250,204,21,.35);
-      color:#0b1020;
-    }
+    --accent-cta-1: #b38728;
+    --accent-cta-2: #f9d976;
 
-    .wrap{max-width:1200px;margin:0 auto;padding:14px 14px 40px}
-    .layout{
-      display:grid;
-      grid-template-columns: 1.3fr .7fr;
-      gap:14px;
-      align-items:stretch;
-    }
-    @media (max-width: 980px){ .layout{grid-template-columns:1fr} }
+    --radius-xl: 28px;
+    --radius-lg: 18px;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .mapCard{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--r-xl);
-      overflow:hidden;
-      background: rgba(255,255,255,.03);
-      box-shadow: var(--shadow);
-      position:relative;
-      min-height: 520px;
-    }
-    #map{height:100%; min-height:520px}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, var(--bg-1), #fbfaf7 40%, #ffffff 100%);
+    overflow: hidden;
+  }
 
-    .side{display:grid; gap:14px; align-content:start;}
+  /* ============================================ */
+  /* 📌 HEADER DIGIY */
+  /* ============================================ */
+  .digiy-header {
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    color: #111;
+    padding: 16px 24px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    position: relative;
+    z-index: 1000;
+  }
+  .digiy-header h1 {
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: 900;
+    letter-spacing: .5px;
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(255,255,255,.3);
+  }
+  .digiy-header p {
+    font-size: clamp(12px, 2.5vw, 14px);
+    margin: 4px 0 0;
+    opacity: .85;
+    font-weight: 600;
+  }
 
-    .panel{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: var(--r-xl);
-      background: rgba(255,255,255,.03);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .panel .hd{
-      padding:12px 14px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .panel .hd b{font-size:14px;letter-spacing:.2px}
-    .panel .bd{padding:12px 14px}
+  /* ============================================ */
+  /* 🔍 BARRE DE RECHERCHE */
+  /* ============================================ */
+  .search-panel {
+    position: absolute;
+    top: 120px;
+    left: 20px;
+    z-index: 999;
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    width: 320px;
+    max-width: calc(100vw - 40px);
+  }
 
-    .search{display:flex; gap:8px; flex-wrap:wrap;}
-    .search input{
-      flex:1; min-width: 220px;
-      padding:12px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      color:var(--text);
-      outline:none;
-      font-weight:800;
-    }
-    .search input::placeholder{color:rgba(156,163,175,.9)}
-    .search select{
-      padding:12px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      color:var(--text);
-      outline:none;
-      font-weight:900;
-    }
+  .search-panel input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all .2s ease;
+  }
+  .search-panel input:focus {
+    outline: none;
+    border-color: var(--gold-1);
+    box-shadow: 0 0 0 3px rgba(209,180,100,.25);
+  }
 
-    /* ✅ PAVÉ */
-    .pave{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:9px 10px;border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      font-weight:900;font-size:12px;
-      cursor:pointer;user-select:none;
-      transition:.15s transform ease,.15s border-color ease,.15s background ease;
-    }
-    .chip:hover{transform:translateY(-1px);border-color:rgba(250,204,21,.45)}
-    .chip.active{background: rgba(250,204,21,.18); border-color: rgba(250,204,21,.55)}
-    .chip.strong{
-      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.88));
-      border-color: rgba(250,204,21,.35);
-      color:#0b1020;
-    }
+  .search-panel select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: white;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
 
-    .list{display:grid; gap:10px}
-    .item{
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      background: rgba(0,0,0,.16);
-      padding:12px 12px;
-    }
-    .itemTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-    .item h3{margin:0;font-size:14px;letter-spacing:.2px}
-    .item p{margin:6px 0 0;color:var(--muted);font-weight:750;font-size:12px;line-height:1.4}
-    .rowBtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .mini{
-      padding:9px 10px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.07);
-      text-decoration:none;
-      font-weight:900;
-      font-size:12px;
-      white-space:nowrap;
-      cursor:pointer;
-      color:inherit;
-    }
-    .mini:hover{border-color:rgba(250,204,21,.45)}
-    .mini-gold{
-      background: linear-gradient(135deg, rgba(250,204,21,.95), rgba(245,158,11,.88));
-      border-color: rgba(250,204,21,.35);
-      color:#0b1020;
-    }
+  .partner-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-top: 8px;
+  }
 
-    .debug{
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:16px;
-      border:1px dashed rgba(250,204,21,.35);
-      background: rgba(250,204,21,.08);
-      color: rgba(255,255,255,.92);
-      font-weight:850;
-      font-size:12px;
-      line-height:1.5;
-      white-space:pre-wrap;
-      display:none;
-    }
+  .partner-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+  }
 
-    .toast{
-      position:fixed; left:12px; right:12px; bottom:12px;
-      max-width:980px; margin:0 auto;
-      background: rgba(0,0,0,.55);
-      border:1px solid rgba(255,255,255,.14);
-      border-radius: 16px;
-      padding:12px 14px;
-      backdrop-filter: blur(10px);
-      display:none;
-      z-index:99;
-      box-shadow: 0 18px 60px rgba(0,0,0,.5);
-      color:var(--text);
-      font-weight:800;
+  .partner-item {
+    padding: 8px 10px;
+    margin: 4px 0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all .2s ease;
+    font-size: 13px;
+  }
+  .partner-item:hover {
+    background: linear-gradient(135deg, var(--gold-3), #fde68a);
+    border-color: var(--gold-1);
+    transform: translateX(4px);
+  }
+  .partner-item strong {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 2px;
+    color: var(--ink);
+  }
+  .partner-item span {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .loading-msg {
+    text-align: center;
+    padding: 20px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* ============================================ */
+  /* 🗺️ CARTE */
+  /* ============================================ */
+  #map {
+    position: absolute;
+    top: 110px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+
+  /* Marker personnalisé */
+  .digiy-marker {
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    border: 3px solid white;
+    border-radius: 50% 50% 50% 0;
+    width: 36px;
+    height: 36px;
+    transform: rotate(-45deg);
+    box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+  .digiy-marker span {
+    transform: rotate(45deg);
+  }
+
+  /* Popup personnalisée */
+  .leaflet-popup-content-wrapper {
+    border-radius: var(--radius-lg);
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 12px 32px rgba(0,0,0,.2);
+  }
+  .leaflet-popup-content {
+    margin: 0;
+    padding: 16px;
+    min-width: 280px;
+  }
+  .popup-header {
+    font-size: 16px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .popup-meta {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .popup-desc {
+    font-size: 13px;
+    margin-bottom: 12px;
+    color: #4b5563;
+  }
+  .popup-cta {
+    display: flex;
+    gap: 8px;
+  }
+  .popup-btn {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 12px;
+    border-radius: 10px;
+    transition: all .2s ease;
+  }
+  .popup-btn.whatsapp {
+    background: linear-gradient(135deg, #35d07f, #0d9f54);
+    color: white;
+  }
+  .popup-btn.view {
+    background: linear-gradient(135deg, var(--accent-cta-2), var(--accent-cta-1));
+    color: #111;
+  }
+  .popup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  }
+
+  /* ============================================ */
+  /* 📱 MOBILE */
+  /* ============================================ */
+  @media (max-width: 640px) {
+    .search-panel {
+      top: 100px;
+      left: 10px;
+      width: calc(100vw - 20px);
+      padding: 12px;
     }
-    .toast small{display:block;margin-top:6px;color:rgba(156,163,175,.9);font-weight:750}
-  </style>
+    #map {
+      top: 90px;
+    }
+    .digiy-header h1 {
+      font-size: 18px;
+    }
+  }
+</style>
 </head>
-
 <body>
-  <div class="topbar">
-    <div class="inner">
-      <div class="brand">
-        <div class="mark">∞</div>
-        <div class="txt">
-          <b>DIGIY NDIMBAL — Map</b>
-          <small>Partenaires · 0% commission · direct</small>
-        </div>
-      </div>
 
-      <div class="spacer"></div>
+<!-- HEADER -->
+<header class="digiy-header">
+  <h1>🗺️ DIGIY NDIMBAL MAP — Saly QG ∞</h1>
+  <p>📍 L'entraide digitale du Sénégal • Pierre par pierre</p>
+</header>
 
-      <a class="btn" href="https://digiylyfe.com/page-partenaires/" target="_blank" rel="noopener">🔎 Moteur</a>
-      <a class="btn btn-gold" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">🏠 HUB</a>
-    </div>
+<!-- PANNEAU DE RECHERCHE -->
+<div class="search-panel">
+  <input type="search" id="searchInput" placeholder="🔍 Rechercher (chauffeur, villa, plombier...)" />
+  
+  <select id="categoryFilter">
+    <option value="all">🌟 Toutes catégories</option>
+    <option value="hebergement">🏨 Hébergement</option>
+    <option value="market">🛒 Market & Style</option>
+    <option value="driver">🚗 Driver</option>
+    <option value="construction">🏗️ Bâtisseur</option>
+    <option value="explore">🌴 Explore</option>
+  </select>
+
+  <div class="partner-count" id="partnerCount">
+    <div class="loading-msg">⏳ Chargement des partenaires...</div>
   </div>
 
-  <div class="wrap">
-    <div class="layout">
+  <div class="partner-list" id="partnerList"></div>
+</div>
 
-      <div class="mapCard">
-        <div id="map"></div>
-      </div>
+<!-- CARTE -->
+<div id="map"></div>
 
-      <div class="side">
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-        <div class="panel">
-          <div class="hd">
-            <b>🧱 Pavé (choix rapide)</b>
-            <span style="color:var(--muted);font-weight:850;font-size:12px" id="countLabel">—</span>
-          </div>
-          <div class="bd">
-            <div class="pave" id="pave"></div>
-            <div class="rowBtns" style="margin-top:10px">
-              <button class="mini mini-gold" id="btnAll" type="button">✨ Tout afficher</button>
-              <button class="mini" id="btnNear" type="button">📍 Centrer Saly</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="hd">
-            <b>🎯 Rechercher</b>
-            <span style="color:var(--muted);font-weight:800;font-size:12px">Texte + catégorie</span>
-          </div>
-          <div class="bd">
-            <div class="search">
-              <input id="q" placeholder="Nom, ville, zone, catégorie…" />
-              <select id="cat">
-                <option value="">Toutes catégories</option>
-                <option value="commerce">Commerce</option>
-                <option value="restaurant">Restaurant</option>
-                <option value="logement">Logement</option>
-                <option value="taxi">Taxi/VTC</option>
-                <option value="hotel">Hôtel</option>
-                <option value="batiment">Bâtiment</option>
-                <option value="voyage">Voyage</option>
-                <option value="loisir">Loisir</option>
-                <option value="notable">Notable</option>
-              </select>
-            </div>
-
-            <div class="debug" id="debugBox"></div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="hd"><b>📌 Partenaires</b><span style="color:var(--muted);font-weight:800;font-size:12px">Clique → fiche</span></div>
-          <div class="bd">
-            <div class="list" id="list"></div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" class="toast">
-    <div id="toastMsg">—</div>
-    <small>Astuce : ouvre une fiche → puis reviens à la carte en 1 clic.</small>
-  </div>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-/* ================================
-   SUPABASE
-================================ */
+// ============================================
+// 🔐 SUPABASE — DÉJÀ POSÉ
+// ============================================
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-const SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-const SB = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
 
-const $ = (id)=>document.getElementById(id);
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function showToast(msg){
-  const t = $("toast");
-  $("toastMsg").innerHTML = msg;
-  t.style.display = "block";
-  clearTimeout(window.__toastTimer);
-  window.__toastTimer = setTimeout(()=> t.style.display="none", 3200);
-}
+// ============================================
+// 🗺️ DIGIY NDIMBAL MAP — Saly QG
+// ============================================
 
-function fold(s){
-  return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-}
-function normCategory(cat){
-  const c = fold(cat);
-  if(c.includes('resto') || c.includes('restaurant')) return 'restaurant';
-  if(c.includes('commerce') || c.includes('market') || c.includes('boutique')) return 'commerce';
-  if(c.includes('logement') || c.includes('heberg') || c.includes('héberg') || c.includes('villa')) return 'logement';
-  if(c.includes('hotel') || c.includes('hôtel')) return 'hotel';
-  if(c.includes('taxi') || c.includes('vtc') || c.includes('driver') || c.includes('chauffeur')) return 'taxi';
-  if(c.includes('bat') || c.includes('bât') || c.includes('construction') || c.includes('artisan')) return 'batiment';
-  if(c.includes('voyage') || c.includes('explore') || c.includes('guide')) return 'voyage';
-  if(c.includes('loisir')) return 'loisir';
-  if(c.includes('notable')) return 'notable';
-  return cat ? 'commerce' : '';
-}
-function catEmoji(c){
-  const m = { commerce:"🏪", restaurant:"🍽️", logement:"🏠", taxi:"🚕", hotel:"🏨", batiment:"🔨", voyage:"✈️", loisir:"🎭", notable:"👔" };
-  return m[c] || "📍";
-}
-function safe(v, fb=""){ return (v==null?fb:String(v)).trim(); }
-function escapeHTML(str){
-  return (str ?? "").toString()
-    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-}
+// Coordonnées QG Saly (Astou Boutique) - Par défaut
+const QG_SALY = {
+  lat: 14.4574,
+  lng: -16.9984,
+  name: "QG DIGIYLYFE Saly"
+};
 
-function pickLat(p){ return p.latitude ?? p.lat ?? p.gps_lat ?? null; }
-function pickLng(p){ return p.longitude ?? p.lng ?? p.gps_lng ?? null; }
+// Variables globales
+let map;
+let markers;
+let allMarkers = [];
+let partners = [];
 
-function proUrl(slug){
-  return "./pro.html?slug=" + encodeURIComponent(slug);
-}
-
-let MAP, layerPins;
-let ALL = [];
-let filterPave = "";
-
-async function loadProfessionals(){
-  const { data, error } = await SB.from("professionals").select("*").limit(2000);
-  if(error) throw error;
-  return data || [];
-}
-
-function initMap(){
-  MAP = L.map("map", { zoomControl:true }).setView([14.439, -17.004], 10);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(MAP);
-  layerPins = L.layerGroup().addTo(MAP);
-}
-
-/* ✅ POPUP SAFE (zéro template string) */
-function popupHTML(p){
-  const slug = safe(p.slug);
-  const name = escapeHTML(safe(p.name, "Partenaire"));
-  const city = escapeHTML(safe(p.city));
-  const zone = escapeHTML(safe(p.zone));
-  const cat = normCategory(p.category || p.cat || p.type || "");
-  const em = catEmoji(cat);
-
-  const line = [city, zone].filter(Boolean).join(" · ");
-  const hrefFiche = slug ? proUrl(slug) : "#";
-
-  return (
-    '<div style="font-family:system-ui;min-width:220px">' +
-      '<div style="font-weight:900;margin-bottom:6px">' + em + ' ' + name + '</div>' +
-      '<div style="color:#334155;font-weight:700;font-size:12px">' + escapeHTML(line || "—") + '</div>' +
-      '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">' +
-        '<a href="' + hrefFiche + '" style="padding:8px 10px;border-radius:999px;background:#facc15;color:#0b1020;font-weight:900;text-decoration:none;border:1px solid rgba(245,158,11,.35)">👀 Voir fiche</a>' +
-        '<a href="./index.html" style="padding:8px 10px;border-radius:999px;background:#0b1120;color:#fff;font-weight:900;text-decoration:none;border:1px solid rgba(2,6,23,.2)">🗺️ Map</a>' +
-      '</div>' +
-    '</div>'
-  );
-}
-
-function drawPins(list){
-  layerPins.clearLayers();
-
-  const bounds = [];
-  list.forEach(p=>{
-    const lat = pickLat(p);
-    const lng = pickLng(p);
-    if(lat==null || lng==null) return;
-
-    const m = L.marker([Number(lat), Number(lng)]).bindPopup(popupHTML(p));
-    m.addTo(layerPins);
-    bounds.push([Number(lat), Number(lng)]);
-  });
-
-  if(bounds.length){
-    try{ MAP.fitBounds(bounds, { padding:[30,30] }); }catch(e){}
+// Attendre que Leaflet ET Supabase soient chargés
+window.addEventListener('load', function() {
+  if (typeof L === 'undefined' || typeof supabase === 'undefined') {
+    console.error('Leaflet ou Supabase non chargé, nouvelle tentative...');
+    setTimeout(initApp, 500);
+  } else {
+    initApp();
   }
+});
+
+async function initApp() {
+  console.log('🦅 Initialisation DIGIY NDIMBAL MAP...');
+  
+  // Charger les partenaires depuis Supabase
+  await loadPartnersFromSupabase();
+  
+  // Initialiser la carte
+  initMap();
+  
+  // Initialiser la recherche
+  initSearch();
 }
 
-function renderList(list){
-  $("countLabel").textContent = list.length + " résultat(s)";
-  const box = $("list");
-  box.innerHTML = "";
+// ============================================
+// 📥 CHARGEMENT SUPABASE
+// ============================================
+async function loadPartnersFromSupabase() {
+  try {
+    console.log('📥 Chargement des partenaires depuis Supabase...');
+    
+    // Récupérer les partenaires de la table 'partners'
+    const { data, error } = await supabase
+      .from('partners')
+      .select('*')
+      .eq('location', 'Saly') // Filtrer par Saly
+      .order('name', { ascending: true });
 
-  if(!list.length){
-    box.innerHTML = '<div class="item"><h3>😅 Rien trouvé</h3><p>Essaie un autre mot-clé ou enlève les filtres.</p></div>';
-    return;
-  }
-
-  list.slice(0, 120).forEach(p=>{
-    const slug = safe(p.slug);
-    const name = safe(p.name, "Partenaire");
-    const city = safe(p.city);
-    const zone = safe(p.zone);
-    const cat = normCategory(p.category || p.cat || p.type || "");
-    const em = catEmoji(cat);
-
-    const el = document.createElement("div");
-    el.className = "item";
-
-    const meta = [safe(p.category||""), city, zone].filter(Boolean).join(" · ") || "Partenaire local";
-    const ficheHref = slug ? proUrl(slug) : "#";
-
-    el.innerHTML =
-      '<div class="itemTop">' +
-        '<div>' +
-          '<h3>' + em + ' ' + escapeHTML(name) + '</h3>' +
-          '<p>' + escapeHTML(meta) + '</p>' +
-          '<p style="color:rgba(156,163,175,.85)">slug: <b>' + escapeHTML(slug || "—") + '</b></p>' +
-        '</div>' +
-        '<a class="mini mini-gold" href="' + ficheHref + '" ' + (slug ? '' : 'onclick="event.preventDefault();alert(\\\'Slug manquant en base\\\')"') + '>👀 Fiche</a>' +
-      '</div>' +
-      '<div class="rowBtns">' +
-        '<a class="mini" href="' + ficheHref + '" ' + (slug ? '' : 'onclick="event.preventDefault();alert(\\\'Slug manquant\\\')"') + '>♾️ Ouvrir</a>' +
-        '<button class="mini" type="button" data-slug="' + escapeHTML(slug) + '">📍 Centrer</button>' +
-      '</div>';
-
-    el.querySelector('button[data-slug]').addEventListener('click', ()=>{
-      focusOn(slug);
-    });
-
-    box.appendChild(el);
-  });
-}
-
-function focusOn(slug){
-  const p = ALL.find(x=>safe(x.slug)===slug);
-  if(!p) return showToast("⚠️ Introuvable : <b>" + escapeHTML(slug) + "</b>");
-  const lat = pickLat(p), lng = pickLng(p);
-  if(lat==null || lng==null) return showToast("⚠️ GPS manquant pour centrer (lat/lng vides).");
-  MAP.setView([Number(lat), Number(lng)], 16);
-
-  layerPins.eachLayer(layer=>{
-    const ll = layer.getLatLng?.();
-    if(ll && Math.abs(ll.lat-Number(lat))<1e-6 && Math.abs(ll.lng-Number(lng))<1e-6){
-      layer.openPopup();
-    }
-  });
-}
-
-function buildPave(){
-  const cities = Array.from(new Set(ALL.map(p=>safe(p.city)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
-  const zones  = Array.from(new Set(ALL.map(p=>safe(p.zone)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
-
-  const pave = $("pave");
-  pave.innerHTML = "";
-
-  function addChip(label, value, type){
-    const c = document.createElement("button");
-    c.className = "chip";
-    c.type = "button";
-    c.textContent = label;
-    c.dataset.value = value;
-    c.dataset.type = type;
-    c.addEventListener("click", ()=>{
-      const v = c.dataset.value;
-      const key = type + ":" + v;
-      filterPave = (filterPave === key) ? "" : key;
-      refreshPaveActive();
-      applyFilters();
-    });
-    pave.appendChild(c);
-  }
-
-  const top = ["Saly","Dakar","Mbour","Thiès"];
-  top.forEach(t=>{
-    const found = cities.find(c=>fold(c)===fold(t));
-    if(found) addChip("📍 " + t, found, "city");
-  });
-
-  cities.forEach(c=>{
-    if(top.some(t=>fold(t)===fold(c))) return;
-    addChip("🏙️ " + c, c, "city");
-  });
-
-  if(zones.length){
-    zones.slice(0, 18).forEach(z=> addChip("🧭 " + z, z, "zone"));
-  }
-
-  if(!pave.children.length){
-    const d = document.createElement("div");
-    d.style.color = "rgba(156,163,175,.9)";
-    d.style.fontWeight = "850";
-    d.style.fontSize = "12px";
-    d.textContent = "Aucune ville/zone trouvée (colonne city/zone vide ?)";
-    pave.appendChild(d);
-  }
-
-  refreshPaveActive();
-}
-
-function refreshPaveActive(){
-  document.querySelectorAll(".chip").forEach(ch=>{
-    const type = ch.dataset.type;
-    const val  = ch.dataset.value;
-    const key  = type + ":" + val;
-    if(filterPave === key) ch.classList.add("active");
-    else ch.classList.remove("active");
-  });
-}
-
-function applyFilters(){
-  const q = fold($("q").value);
-  const cat = $("cat").value;
-
-  let type="", val="";
-  if(filterPave){
-    const parts = filterPave.split(":");
-    type = parts[0] || "";
-    val = parts.slice(1).join(":") || "";
-  }
-
-  const filtered = ALL.filter(p=>{
-    const blob = fold([p.name,p.slug,p.category,p.city,p.zone,p.region,p.description].filter(Boolean).join(" "));
-    const okQ = !q || blob.includes(q);
-
-    const pc = normCategory(p.category || p.cat || p.type || "");
-    const okC = !cat || pc === cat;
-
-    let okP = true;
-    if(type==="city") okP = !val || fold(safe(p.city)) === fold(val);
-    if(type==="zone") okP = !val || fold(safe(p.zone)) === fold(val);
-
-    return okQ && okC && okP;
-  });
-
-  renderList(filtered);
-  drawPins(filtered);
-
-  const dbg = $("debugBox");
-  dbg.style.display = "block";
-  const slugs = filtered.slice(0, 25).map(x=>safe(x.slug)||"(slug vide)").join(", ");
-  const total = ALL.length;
-  const gpsCount = ALL.filter(p=>pickLat(p)!=null && pickLng(p)!=null).length;
-  dbg.textContent =
-    "DEBUG:\n" +
-    "- Supabase a renvoyé: " + total + " partenaire(s)\n" +
-    "- Avec GPS (lat/lng): " + gpsCount + "\n" +
-    "- Affichés après filtres: " + filtered.length + "\n" +
-    "- Slugs (échantillon): " + slugs;
-}
-
-(async function boot(){
-  try{
-    initMap();
-    showToast("♾️ NDIMBAL Map prête. Chargement…");
-
-    ALL = await loadProfessionals();
-
-    if(ALL.length <= 2){
-      showToast("⚠️ Seulement " + ALL.length + " partenaire(s) reçus. Ça sent RLS/policy ou table vide.");
-    }else{
-      showToast("✅ " + ALL.length + " partenaire(s) chargés.");
+    if (error) {
+      console.error('❌ Erreur Supabase:', error);
+      // Fallback sur les données locales
+      useFallbackData();
+      return;
     }
 
-    buildPave();
-    applyFilters();
+    if (data && data.length > 0) {
+      console.log(`✅ ${data.length} partenaires chargés depuis Supabase`);
+      partners = data.map(p => ({
+        id: p.id || p.slug,
+        name: p.name,
+        category: p.category,
+        description: p.description || '',
+        price: p.price || 'Sur demande',
+        whatsapp: p.whatsapp_url,
+        link: p.website_url || p.whatsapp_url,
+        icon: p.icon || getCategoryIcon(p.category),
+        keywords: p.keywords || '',
+        lat: p.latitude || QG_SALY.lat,
+        lng: p.longitude || QG_SALY.lng
+      }));
+    } else {
+      console.log('⚠️ Aucun partenaire trouvé, utilisation des données locales');
+      useFallbackData();
+    }
 
-    $("q").addEventListener("input", applyFilters);
-    $("cat").addEventListener("change", applyFilters);
-
-    $("btnAll").addEventListener("click", ()=>{
-      filterPave = "";
-      $("q").value = "";
-      $("cat").value = "";
-      refreshPaveActive();
-      applyFilters();
-    });
-
-    $("btnNear").addEventListener("click", ()=>{
-      MAP.setView([14.441, -17.006], 13);
-      showToast("📍 Centré sur Saly (approx).");
-    });
-
-  }catch(e){
-    console.error(e);
-    showToast("❌ Erreur Supabase. Probable RLS/policy.");
-    $("list").innerHTML =
-      '<div class="item">' +
-        '<h3>❌ Impossible de charger les partenaires</h3>' +
-        '<p>Cause fréquente : RLS bloque le SELECT public sur <b>professionals</b>.</p>' +
-        '<p style="color:var(--muted)">Détail: ' + escapeHTML(String(e?.message||e)) + '</p>' +
-      '</div>';
+  } catch (err) {
+    console.error('❌ Erreur de connexion Supabase:', err);
+    useFallbackData();
   }
-})();
+}
+
+// Données de fallback si Supabase échoue
+function useFallbackData() {
+  console.log('📦 Utilisation des données locales de fallback');
+  partners = [
+    {
+      id: "baptiste-saly",
+      name: "🏝️ Chez Baptiste — Saly",
+      category: "hebergement",
+      description: "Appartement meublé — 2 chambres, salon, cuisine",
+      price: "30 000 FCFA / nuit",
+      whatsapp: "https://wa.me/221771342889?text=Salam%20je%20veux%20réserver%20Chez%20Baptiste%20Saly%20🙏",
+      link: "https://digiylyfe.com/partenaires-chez-baptiste/",
+      icon: "🏝️",
+      keywords: "saly appartement meuble 2 chambres cuisine hebergement",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "lamine",
+      name: "🚗 Lamine — Chauffeur",
+      category: "driver",
+      description: "Transferts AIBD et circuits • Saly – Thiès – Dakar",
+      price: "Sur demande",
+      whatsapp: "https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE%20(j'aimerais%20réserver%20un%20trajet)",
+      link: "https://digiylyfe.com/partenaires-lamine/",
+      icon: "🚗",
+      keywords: "chauffeur taxi transport aibd dakar saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "michel",
+      name: "✂️ Michel — Styliste",
+      category: "market",
+      description: "Robes personnalisées • Saly – Thiès",
+      price: "Sur mesure",
+      whatsapp: "https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE%20je%20veux%20une%20création%20👗",
+      link: "https://digiylyfe.com/page-partenaire-michel/",
+      icon: "✂️",
+      keywords: "styliste couture robes personnalisees vetements saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "zal",
+      name: "⚡ Zal & Kourant — Électriciens",
+      category: "construction",
+      description: "Électricité maison & bâtiment • Saly",
+      price: "Devis rapide",
+      whatsapp: "https://wa.me/221772084781?text=Salam%20Zal%20je%20viens%20de%20DIGIYLYFE",
+      link: "https://digiylyfe.com/partenaires-zal-kourant/",
+      icon: "⚡",
+      keywords: "electricien electricite maison depannage saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "helage",
+      name: "💧 Helage — Plombier",
+      category: "construction",
+      description: "Plomberie multi-services • Saly – Petite Côte",
+      price: "Sur demande / devis",
+      whatsapp: "https://wa.me/221774513523?text=Salam%20Helage%2C%20je%20viens%20de%20DIGIYLYFE",
+      link: "tel:+221774513523",
+      icon: "💧",
+      keywords: "plombier plomberie depannage fuite robinet saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "astou",
+      name: "🧵 Astou — Linge de maison",
+      category: "market",
+      description: "Linge de maison & couture sur mesure • Saly",
+      price: "Promo locale",
+      whatsapp: "https://wa.me/221778765785?text=Salam%20Astou%20je%20viens%20de%20DIGIYLYFE",
+      link: "https://digiylyfe.com/partenaires-astou/",
+      icon: "🧵",
+      keywords: "linge maison couture serviette torchon drap saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "daouda",
+      name: "🌴 Daouda Explore",
+      category: "explore",
+      description: "Guide local — circuits authentiques • Saly",
+      price: "Circuits sur mesure",
+      whatsapp: "https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE%20circuit%20🌴",
+      link: "https://digiylyfe.com/partenaires-daouda/",
+      icon: "🌴",
+      keywords: "guide touristique circuit marche saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "tonton-elhadji",
+      name: "👜 Tonton Elhadji",
+      category: "market",
+      description: "Sélection sacs & montres — qualité • Saly",
+      price: "Stock limité",
+      whatsapp: "https://wa.me/221778329612?text=Salam%20Tonton%20DIGIYLYFE%20👜",
+      link: "https://digiylyfe.com/partenaire-tonton-elhadji/",
+      icon: "👜",
+      keywords: "sacs montres accessoires maroquinerie saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    },
+    {
+      id: "mbaye",
+      name: "👷 Mbaye Diouf — Bâtisseur",
+      category: "construction",
+      description: "Villas modernes, piscines • Dakar – Thiès – Petite Côte",
+      price: "Visite chantier",
+      whatsapp: "https://wa.me/221776427113?text=Salam%20Mbaye%20je%20veux%20parler%20d%E2%80%99un%20projet%20🏗️%20(DIGIYLYFE)",
+      link: "https://digiylyfe.com/partenaires-mbaye/",
+      icon: "👷",
+      keywords: "batisseur villa piscine travaux construction saly",
+      lat: QG_SALY.lat,
+      lng: QG_SALY.lng
+    }
+  ];
+}
+
+function getCategoryIcon(category) {
+  const icons = {
+    hebergement: '🏨',
+    driver: '🚗',
+    market: '🛒',
+    construction: '🏗️',
+    explore: '🌴'
+  };
+  return icons[category] || '📍';
+}
+
+// ============================================
+// 🗺️ INITIALISATION CARTE
+// ============================================
+function initMap() {
+  console.log('🗺️ Initialisation de la carte...');
+  
+  // Initialisation carte
+  map = L.map('map', {
+    zoomControl: true,
+    scrollWheelZoom: true
+  }).setView([QG_SALY.lat, QG_SALY.lng], 15);
+
+  // Tuile OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap | DIGIYLYFE ∞',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Cluster de markers
+  markers = L.markerClusterGroup({
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true
+  });
+
+  // Ajouter tous les partenaires
+  allMarkers = [];
+  partners.forEach(partner => {
+    const marker = L.marker([partner.lat, partner.lng], {
+      icon: createCustomIcon(partner.icon)
+    }).bindPopup(createPopup(partner));
+    
+    marker.partnerData = partner;
+    allMarkers.push(marker);
+    markers.addLayer(marker);
+  });
+
+  map.addLayer(markers);
+
+  // Ajouter le marker QG
+  const qgMarker = L.marker([QG_SALY.lat, QG_SALY.lng], {
+    icon: L.divIcon({
+      className: 'custom-marker',
+      html: `<div class="digiy-marker" style="width:48px;height:48px;border-width:4px;"><span style="font-size:24px;">∞</span></div>`,
+      iconSize: [48, 48],
+      iconAnchor: [24, 48],
+      popupAnchor: [0, -48]
+    })
+  }).bindPopup(`
+    <div class="popup-header">🏢 QG DIGIYLYFE Saly</div>
+    <div class="popup-meta">📍 Centre de coordination</div>
+    <div class="popup-desc">${partners.length} partenaires locaux • 0% commission • Entraide digitale</div>
+    <div class="popup-cta">
+      <a href="https://digiylyfe.com" target="_blank" class="popup-btn view">🌐 DIGIYLYFE</a>
+    </div>
+  `).addTo(map);
+
+  console.log(`✅ Carte initialisée avec ${partners.length} partenaires`);
+}
+
+// Fonction pour créer un marker personnalisé
+function createCustomIcon(icon) {
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `<div class="digiy-marker"><span>${icon}</span></div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36]
+  });
+}
+
+// Fonction pour créer le contenu popup
+function createPopup(partner) {
+  return `
+    <div class="popup-header">${partner.name}</div>
+    <div class="popup-meta">📍 ${partner.category.toUpperCase()}</div>
+    <div class="popup-desc">${partner.description}</div>
+    ${partner.price ? `<div class="popup-meta">💰 ${partner.price}</div>` : ''}
+    <div class="popup-cta">
+      ${partner.whatsapp ? `<a href="${partner.whatsapp}" target="_blank" class="popup-btn whatsapp">💬 WhatsApp</a>` : ''}
+      <a href="${partner.link}" target="_blank" class="popup-btn view">🔎 Voir</a>
+    </div>
+  `;
+}
+
+// ============================================
+// 🔍 RECHERCHE & FILTRES
+// ============================================
+function initSearch() {
+  const searchInput = document.getElementById('searchInput');
+  const categoryFilter = document.getElementById('categoryFilter');
+  const partnerCount = document.getElementById('partnerCount');
+  const partnerList = document.getElementById('partnerList');
+
+  function normalizeText(text) {
+    return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function updateDisplay() {
+    const searchTerm = normalizeText(searchInput.value.trim());
+    const category = categoryFilter.value;
+    
+    // Filtrer les partenaires
+    const filtered = partners.filter(p => {
+      const matchCategory = category === 'all' || p.category === category;
+      const matchSearch = !searchTerm || 
+        normalizeText(p.name + ' ' + p.description + ' ' + p.keywords).includes(searchTerm);
+      return matchCategory && matchSearch;
+    });
+
+    // Mettre à jour le compteur
+    partnerCount.innerHTML = `${filtered.length} partenaire${filtered.length > 1 ? 's' : ''} • QG Saly`;
+
+    // Mettre à jour la liste
+    partnerList.innerHTML = filtered.map(p => `
+      <div class="partner-item" onclick="focusPartner('${p.id}')">
+        <strong>${p.name}</strong>
+        <span>${p.description}</span>
+      </div>
+    `).join('');
+
+    // Mettre à jour les markers sur la carte
+    if (markers) {
+      markers.clearLayers();
+      allMarkers.forEach(marker => {
+        if (filtered.find(p => p.id === marker.partnerData.id)) {
+          markers.addLayer(marker);
+        }
+      });
+    }
+  }
+
+  // Focus sur un partenaire
+  window.focusPartner = function(partnerId) {
+    const marker = allMarkers.find(m => m.partnerData.id === partnerId);
+    if (marker) {
+      map.setView([marker.partnerData.lat, marker.partnerData.lng], 17);
+      marker.openPopup();
+    }
+  };
+
+  // Event listeners
+  searchInput.addEventListener('input', updateDisplay);
+  categoryFilter.addEventListener('change', updateDisplay);
+
+  // Initialisation
+  updateDisplay();
+}
+
+// Fallback si window.load a déjà eu lieu
+if (document.readyState === 'complete') {
+  initApp();
+}
+
+console.log('🦅 DIGIY NDIMBAL MAP Saly (Supabase) — Prêt ! Pierre par pierre ∞');
 </script>
+
 </body>
 </html>
