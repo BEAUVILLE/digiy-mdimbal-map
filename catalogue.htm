@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DIGIYLYFE — Catalogue NDIMBAL (Cards Premium) — Supabase</title>
+<title>DIGIYLYFE — Catalogue NDIMBAL (Sable & Or) — Live Supabase</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -25,11 +25,14 @@
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --ink:#f4f5f7; --card:#0f141b; --line: rgba(255,255,255,.08); --bg-1:#0a0d12; --bg-2:#141922; --muted:#a3aab6; }
-    body{ background: linear-gradient(180deg, #0b0f15, #10161e 60%, #0b0f15); }
+    :root{
+      --ink:#f4f5f7; --card:#0f141b; --line:rgba(255,255,255,.10);
+      --bg-1:#0a0d12; --bg-2:#141922; --muted:#a3aab6; --shadow:0 10px 30px rgba(0,0,0,.45);
+    }
+    body{ background: linear-gradient(180deg,#0b0f15,#10161e 60%,#0b0f15); }
   }
 
-  .wrap{
+  .digiy-wrap{
     max-width:1200px; margin:0 auto; padding:24px;
     background: rgba(255,255,255,.85);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
@@ -39,137 +42,223 @@
     box-shadow: 0 24px 60px rgba(0,0,0,.12), 0 1px 0 rgba(255,255,255,.6) inset;
     position:relative; overflow:hidden;
   }
-  .wrap::before{
-    content:""; position:absolute; inset:0;
+  @media (prefers-color-scheme: dark){
+    .digiy-wrap{ background: rgba(15,20,27,.86); box-shadow:0 24px 70px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.06) inset; }
+  }
+  .digiy-wrap::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
     background: linear-gradient(90deg, transparent 0%, rgba(209,180,100,.08) 50%, transparent 100%);
-    pointer-events:none; mask: linear-gradient(90deg, transparent 0%, black 45%, black 55%, transparent 100%);
+    mask: linear-gradient(90deg, transparent 0%, black 45%, black 55%, transparent 100%);
   }
 
-  .topbar{
-    display:flex; gap:12px; align-items:center;
-    position:sticky; top:0; z-index:10;
-    padding:14px 18px; margin:-24px -24px 18px; width:calc(100% + 48px);
+  .digiy-topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    position:sticky; top:0; z-index:20;
+    height: var(--topbar-h);
+    padding:12px 18px; margin:-24px -24px 12px; width: calc(100% + 48px);
     background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
     -webkit-backdrop-filter: blur(10px) saturate(140%);
     backdrop-filter: blur(10px) saturate(140%);
-    border-bottom: 1px solid var(--line);
+    border-bottom:1px solid var(--line);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     box-shadow: 0 10px 30px rgba(0,0,0,.06);
   }
-  .topbar input, .topbar select{
+  @media (prefers-color-scheme: dark){
+    .digiy-topbar{ background: linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.82)); box-shadow: 0 10px 30px rgba(0,0,0,.35); }
+  }
+  .digiy-brand{ display:flex; align-items:center; gap:10px; min-width:220px; }
+  .digiy-inf{
+    font-weight:900; font-size:22px;
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .digiy-brand-title{ margin:0; font-size:14px; font-weight:900; letter-spacing:.2px; }
+  .digiy-brand-sub{ margin:0; font-size:12px; color:var(--muted); font-weight:800; }
+
+  .digiy-actions{ display:flex; gap:10px; align-items:center; }
+  .digiy-back{
+    text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+    padding:10px 12px; border-radius:12px;
+    border:1px solid var(--line);
+    background: rgba(255,255,255,.7);
+    color: var(--ink);
+    font-weight:900; font-size:13px;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    white-space:nowrap;
+  }
+  @media (prefers-color-scheme: dark){ .digiy-back{ background: rgba(255,255,255,.06); } }
+  .digiy-back:hover{
+    transform: translateY(-1px);
+    border-color: rgba(209,180,100,.45);
+    box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  }
+
+  .digiy-toolbar{
+    display:flex; gap:12px;
+    position:sticky; top: var(--topbar-h); z-index:19;
+    padding:14px 18px; margin:0 -24px 18px; width: calc(100% + 48px);
+    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.82));
+    -webkit-backdrop-filter: blur(10px) saturate(140%);
+    backdrop-filter: blur(10px) saturate(140%);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark){ .digiy-toolbar{ background: linear-gradient(180deg, rgba(15,20,27,.92), rgba(15,20,27,.82)); } }
+  .digiy-toolbar input, .digiy-toolbar select{
     flex:1; padding:11px 14px; font-size:14px; color:var(--ink);
-    background:#fff; border:1px solid var(--line); border-radius: 12px;
+    background:#fff; border:1px solid var(--line); border-radius:12px;
     transition: box-shadow .2s ease, border-color .2s ease, transform .15s ease;
   }
-  .topbar input:focus, .topbar select:focus{
+  @media (prefers-color-scheme: dark){
+    .digiy-toolbar input, .digiy-toolbar select{ background: rgba(255,255,255,.06); color: var(--ink); }
+  }
+  .digiy-toolbar input:focus, .digiy-toolbar select:focus{
     outline:none; border-color: var(--gold-1);
     box-shadow: 0 0 0 3px rgba(209,180,100,.25);
     transform: translateY(-1px);
   }
-  .btn-hub{
-    flex:0 0 auto;
-    padding:11px 14px; border-radius:12px; border:1px solid var(--line);
-    background: rgba(255,255,255,.9);
-    font-weight:1000; cursor:pointer;
-    transition: transform .15s ease, box-shadow .15s ease;
-    white-space:nowrap;
-  }
-  .btn-hub:hover{ transform: translateY(-1px); box-shadow: 0 10px 22px rgba(0,0,0,.10); }
 
-  .count{ margin: 10px 0 8px; font-weight:1000; color:var(--muted); }
-  .grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 22px; }
+  .digiy-count{ margin:10px 0 8px; font-weight:900; color:var(--muted); }
+  mark{ background: linear-gradient(120deg, var(--gold-3), #fde68a); border-radius:4px; padding:0 4px; }
 
-  .card{
-    display:flex; flex-direction:column; background:var(--card);
+  .digiy-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:22px; }
+
+  .digiy-card{
+    display:flex; flex-direction:column;
+    background: var(--card);
     border-radius: var(--radius-lg);
     border:1px solid var(--line);
     box-shadow: var(--shadow);
     position:relative; overflow:hidden;
     transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+    cursor:pointer;
     content-visibility:auto; contain-intrinsic-size: 320px 420px;
   }
-  .card:hover{ transform: translateY(-5px); box-shadow: 0 18px 40px rgba(0,0,0,.10); border-color: rgba(209,180,100,.45); }
-  .thumb{ height:220px; position:relative; overflow:hidden; background: linear-gradient(135deg, #c8b27a, #e9d9a4); }
-  .thumb img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease; }
-  .card:hover .thumb img{ transform: scale(1.05); }
+  .digiy-card:hover{ transform: translateY(-5px); box-shadow: 0 18px 40px rgba(0,0,0,.10); border-color: rgba(209,180,100,.45); }
+  .digiy-card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .2s ease;
+    background: radial-gradient(400px 120px at 80% 0%, rgba(209,180,100,.18), transparent 60%);
+  }
+  .digiy-card:hover::after{ opacity:1; }
 
-  .badge{
+  .digiy-thumb{ height:220px; position:relative; overflow:hidden; background: linear-gradient(135deg, #c8b27a, #e9d9a4); }
+  .digiy-thumb img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; transition: transform .35s ease; }
+  .digiy-card:hover .digiy-thumb img{ transform: scale(1.05); }
+
+  .digiy-badge{
     position:absolute; top:12px; right:12px; z-index:2;
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
-    color:#111; border-radius:10px; font-size:11px; font-weight:1000; padding:6px 10px;
+    color:#111; border-radius:10px; font-size:11px; font-weight:900; padding:6px 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,.12), 0 0 0 1px rgba(255,255,255,.35) inset;
     max-width: 80%;
     white-space: nowrap; overflow:hidden; text-overflow: ellipsis;
   }
 
-  .body{ padding:16px; display:flex; flex-direction:column; gap:6px; }
-  .title{ margin:0; font-size:18px; font-weight:1000; letter-spacing:.2px; }
-  .meta{ margin:0; font-size:13px; color:var(--muted); font-weight:800; }
-  .desc{ margin:0; font-size:13px; color:#4b5563; }
-  .price{ margin:6px 0 10px; font-weight:1000; font-size:17px; }
+  .digiy-body{ padding:16px; display:flex; flex-direction:column; gap:6px; }
+  .digiy-title{ margin:0; font-size:18px; font-weight:900; color:var(--ink); letter-spacing:.2px; }
+  .digiy-meta{ margin:0; font-size:13px; color:var(--muted); font-weight:800; }
+  .digiy-desc{ margin:0; font-size:13px; color:#4b5563; }
+  @media (prefers-color-scheme: dark){ .digiy-desc{ color:#cbd5e1; } }
+  .digiy-price{ margin:6px 0 10px; font-weight:900; font-size:17px; color:var(--ink); }
 
-  .footer{ border-top:1px solid var(--line); padding-top:10px; margin-top:auto; }
-  .cta{ display:flex; gap:8px; flex-wrap:wrap; }
+  .digiy-footer{ border-top:1px solid var(--line); padding-top:10px; margin-top:auto; }
+  .digiy-cta{ display:flex; gap:8px; flex-wrap:wrap; }
 
-  .btn{
-    flex:1;
-    text-align:center; text-decoration:none;
-    font-weight:1000; font-size:13px;
-    padding:10px 14px; border-radius:12px;
-    position:relative; overflow:hidden;
+  .digiy-btn{
+    flex:1; text-align:center; text-decoration:none; font-weight:900; font-size:13px;
+    padding:10px 14px; border-radius:12px; color:#111; position:relative; overflow:hidden;
     transition: transform .15s ease, box-shadow .15s ease;
+    user-select:none;
   }
-  .btn:hover{ transform: translateY(-1px); }
-  .btn.primary{
-    color:#fff;
-    background: linear-gradient(135deg, #35d07f, #0d9f54);
-    box-shadow: 0 6px 16px rgba(13,159,84,.28);
-  }
-  .btn.secondary{
+  .digiy-btn:focus{ outline:3px solid rgba(209,180,100,.35); outline-offset:2px; }
+  .digiy-btn:hover{ transform: translateY(-1px); }
+
+  .digiy-btn.ndimbal{
     color:#111;
-    background: linear-gradient(135deg, var(--accent-cta-2), var(--accent-cta-1));
+    background: linear-gradient(135deg, #fde68a, var(--accent-cta-1));
     box-shadow: 0 6px 16px rgba(179,135,40,.28);
   }
+  .digiy-btn.whatsapp{
+    color:#fff; background: linear-gradient(135deg, #35d07f, #0d9f54);
+    box-shadow: 0 6px 16px rgba(13,159,84,.28);
+  }
+  .digiy-btn.call{
+    color:#fff; background: linear-gradient(135deg, #334155, #111827);
+    box-shadow: 0 6px 16px rgba(0,0,0,.18);
+  }
 
-  .empty{
+  .empty-state-box{
     text-align:center; padding:56px 18px;
     background: rgba(255,255,255,.6);
     border-radius: 18px;
     border: 2px dashed rgba(31,41,55,.12);
     margin: 18px 0;
   }
-  .empty p:first-child{ font-size:18px; font-weight:1000; margin:0 0 8px; }
-  .empty p:last-child{ font-size:14px; color:var(--muted); margin:0; }
+  @media (prefers-color-scheme: dark){
+    .empty-state-box{ background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); }
+  }
+  .empty-state-box p:first-child{ font-size:18px; font-weight:900; margin:0 0 8px; }
+  .empty-state-box p:last-child{ font-size:14px; color:var(--muted); margin:0; }
+
+  .loader{
+    display:inline-flex; align-items:center; gap:10px;
+    font-weight:900; color:var(--muted);
+    padding:14px 16px; border:1px solid var(--line); border-radius:14px;
+    background: rgba(255,255,255,.55);
+    margin: 6px 0 10px;
+  }
+  @media (prefers-color-scheme: dark){ .loader{ background: rgba(255,255,255,.05); } }
+  .dot{ width:10px; height:10px; border-radius:50%; background: rgba(209,180,100,.8); animation: pulse 1s infinite ease-in-out; }
+  .dot:nth-child(2){ animation-delay:.15s }
+  .dot:nth-child(3){ animation-delay:.30s }
+  @keyframes pulse{ 0%,100%{ transform:scale(1); opacity:.7 } 50%{ transform:scale(1.35); opacity:1 } }
 
   @media (max-width: 640px){
     body{ padding:10px; }
-    .wrap{ padding:14px; border-radius: 20px; }
-    .topbar{ flex-direction:column; padding:12px; margin:-14px -14px 14px; width:calc(100% + 28px); }
-    .btn-hub{ width:100%; }
-    .card{ display:grid; grid-template-columns: 1fr; grid-template-rows: 110px; border-radius:16px; }
-    .thumb{ grid-column:1 / -1; height:100%; width:100%; }
-    .body{
+    .digiy-wrap{ padding:14px; border-radius:20px; }
+    .digiy-topbar{ margin:-14px -14px 10px; width: calc(100% + 28px); padding:10px 12px; height: 58px; }
+    :root{ --topbar-h: 58px; }
+    .digiy-toolbar{ flex-direction:column; padding:12px; margin:0 -14px 14px; width: calc(100% + 28px); }
+
+    .digiy-card{ display:grid; grid-template-columns: 1fr; grid-template-rows: 110px; border-radius:16px; }
+    .digiy-thumb{ grid-column:1 / -1; height:100%; width:100%; }
+    .digiy-body{
       grid-column:1 / -1; grid-row:1 / -1;
       background: linear-gradient(to right, rgba(255,255,255,0) 88px, rgba(255,255,255,.96) 110px, #fff 128px);
       border-radius: 0 16px 16px 0; padding:6px 8px 6px 114px;
     }
-    .title{ font-size:14px; line-height:1.12; }
-    .meta{ display:none !important; }
-    .desc{ font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .price{ font-size:13px; margin:2px 0 4px; }
-    .footer{ border-top:none; padding-top:0; }
-    .btn{ padding:6px 8px; font-size:11px; flex:0 0 auto; width:auto; }
-    .badge{ top:6px; right:8px; font-size:10px; padding:4px 7px; }
+    .digiy-title{ font-size:14px; line-height:1.12; }
+    .digiy-meta{ display:none !important; }
+    .digiy-desc{ font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .digiy-price{ font-size:13px; margin:2px 0 4px; color: var(--ink); }
+    .digiy-footer{ border-top:none; padding-top:0; }
+    .digiy-btn{ padding:6px 8px; font-size:11px; flex:0 0 auto; width:auto; }
+    .digiy-badge{ top:6px; right:8px; font-size:10px; padding:4px 7px; }
   }
 </style>
 </head>
 
 <body>
-<section class="wrap" aria-label="Catalogue NDIMBAL — DIGIYLYFE">
+<section class="digiy-wrap" aria-label="Catalogue NDIMBAL — DIGIYLYFE">
 
-  <div class="topbar" role="region" aria-label="Recherche et filtres">
-    <input id="q" type="search" placeholder="🔍 Rechercher (Saly, chauffeur, villa…)" autocomplete="off" />
-    <select id="cat">
+  <div class="digiy-topbar">
+    <div class="digiy-brand">
+      <div class="digiy-inf">∞</div>
+      <div>
+        <p class="digiy-brand-title">DIGIYLYFE — Catalogue NDIMBAL</p>
+        <p class="digiy-brand-sub">clic card → fiche NDIMBAL</p>
+      </div>
+    </div>
+
+    <div class="digiy-actions">
+      <a class="digiy-back" id="btnMap" href="https://beauville.github.io/digiy-mdimbal-map/" rel="noopener">🗺️ Carte</a>
+      <a class="digiy-back" id="btnHub" href="https://beauville.github.io/digiy-hub/" rel="noopener">← HUB</a>
+    </div>
+  </div>
+
+  <div class="digiy-toolbar" role="region" aria-label="Filtres catalogue">
+    <input id="q-search" type="search" placeholder="🔍 Rechercher (Saly, resto, chauffeur, villa...)" autocomplete="off" inputmode="search" />
+    <select id="cat-filter" aria-label="Filtrer par catégorie">
       <option value="all">🌟 Toutes catégories</option>
       <option value="hebergement">🏨 Hébergement</option>
       <option value="market">🛒 Market & Style</option>
@@ -177,244 +266,317 @@
       <option value="construction">🏗️ Bâtisseur</option>
       <option value="explore">🌴 Explore</option>
       <option value="restaurant">🍽️ Restaurant</option>
+      <option value="hotel">🏨 Hôtel</option>
+      <option value="taxi">🚕 Taxi/VTC</option>
     </select>
-    <button class="btn-hub" id="btnMap">🗺️ Carte NDIMBAL</button>
-    <button class="btn-hub" id="btnHub">🏠 HUB</button>
   </div>
 
-  <p class="count" id="count">Chargement…</p>
+  <p id="count" class="digiy-count" aria-live="polite">—</p>
 
-  <div class="grid" id="grid"></div>
+  <div id="status" class="loader" aria-live="polite">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span>Chargement des partenaires…</span>
+  </div>
 
-  <div class="empty" id="empty" hidden>
+  <div class="digiy-row" id="cards-container"></div>
+
+  <div id="empty-state" class="empty-state-box" hidden>
     <p>😕 Oups ! Aucun partenaire trouvé.</p>
     <p>Vérifie l’orthographe ou remets “Toutes catégories”.</p>
   </div>
 </section>
 
 <script>
-/* ================================
-   SUPABASE (SAFE / UNIQUE)
-================================ */
+/* 🔐 SUPABASE — DÉJÀ POSÉ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+const SB = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ✅ 1 seul client global (anti double déclaration)
-window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const SB = window.SB;
+/* 🔥 NDIMBAL MAP: la fiche est ouverte via ?pro=slug */
+const NDIMBAL_BASE = "https://beauville.github.io/digiy-mdimbal-map/";
+function ndimbalUrlFromSlug(slug){
+  const s = (slug || "").toString().trim();
+  return s ? `${NDIMBAL_BASE}?pro=${encodeURIComponent(s)}` : NDIMBAL_BASE;
+}
 
-/* ================================
-   DOM HELPERS
-================================ */
-const $ = (s, p=document)=> p.querySelector(s);
-
-const grid = $("#grid");
-const countEl = $("#count");
-const emptyEl = $("#empty");
-const qEl = $("#q");
-const catEl = $("#cat");
-
-let all = [];
-let view = [];
-
-const FALLBACK_COVER = "https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png";
-
-const fold = (s) => (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-const safe = (s) => (s??"").toString()
+/* utils */
+const $  = (s,p=document)=>p.querySelector(s);
+const $$ = (s,p=document)=>Array.from(p.querySelectorAll(s));
+const fold = (s)=> (s||"").toString().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const tokenize = (s)=> fold(s).split(/\s+/).filter(t=>t.length>1);
+const safeText = (s)=> (s ?? "").toString()
   .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
   .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+const escapeRegex = (s)=> s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+
+function setCount(n){
+  $("#count").textContent = `${n} partenaire${n>1?"s":""} trouvé${n>1?"s":""}`;
+}
+
+function normalizeCatFromRow(p){
+  const c = fold(p.category || p.cat || p.type || "");
+  if(!c) return "market";
+  if(c.includes("heberg") || c.includes("logement") || c.includes("villa") || c.includes("appart")) return "hebergement";
+  if(c.includes("driver") || c.includes("chauffeur") || c.includes("vtc") || c.includes("taxi")) return "driver";
+  if(c.includes("construct") || c.includes("bat") || c.includes("bât") || c.includes("artisan") || c.includes("plomb") || c.includes("elect")) return "construction";
+  if(c.includes("explore") || c.includes("voyage") || c.includes("guide")) return "explore";
+  if(c.includes("resto") || c.includes("restaurant")) return "restaurant";
+  if(c.includes("hotel") || c.includes("hôtel")) return "hotel";
+  if(c.includes("market") || c.includes("boutique") || c.includes("style") || c.includes("commerce")) return "market";
+  return (p.category || p.cat || p.type || "market").toString().trim().toLowerCase();
+}
+
+function normalizePhoneToWhatsApp(phoneOrUrl){
+  if(!phoneOrUrl) return null;
+  const s = String(phoneOrUrl).trim();
+  if(s.includes("wa.me/")){
+    const m = s.match(/wa\.me\/(\d+)/);
+    return m ? m[1] : null;
+  }
+  const digits = s.replace(/\D/g,"");
+  return digits.length >= 8 ? digits : null;
+}
 
 function pick(p, ...keys){
   for(const k of keys){
-    if(p && p[k] != null && String(p[k]).trim() !== "") return String(p[k]);
+    const v = p?.[k];
+    if(v != null && String(v).trim() !== "") return String(v);
   }
   return "";
 }
 
-/* ================================
-   CATEGORY NORMALIZATION
-   (match select values)
-================================ */
-function normalizeCat(p){
-  const raw = fold(p.category || p.cat || p.type || "");
-  if(!raw) return "market";
+function buildCard(row){
+  const slug = pick(row,"slug");
+  const name = pick(row,"name","title") || "Partenaire";
+  const city = pick(row,"city");
+  const region = pick(row,"region");
+  const meta = [city, region].filter(Boolean).join(" • ");
+  const desc = pick(row,"description") || "Service local — DIGIYLYFE";
+  const badge = pick(row,"badge_text") || "";
+  const price = pick(row,"price_text") || "";
+  const cover = pick(row,"cover_url","photo_url","image_url") || "https://digiylyfe.com/wp-content/uploads/2025/06/042-BAPTISTE.png";
 
-  // hebergement
-  if(raw.includes("heberg") || raw.includes("héberg") || raw.includes("logement") || raw.includes("villa") || raw.includes("hotel") || raw.includes("hôtel")) return "hebergement";
+  const cat = normalizeCatFromRow(row);
+  const ndimbalLink = ndimbalUrlFromSlug(slug);
 
-  // driver / taxi
-  if(raw.includes("driver") || raw.includes("taxi") || raw.includes("vtc") || raw.includes("chauffeur")) return "driver";
+  // CTA
+  const cta1Label = pick(row,"cta_primary_label") || "💬 WhatsApp";
+  const cta1Url   = pick(row,"cta_primary_url");
+  const cta2Label = pick(row,"cta_secondary_label") || "🔎 Voir";
+  const cta2Url   = pick(row,"cta_secondary_url", "page_url", "website", "url", "link");
 
-  // construction / batiment
-  if(raw.includes("construction") || raw.includes("batiment") || raw.includes("bâtiment") || raw.includes("artisan") || raw.includes("batie") || raw.includes("bâtie")) return "construction";
-
-  // explore / voyage
-  if(raw.includes("explore") || raw.includes("voyage") || raw.includes("guide") || raw.includes("tour")) return "explore";
-
-  // restaurant
-  if(raw.includes("resto") || raw.includes("restaurant") || raw.includes("food")) return "restaurant";
-
-  // market (default)
-  if(raw.includes("market") || raw.includes("boutique") || raw.includes("commerce") || raw.includes("style") || raw.includes("shop")) return "market";
-
-  return "market";
-}
-
-function computeKeywords(p){
-  return fold([
-    p.name, p.title, p.slug, p.city, p.region, p.description,
-    p.keywords, p.tags, p.badge_text, p.price_text
-  ].filter(Boolean).join(" "));
-}
-
-/* ================================
-   CARD
-================================ */
-function cardHTML(p){
-  const name = pick(p, "name", "title", "label") || "Partenaire";
-  const meta = [pick(p,"city"), pick(p,"region")].filter(Boolean).join(" — ");
-  const desc = pick(p, "description") || "Service local — DIGIYLYFE";
-  const cover = pick(p, "cover_url", "photo_url", "image_url") || FALLBACK_COVER;
-  const badge = pick(p, "badge_text") || "✨ Partenaire";
-  const price = pick(p, "price_text") || "💰 Sur demande";
-
-  const cta1Label = pick(p, "cta_primary_label") || "💬 Contacter";
-  const cta1Url   = pick(p, "cta_primary_url", "whatsapp_url", "phone_url");
-  const cta2Label = pick(p, "cta_secondary_label") || "🔎 Voir";
-  const cta2Url   = pick(p, "cta_secondary_url", "page_url", "website", "url", "link");
-
-  // fallback contact si on a un phone
-  const phone = pick(p, "phone");
+  const phone = pick(row,"phone");
+  const waFromPhone = normalizePhoneToWhatsApp(phone);
+  const waAuto = waFromPhone ? `https://wa.me/${waFromPhone}?text=${encodeURIComponent("Salam je viens de DIGIYLYFE 🙏")}` : "";
   const telUrl = phone ? `tel:${phone.replace(/\s+/g,"")}` : "";
-  const waAuto = phone ? `https://wa.me/${phone.replace(/[^\d]/g,"")}?text=${encodeURIComponent("Salam je viens de DIGIYLYFE 🙏")}` : "";
 
-  const primaryHref = cta1Url || waAuto || telUrl || "";
-  const secondaryHref = cta2Url || (p.slug ? (`https://digiylyfe.com/partenaires-${encodeURIComponent(p.slug)}/`) : "");
+  const primaryHref = cta1Url || waAuto || "";
+  const secondaryHref = cta2Url || "";
 
-  const primaryOk = primaryHref.startsWith("http") || primaryHref.startsWith("tel:");
-  const secondaryOk = secondaryHref.startsWith("http");
+  // Index texte pour recherche
+  const kw = fold([name, slug, city, region, desc, row.keywords, row.tags, cat].filter(Boolean).join(" "));
 
-  const cat = p.__cat || "market";
+  const card = document.createElement("article");
+  card.className = "digiy-card";
+  card.dataset.cat = cat;
+  card.dataset.kw = kw;
 
-  return `
-    <article class="card" data-cat="${safe(cat)}" data-key="${safe(p.__kw)}">
-      <div class="thumb">
-        <div class="badge">${safe(badge)}</div>
-        <img
-          src="${safe(cover)}"
-          alt="${safe(name)}"
-          loading="lazy"
-          decoding="async"
-          onerror="this.onerror=null;this.src='${safe(FALLBACK_COVER)}';"
-        />
-      </div>
-      <div class="body">
-        <h3 class="title">${safe(name)}</h3>
-        <p class="meta">${safe(meta || "Sénégal")}</p>
-        <p class="desc">${safe(desc)}</p>
-        <div class="footer">
-          <p class="price">${safe(price)}</p>
-          <div class="cta">
-            ${primaryOk ? `<a class="btn primary" href="${safe(primaryHref)}" target="_blank" rel="noopener">${safe(cta1Label)}</a>` : ""}
-            ${secondaryOk ? `<a class="btn secondary" href="${safe(secondaryHref)}" target="_blank" rel="noopener">${safe(cta2Label)}</a>` : ""}
-          </div>
+  card.innerHTML = `
+    <div class="digiy-thumb">
+      ${badge ? `<div class="digiy-badge">${safeText(badge)}</div>` : ``}
+      <img src="${safeText(cover)}" alt="${safeText(name)}" loading="lazy" decoding="async" />
+    </div>
+
+    <div class="digiy-body">
+      <h3 class="digiy-title">${safeText(name)}</h3>
+      <p class="digiy-meta">${safeText(meta || "Sénégal")}</p>
+      <p class="digiy-desc">${safeText(desc)}</p>
+
+      <div class="digiy-footer">
+        ${price ? `<p class="digiy-price">${safeText(price)}</p>` : ``}
+
+        <div class="digiy-cta">
+          <a class="digiy-btn ndimbal" href="${ndimbalLink}" target="_blank" rel="noopener">♾️ NDIMBAL</a>
+
+          ${primaryHref ? `<a class="digiy-btn whatsapp" href="${safeText(primaryHref)}" target="_blank" rel="noopener">${safeText(cta1Label)}</a>` : ``}
+          ${telUrl ? `<a class="digiy-btn call" href="${safeText(telUrl)}">📞 Appeler</a>` : ``}
+          ${secondaryHref ? `<a class="digiy-btn ndimbal" href="${safeText(secondaryHref)}" target="_blank" rel="noopener">${safeText(cta2Label)}</a>` : ``}
         </div>
       </div>
-    </article>
+    </div>
   `;
-}
 
-/* ================================
-   RENDER
-================================ */
-function render(list){
-  grid.innerHTML = list.map(cardHTML).join("");
-  const n = list.length;
-  countEl.textContent = `${n} partenaire${n>1?"s":""} trouvé${n>1?"s":""}`;
-  emptyEl.hidden = n > 0;
-}
-
-/* ================================
-   FILTERS (debounced)
-================================ */
-function applyFilters(){
-  const q = fold(qEl.value.trim());
-  const cat = catEl.value;
-
-  view = all.filter(p=>{
-    if(cat !== "all" && p.__cat !== cat) return false;
-    if(q){
-      const tokens = q.split(/\s+/).filter(t=>t.length>1);
-      return tokens.every(t=> p.__kw.includes(t));
-    }
-    return true;
+  // clic carte = fiche NDIMBAL (sauf si clic sur un bouton)
+  card.addEventListener("click", (e)=>{
+    const onLink = e.target.closest("a,button");
+    if(onLink) return;
+    window.open(ndimbalLink, "_blank");
   });
 
-  render(view);
+  // on garde les originaux pour highlight safe
+  const titleEl = card.querySelector(".digiy-title");
+  const descEl  = card.querySelector(".digiy-desc");
+  card._titleRaw = titleEl?.textContent || "";
+  card._descRaw  = descEl?.textContent || "";
+
+  return card;
 }
 
-function debounce(fn, ms=140){
-  let t=null;
-  return (...args)=>{
-    clearTimeout(t);
-    t=setTimeout(()=>fn(...args), ms);
-  };
-}
-const applyFiltersDebounced = debounce(applyFilters, 140);
+/* state + render */
+let allRows = [];
+let cardsIndex = [];
 
-/* ================================
-   LOAD
-================================ */
-async function load(){
-  countEl.textContent = "Chargement…";
+function markSafe(el, raw, terms){
+  if(!el) return;
+  el.textContent = raw; // reset safe
+  if(!terms.length) return;
+
+  const escaped = terms.map(escapeRegex).filter(Boolean);
+  if(!escaped.length) return;
+
+  const rx = new RegExp("(" + escaped.join("|") + ")", "gi");
+  const parts = raw.split(rx);
+
+  el.textContent = "";
+  for(const part of parts){
+    if(!part) continue;
+    if(rx.test(part)){
+      const m = document.createElement("mark");
+      m.textContent = part;
+      el.appendChild(m);
+    }else{
+      el.appendChild(document.createTextNode(part));
+    }
+  }
+}
+
+function applyFilters(){
+  const q = $("#q-search").value.trim();
+  const cat = $("#cat-filter").value;
+  const termsFold = tokenize(q);
+  const termsRaw = q.split(/\s+/).filter(t=>t.length>1);
+
+  const container = $("#cards-container");
+  const empty = $("#empty-state");
+
+  let results = [];
+  for(const item of cardsIndex){
+    let ok = true;
+    let score = 0;
+
+    if(cat !== "all" && item.cat !== cat) ok = false;
+
+    if(ok && termsFold.length){
+      ok = termsFold.every(t=>{
+        const hit = item.kw.includes(t);
+        if(hit) score++;
+        return hit;
+      });
+    }
+
+    // reset display + reset text
+    item.card.style.display = "none";
+    markSafe(item.titleEl, item.titleRaw, []);
+    markSafe(item.descEl, item.descRaw, []);
+
+    if(ok) results.push({ item, score });
+  }
+
+  if(termsFold.length) results.sort((a,b)=> b.score - a.score);
+
+  const frag = document.createDocumentFragment();
+  for(const r of results){
+    const it = r.item;
+    it.card.style.display = (window.innerWidth <= 640) ? "grid" : "flex";
+    frag.appendChild(it.card);
+
+    if(termsRaw.length){
+      markSafe(it.titleEl, it.titleRaw, termsRaw);
+      markSafe(it.descEl,  it.descRaw,  termsRaw);
+    }
+  }
+  container.appendChild(frag);
+
+  setCount(results.length);
+  empty.hidden = results.length > 0;
+}
+
+let debounceId;
+function debouncedFilter(){
+  clearTimeout(debounceId);
+  debounceId = setTimeout(applyFilters, 80);
+}
+
+/* load supabase */
+async function loadProfessionals(){
+  const status = $("#status");
+  status.style.display = "inline-flex";
+
+  // ⚡ IMPORTANT: on sélectionne seulement les colonnes utiles (plus léger)
+  // Si tu changes la table, adapte ici.
+  const selectCols = [
+    "id","created_at","slug","name","title","category","cat","type",
+    "city","region","description","keywords","tags","phone",
+    "cover_url","badge_text","price_text",
+    "cta_primary_label","cta_primary_url",
+    "cta_secondary_label","cta_secondary_url",
+    "page_url","website","url","link"
+  ].join(",");
 
   const { data, error } = await SB
     .from("professionals")
-    .select("id, created_at, name, title, slug, category, cat, type, city, region, description, keywords, tags, phone, cover_url, badge_text, price_text, cta_primary_label, cta_primary_url, cta_secondary_label, cta_secondary_url, page_url, website, url, link")
-    .order("created_at", { ascending:false })
-    .limit(500);
+    .select(selectCols)
+    .order("created_at", { ascending:false });
 
   if(error){
     console.error("Supabase error:", error);
-    countEl.textContent = "Erreur Supabase (voir console)";
-    render([]);
+    status.querySelector("span:last-child").textContent = "Erreur Supabase (voir console).";
     return;
   }
 
-  all = (data || []).map(p=>{
-    p.__cat = normalizeCat(p);
-    p.__kw = computeKeywords(p);
-    return p;
-  });
+  allRows = data || [];
 
+  const container = $("#cards-container");
+  container.innerHTML = "";
+
+  // render
+  for(const row of allRows){
+    const card = buildCard(row);
+    container.appendChild(card);
+  }
+
+  // build index
+  const cards = $$(".digiy-card");
+  cardsIndex = cards.map(card => ({
+    card,
+    cat: card.dataset.cat || "all",
+    kw: card.dataset.kw || "",
+    titleEl: card.querySelector(".digiy-title"),
+    descEl: card.querySelector(".digiy-desc"),
+    titleRaw: card._titleRaw || "",
+    descRaw: card._descRaw || ""
+  }));
+
+  status.style.display = "none";
   applyFilters();
 }
 
-/* ================================
-   NAV
-================================ */
-$("#btnHub").addEventListener("click", ()=>{ window.location.href = "https://beauville.github.io/digiy-hub/"; });
+/* init */
+document.addEventListener("DOMContentLoaded", async ()=>{
+  $("#q-search").addEventListener("input", debouncedFilter);
+  $("#q-search").addEventListener("keydown", (e)=>{ if(e.key==="Enter"){ e.preventDefault(); applyFilters(); }});
+  $("#cat-filter").addEventListener("change", applyFilters);
 
-// ✅ Carte NDIMBAL intelligente : si 1 résultat avec slug -> focus direct
-$("#btnMap").addEventListener("click", ()=>{
-  if(view.length === 1){
-    const slug = (view[0]?.slug || "").trim();
-    if(slug){
-      window.location.href = `https://beauville.github.io/digiy-mdimbal-map/?pro=${encodeURIComponent(slug)}`;
-      return;
-    }
-  }
-  window.location.href = "https://beauville.github.io/digiy-mdimbal-map/";
+  let resizeTimer;
+  window.addEventListener("resize", ()=>{
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(applyFilters, 150);
+  }, { passive:true });
+
+  await loadProfessionals();
 });
-
-/* ================================
-   EVENTS
-================================ */
-qEl.addEventListener("input", applyFiltersDebounced);
-catEl.addEventListener("change", applyFilters);
-
-load();
 </script>
+
 </body>
 </html>
