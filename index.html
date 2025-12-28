@@ -2,288 +2,429 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DIGIY NDIMBAL MAP — Sénégal (Slug Ready)</title>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Fiche Pro — DIGIY NDIMBAL</title>
+  <meta name="description" content="Fiche professionnelle DIGIY NDIMBAL — horaires, services, contact, localisation." />
+  <meta name="theme-color" content="#0b1020" />
 
   <style>
     :root{
-      --primary:#FF6B35; --primary-dark:#E55A2B; --secondary:#4ECDC4;
-      --success:#95E1D3; --warning:#FFD93D; --danger:#FF6B6B;
-      --dark:#1A1A2E; --card:#16213E; --sidebar:#0F1419;
-      --text:#FFFFFF; --muted:#B8B8B8; --radius:15px; --t: all .25s ease;
+      --bg:#0b1020;
+      --panel:#111a2f;
+      --card:#16213e;
+      --line:rgba(255,255,255,.10);
+      --text:#ffffff;
+      --muted:#b8b8b8;
 
-      --color-restaurant:#FF6B35; --color-commerce:#4ECDC4; --color-logement:#FFD93D;
-      --color-taxi:#95E1D3; --color-notable:#9B59B6; --color-batiment:#E67E22;
-      --color-voiture:#3498DB; --color-voyage:#1ABC9C; --color-loisir:#E91E63; --color-hotel:#FF9800;
+      --primary:#FF6B35;
+      --primary-dark:#E55A2B;
+      --secondary:#4ECDC4;
+
+      --ok:#22c55e;
+      --warn:#fbbf24;
+      --danger:#ff6b6b;
+
+      --r-xl:22px;
+      --r-lg:16px;
+      --r-md:12px;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --t: all .22s ease;
     }
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;overflow:hidden;height:100vh;background:#0b1020}
-
-    .header{
-      background:linear-gradient(135deg,var(--dark),#0F3460);
-      padding:1rem 1.2rem; display:flex; gap:1rem; align-items:center; justify-content:space-between;
-      box-shadow:0 4px 20px rgba(0,0,0,.5); position:relative; z-index:1000;
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 10% -10%, rgba(255,107,53,.18), transparent 55%),
+        radial-gradient(900px 520px at 100% 0%, rgba(78,205,196,.14), transparent 55%),
+        linear-gradient(180deg, #070b16 0%, var(--bg) 40%, #070b16 100%);
+      overflow-x:hidden;
     }
-    .logo-section{display:flex;align-items:center;gap:.8rem}
-    .logo-infinity{font-size:2rem;font-weight:900;color:var(--primary)}
-    .logo-text h1{font-size:1.25rem;color:var(--text);margin:0}
-    .logo-text p{font-size:.85rem;color:var(--muted);margin:.1rem 0 0}
-
-    .header-search{flex:1;max-width:560px}
-    .search-input{
-      width:100%; padding:.85rem 1rem; border:2px solid rgba(255,255,255,.12);
-      border-radius:999px; background:rgba(255,255,255,.06); color:var(--text); font-size:1rem; transition:var(--t)
+    a{color:inherit}
+    .wrap{max-width:1120px;margin:0 auto;padding:18px 14px 70px}
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:12px 10px;
+      background: rgba(11,16,32,.78);
+      backdrop-filter: blur(10px) saturate(140%);
+      border-bottom:1px solid var(--line);
     }
-    .search-input:focus{outline:none;border-color:var(--primary);background:rgba(255,255,255,.09)}
+    .brand{display:flex;align-items:center;gap:10px}
+    .infty{
+      width:42px;height:42px;border-radius:14px;
+      display:grid;place-items:center;
+      background: linear-gradient(135deg, rgba(255,107,53,.22), rgba(78,205,196,.18));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+      font-weight:900; font-size:22px; color: var(--primary);
+    }
+    .brand h1{margin:0;font-size:14px;letter-spacing:.2px}
+    .brand p{margin:2px 0 0; font-size:12px; color:var(--muted)}
+    .actions{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .btn{
+      cursor:pointer; border:none; text-decoration:none;
+      padding:10px 12px; border-radius:999px;
+      display:inline-flex; align-items:center; gap:8px;
+      font-weight:900; font-size:13px;
+      transition: var(--t);
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn-outline{
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      color:var(--text);
+    }
+    .btn-outline:hover{border-color: rgba(255,107,53,.45); transform: translateY(-1px)}
+    .btn-primary{
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color:#fff;
+    }
+    .btn-primary:hover{transform: translateY(-1px)}
+    .btn-secondary{
+      background: linear-gradient(135deg, rgba(78,205,196,1), rgba(78,205,196,.75));
+      color:#09121f;
+    }
+    .btn-secondary:hover{transform: translateY(-1px)}
+    .btn-whatsapp{
+      background: linear-gradient(135deg, #35d07f, #0d9f54);
+      color:#fff;
+    }
 
-    .header-right{display:flex; align-items:center; gap:.6rem}
+    .grid{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .actions{justify-content:flex-start}
+    }
+
+    .hero{
+      background: linear-gradient(135deg, rgba(255,107,53,.18), rgba(78,205,196,.12));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .hero::before{
+      content:""; position:absolute; inset:-2px;
+      background: radial-gradient(520px 180px at 70% 0%, rgba(255,255,255,.12), transparent 55%);
+      pointer-events:none;
+    }
+    .hero-inner{display:grid; grid-template-columns: 1fr; gap:12px; padding:14px}
+    .cover{
+      position:relative;
+      border-radius: var(--r-lg);
+      overflow:hidden;
+      background: linear-gradient(135deg, rgba(255,107,53,.35), rgba(78,205,196,.22));
+      border:1px solid rgba(255,255,255,.10);
+      min-height: 220px;
+    }
+    .cover img{width:100%;height:100%;object-fit:cover;display:block}
+    .badge{
+      position:absolute; top:12px; left:12px;
+      background: rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.16);
+      padding:8px 10px; border-radius:999px;
+      font-weight:900; font-size:12px;
+      backdrop-filter: blur(10px);
+    }
+    .badge.ok{border-color: rgba(34,197,94,.35)}
+    .badge.warn{border-color: rgba(251,191,36,.35)}
+    .badge.danger{border-color: rgba(255,107,107,.35)}
+
+    .head{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      padding:2px 2px 0;
+      flex-wrap:wrap;
+    }
+    .title h2{margin:0; font-size:22px; letter-spacing:.2px}
+    .subtitle{
+      margin:6px 0 0;
+      color: var(--muted);
+      font-weight:700;
+      font-size:13px;
+    }
+    .chips{display:flex; gap:8px; flex-wrap:wrap}
     .chip{
-      border:1px solid rgba(255,255,255,.15);
-      background:rgba(255,255,255,.06);
-      color:#fff; padding:.55rem .8rem; border-radius:999px; font-weight:700; font-size:.9rem;
-      display:flex; gap:.45rem; align-items:center; cursor:pointer; transition:var(--t)
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      padding:8px 10px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:12px;
+      color:#fff;
     }
-    .chip:hover{transform:translateY(-1px);border-color:rgba(255,107,53,.45)}
+    .chip strong{color: var(--secondary)}
+    .section{
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--r-xl);
+      box-shadow: 0 12px 40px rgba(0,0,0,.32);
+      overflow:hidden;
+    }
+    .section h3{
+      margin:0;
+      padding:14px 14px 10px;
+      font-size:14px;
+      letter-spacing:.2px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), transparent);
+    }
+    .section .content{padding:12px 14px 14px}
+    .kvs{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    @media (max-width:540px){.kvs{grid-template-columns:1fr}}
+    .kv{
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--r-md);
+      padding:10px 12px;
+    }
+    .kv .k{color:var(--muted); font-size:12px; font-weight:800}
+    .kv .v{margin-top:3px; font-weight:900; font-size:13px}
 
-    .main-container{display:flex;height:calc(100vh - 76px)}
-    .sidebar{
-      width:320px;background:var(--sidebar);overflow-y:auto; box-shadow:4px 0 20px rgba(0,0,0,.3);
-      position:relative; z-index:900;
+    .desc{
+      line-height:1.6;
+      color: rgba(255,255,255,.92);
+      font-weight:600;
+      font-size:14px;
     }
-    .sidebar-header{padding:1.2rem;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;text-align:center}
-    .sidebar-header h2{font-size:1.15rem;margin:0 0 .25rem}
-    .category-section{padding:1rem}
-    .category-title{color:var(--muted);font-size:.82rem;text-transform:uppercase;margin-bottom:.7rem;padding:0 .5rem}
-    .category-list{display:flex;flex-direction:column;gap:.5rem}
-    .category-item{
-      display:flex; align-items:center; gap:1rem; padding:1rem;
-      background:rgba(255,255,255,.03); border-radius:var(--radius);
-      cursor:pointer; transition:var(--t); border-left:4px solid transparent; position:relative;
-    }
-    .category-item:hover{background:rgba(255,255,255,.08); transform:translateX(5px)}
-    .category-item.active{background:rgba(255,107,53,.2); border-left-color:var(--primary)}
-    .category-icon{font-size:1.8rem; min-width:40px; text-align:center}
-    .category-info{flex:1}
-    .category-name{color:var(--text); font-weight:800; font-size:.95rem; margin-bottom:.15rem}
-    .category-count{color:var(--muted); font-size:.8rem}
-
-    .region-filter{padding:1rem;background:rgba(255,255,255,.02);margin:1rem;border-radius:var(--radius)}
-    .region-filter-title{color:var(--text);font-size:.9rem;margin-bottom:.8rem;font-weight:800}
-    .region-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.5rem}
-    .region-btn{
-      padding:.55rem; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
-      border-radius:10px; color:var(--text); font-size:.82rem; cursor:pointer; transition:var(--t); text-align:center;
-    }
-    .region-btn:hover{background:rgba(78,205,196,.2); border-color:var(--secondary)}
-    .region-btn.active{background:var(--secondary); color:var(--dark); font-weight:900; border-color:var(--secondary)}
-
-    .map-container{flex:1; position:relative}
-    #map{width:100%; height:100%}
-
-    .map-controls{
-      position:absolute; top:1rem; right:1rem; z-index:800;
-      display:flex; flex-direction:column; gap:.5rem;
-    }
-    .control-btn{
-      background:#fff; border:none; padding:.8rem; border-radius:50%;
-      width:45px; height:45px; cursor:pointer;
-      box-shadow:0 4px 15px rgba(0,0,0,.2); transition:var(--t); font-size:1.15rem;
-    }
-    .control-btn:hover{transform:scale(1.08); box-shadow:0 6px 20px rgba(0,0,0,.3)}
-
-    .leaflet-popup-content-wrapper{
-      background:var(--card); color:var(--text); border-radius:var(--radius);
-      padding:0; box-shadow:0 8px 32px rgba(0,0,0,.5);
-    }
-    .leaflet-popup-content{margin:0; min-width:280px}
-    .popup-header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));padding:1rem;border-radius:var(--radius) var(--radius) 0 0}
-    .popup-title{font-size:1.15rem;font-weight:900;margin-bottom:.2rem}
-    .popup-category{font-size:.85rem;opacity:.92}
-    .popup-body{padding:1rem}
-    .popup-info{display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem;color:var(--muted);font-size:.9rem}
-    .popup-description{color:var(--muted);font-size:.85rem;line-height:1.5;margin-bottom:1rem}
-    .popup-actions{display:flex;gap:.5rem}
-    .popup-btn{
-      flex:1; padding:.65rem; border:none; border-radius:10px; font-weight:900; cursor:pointer; transition:var(--t); font-size:.85rem
-    }
-    .popup-btn-primary{background:var(--primary);color:#fff}
-    .popup-btn-secondary{background:var(--secondary);color:var(--dark)}
-    .popup-btn:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.3)}
-
-    .custom-marker{
-      display:flex; align-items:center; justify-content:center;
-      width:35px;height:35px;border-radius:50%;
-      border:3px solid #fff; box-shadow:0 4px 10px rgba(0,0,0,.3);
-      font-size:1.2rem; cursor:pointer; transition:var(--t)
-    }
-    .custom-marker:hover{transform:scale(1.18)}
-    .marker-restaurant{background:var(--color-restaurant)}
-    .marker-commerce{background:var(--color-commerce)}
-    .marker-logement{background:var(--color-logement)}
-    .marker-taxi{background:var(--color-taxi)}
-    .marker-notable{background:var(--color-notable)}
-    .marker-batiment{background:var(--color-batiment)}
-    .marker-voiture{background:var(--color-voiture)}
-    .marker-voyage{background:var(--color-voyage)}
-    .marker-loisir{background:var(--color-loisir)}
-    .marker-hotel{background:var(--color-hotel)}
-
-    /* Modal (on le garde au cas où) */
-    .modal{
-      display:none; position:fixed; z-index:2000; inset:0;
-      background:rgba(0,0,0,.85); backdrop-filter: blur(5px);
-    }
-    .modal-content{
-      background:var(--card); margin:2% auto; padding:1.6rem;
-      border-radius:var(--radius); max-width:720px; max-height:85vh; overflow:auto;
-      box-shadow:0 10px 50px rgba(0,0,0,.5); animation: slideIn .25s ease;
-    }
-    @keyframes slideIn{from{transform:translateY(-30px);opacity:0} to{transform:translateY(0);opacity:1}}
-    .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:1rem;border-bottom:2px solid rgba(255,255,255,.1)}
-    .close{color:var(--muted);font-size:2rem;font-weight:900;cursor:pointer;transition:var(--t)}
-    .close:hover{color:var(--danger)}
-    .modal-body h2{color:var(--primary);margin-bottom:.7rem}
-    .modal-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.2rem}
-    .info-card{background:rgba(255,255,255,.05); padding:1rem; border-radius:var(--radius)}
-    .info-label{color:var(--muted);font-size:.85rem;margin-bottom:.25rem}
-    .info-value{color:var(--text);font-weight:800}
-
-    .loader{
-      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-      border:5px solid rgba(255,255,255,.1); border-top:5px solid var(--primary);
-      border-radius:50%; width:60px; height:60px; animation:spin 1s linear infinite; z-index:1000;
-    }
-    @keyframes spin{0%{transform:translate(-50%,-50%) rotate(0deg)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
-    .hidden{display:none !important;}
-
-    @media (max-width:1024px){ .sidebar{width:280px} }
-    @media (max-width:768px){
-      .header{flex-direction:column; align-items:stretch}
-      .header-search{max-width:100%}
-      .sidebar{position:absolute; left:-320px; height:calc(100vh - 140px); transition:left .3s ease; z-index:1000}
-      .sidebar.open{left:0}
-      .region-grid{grid-template-columns:1fr}
-      .modal-info-grid{grid-template-columns:1fr}
+    .services{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+    .tag{
+      background: rgba(78,205,196,.14);
+      border:1px solid rgba(78,205,196,.28);
+      color: var(--secondary);
+      padding:7px 10px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:12px;
     }
 
-    ::-webkit-scrollbar{width:8px}
-    ::-webkit-scrollbar-track{background:var(--dark)}
-    ::-webkit-scrollbar-thumb{background:var(--primary);border-radius:4px}
-    ::-webkit-scrollbar-thumb:hover{background:var(--primary-dark)}
+    .gallery{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 540px){ .gallery{grid-template-columns:repeat(2,1fr)} }
+    .photo{
+      border-radius: 14px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      min-height:110px;
+    }
+    .photo img{width:100%; height:100%; object-fit:cover; display:block}
+
+    .side-stack{display:grid; gap:14px}
+    .cta-box{
+      background: linear-gradient(135deg, rgba(255,107,53,.18), rgba(78,205,196,.12));
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--r-xl);
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+    .cta-box h4{margin:0 0 10px; font-size:14px}
+    .cta-row{display:flex; gap:10px; flex-wrap:wrap}
+    .cta-row .btn{flex:1; justify-content:center; min-width:160px}
+    .note{
+      margin-top:10px;
+      color: var(--muted);
+      font-size:12px;
+      font-weight:700;
+      line-height:1.5;
+    }
+
+    .skeleton{
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.12), rgba(255,255,255,.06));
+      background-size: 220% 100%;
+      animation: shimmer 1.2s linear infinite;
+    }
+    @keyframes shimmer{0%{background-position: 0% 0%}100%{background-position: 220% 0%}}
+    .sk-wrap{display:grid; gap:10px; padding:14px}
+    .toast{
+      position:fixed; left:12px; right:12px; bottom:12px;
+      max-width:980px; margin:0 auto;
+      background: rgba(0,0,0,.55);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      padding:12px 14px;
+      backdrop-filter: blur(10px);
+      display:none;
+      z-index:99;
+      box-shadow: 0 18px 60px rgba(0,0,0,.5);
+    }
+    .toast strong{color: var(--secondary)}
+    .toast small{display:block; margin-top:6px; color: var(--muted); font-weight:700}
   </style>
+
+  <!-- Leaflet (map mini optionnel, sans charger une carte complète si inutile) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-<header class="header">
-  <div class="logo-section">
-    <div class="logo-infinity">∞</div>
-    <div class="logo-text">
-      <h1>DIGIY NDIMBAL MAP</h1>
-      <p>Annuaire géolocalisé du Sénégal • slug ready</p>
+  <div class="topbar">
+    <div class="brand">
+      <div class="infty">∞</div>
+      <div>
+        <h1 id="brandTitle">DIGIY NDIMBAL — Fiche</h1>
+        <p id="brandSub">Propriété du pro • zéro intermédiaire</p>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn btn-outline" id="btnBackMap" href="./index.html">🗺️ Retour carte</a>
+      <a class="btn btn-outline" id="btnHub" href="https://beauville.github.io/digiy-hub/" target="_blank" rel="noopener">🏠 HUB</a>
     </div>
   </div>
 
-  <div class="header-search">
-    <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un service, une ville, un nom..." />
-  </div>
+  <div class="wrap">
 
-  <div class="header-right">
-    <div class="chip" id="chipTotal" title="Total affiché">👥 <span id="totalPros">0</span></div>
-    <div class="chip" onclick="goBackHub()" title="Retour HUB">🏠 HUB</div>
-  </div>
-</header>
-
-<div class="main-container">
-
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h2>🗂️ Catégories</h2>
-      <p style="font-size:.85rem; opacity:.9;">Clique pour filtrer</p>
+    <!-- Skeleton while loading -->
+    <div id="loading" class="section" style="margin-top:14px">
+      <div class="sk-wrap">
+        <div class="skeleton" style="width:55%"></div>
+        <div class="skeleton" style="width:85%"></div>
+        <div class="skeleton" style="width:65%"></div>
+        <div class="skeleton" style="width:95%; height:160px; border-radius:18px"></div>
+        <div class="skeleton" style="width:75%"></div>
+        <div class="skeleton" style="width:92%"></div>
+      </div>
     </div>
 
-    <div class="category-section">
-      <div class="category-title">Services</div>
-      <div class="category-list">
-        <div class="category-item active" data-category="all">
-          <span class="category-icon">🌍</span>
-          <div class="category-info">
-            <div class="category-name">Tout afficher</div>
-            <div class="category-count" id="count-all">0 résultats</div>
+    <!-- Real content -->
+    <div id="content" class="grid" style="display:none">
+
+      <!-- LEFT -->
+      <div class="hero">
+        <div class="hero-inner">
+          <div class="cover">
+            <img id="coverImg" alt="Photo du professionnel" loading="lazy" decoding="async" />
+            <div id="badge" class="badge ok" hidden>✅ Vérifié</div>
+          </div>
+
+          <div class="head">
+            <div class="title">
+              <h2 id="proName">—</h2>
+              <div class="subtitle" id="proMeta">—</div>
+            </div>
+
+            <div class="chips">
+              <div class="chip">⭐ <strong id="proRating">—</strong>/5</div>
+              <div class="chip">♾️ <strong id="proSlug">—</strong></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>📝 Histoire & description</h3>
+            <div class="content">
+              <div class="desc" id="proDesc">—</div>
+              <div class="services" id="proServices"></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>📸 Photos</h3>
+            <div class="content">
+              <div class="gallery" id="gallery"></div>
+              <div class="note">Astuce : plus tu ajoutes des photos réelles, plus la fiche “respire” et la confiance grimpe.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="side-stack">
+
+        <div class="cta-box">
+          <h4>⚡ Contacter maintenant</h4>
+          <div class="cta-row">
+            <a class="btn btn-primary" id="btnCall" href="#">📞 Appeler</a>
+            <a class="btn btn-whatsapp" id="btnWA" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
+          </div>
+          <div class="cta-row" style="margin-top:10px">
+            <button class="btn btn-secondary" id="btnShare" type="button">🔗 Partager la fiche</button>
+            <a class="btn btn-outline" id="btnOpenMap" href="#">🧭 Ouvrir GPS</a>
+          </div>
+          <div class="note">
+            Ici, pas d’OTA qui pompe ton SEO : c’est la fiche du pro, par le pro, pour le peuple.
           </div>
         </div>
 
-        <div class="category-item" data-category="restaurant"><span class="category-icon">🍽️</span><div class="category-info"><div class="category-name">Restaurants</div><div class="category-count" id="count-restaurant">0 résultats</div></div></div>
-        <div class="category-item" data-category="commerce"><span class="category-icon">🏪</span><div class="category-info"><div class="category-name">Commerces</div><div class="category-count" id="count-commerce">0 résultats</div></div></div>
-        <div class="category-item" data-category="logement"><span class="category-icon">🏠</span><div class="category-info"><div class="category-name">Logements</div><div class="category-count" id="count-logement">0 résultats</div></div></div>
-        <div class="category-item" data-category="taxi"><span class="category-icon">🚕</span><div class="category-info"><div class="category-name">Taxis & VTC</div><div class="category-count" id="count-taxi">0 résultats</div></div></div>
-        <div class="category-item" data-category="notable"><span class="category-icon">👔</span><div class="category-info"><div class="category-name">Notables</div><div class="category-count" id="count-notable">0 résultats</div></div></div>
-        <div class="category-item" data-category="batiment"><span class="category-icon">🔨</span><div class="category-info"><div class="category-name">Bâtiment</div><div class="category-count" id="count-batiment">0 résultats</div></div></div>
-        <div class="category-item" data-category="voiture"><span class="category-icon">🚗</span><div class="category-info"><div class="category-name">Voitures</div><div class="category-count" id="count-voiture">0 résultats</div></div></div>
-        <div class="category-item" data-category="voyage"><span class="category-icon">✈️</span><div class="category-info"><div class="category-name">Voyage</div><div class="category-count" id="count-voyage">0 résultats</div></div></div>
-        <div class="category-item" data-category="loisir"><span class="category-icon">🎭</span><div class="category-info"><div class="category-name">Loisirs</div><div class="category-count" id="count-loisir">0 résultats</div></div></div>
-        <div class="category-item" data-category="hotel"><span class="category-icon">🏨</span><div class="category-info"><div class="category-name">Hôtels</div><div class="category-count" id="count-hotel">0 résultats</div></div></div>
+        <div class="section">
+          <h3>📌 Infos rapides</h3>
+          <div class="content">
+            <div class="kvs">
+              <div class="kv">
+                <div class="k">Catégorie</div>
+                <div class="v" id="kvCategory">—</div>
+              </div>
+              <div class="kv">
+                <div class="k">Région</div>
+                <div class="v" id="kvRegion">—</div>
+              </div>
+              <div class="kv">
+                <div class="k">Ville / Zone</div>
+                <div class="v" id="kvCity">—</div>
+              </div>
+              <div class="kv">
+                <div class="k">Horaires</div>
+                <div class="v" id="kvHours">—</div>
+              </div>
+              <div class="kv">
+                <div class="k">Email</div>
+                <div class="v" id="kvEmail">—</div>
+              </div>
+              <div class="kv">
+                <div class="k">Téléphone</div>
+                <div class="v" id="kvPhone">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>🗺️ Localisation</h3>
+          <div class="content">
+            <div class="desc" id="locLine">—</div>
+            <div class="note" id="gpsNote"></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>🧠 SEO (invisible mais puissant)</h3>
+          <div class="content">
+            <div class="desc" style="font-size:13px;color:rgba(255,255,255,.82)">
+              Cette fiche génère automatiquement un bloc “Business” (JSON-LD) pour aider Google à comprendre le pro.
+              C’est propre, et ça travaille pendant que toi tu dors.
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <div class="region-filter">
-      <div class="region-filter-title">🗺️ Filtrer par région</div>
-      <div class="region-grid" id="regionGrid">
-        <button class="region-btn active" data-region="all">Toutes</button>
-        <button class="region-btn" data-region="dakar">Dakar</button>
-        <button class="region-btn" data-region="thies">Thiès (Saly)</button>
-        <button class="region-btn" data-region="diourbel">Diourbel</button>
-        <button class="region-btn" data-region="fatick">Fatick</button>
-        <button class="region-btn" data-region="kaolack">Kaolack</button>
-        <button class="region-btn" data-region="kaffrine">Kaffrine</button>
-        <button class="region-btn" data-region="kolda">Kolda</button>
-        <button class="region-btn" data-region="louga">Louga</button>
-        <button class="region-btn" data-region="matam">Matam</button>
-        <button class="region-btn" data-region="saint-louis">Saint-Louis</button>
-        <button class="region-btn" data-region="sedhiou">Sédhiou</button>
-        <button class="region-btn" data-region="tambacounda">Tambacounda</button>
-        <button class="region-btn" data-region="kedougou">Kédougou</button>
-        <button class="region-btn" data-region="ziguinchor">Ziguinchor</button>
-      </div>
-    </div>
-  </aside>
-
-  <div class="map-container">
-    <div id="map"></div>
-
-    <div class="map-controls">
-      <button class="control-btn" onclick="centerMap()" title="Centrer Sénégal">🎯</button>
-      <button class="control-btn" onclick="locateUser()" title="Ma position">📍</button>
-      <button class="control-btn" onclick="toggleSidebar()" title="Menu" style="display:none" id="menuBtn">☰</button>
-    </div>
-
-    <div class="loader" id="loader"></div>
   </div>
 
-</div>
-
-<!-- Modal (gardé, mais NDIMBAL => fiche) -->
-<div id="detailsModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2 style="color:var(--primary); margin:0;">Détails du professionnel</h2>
-      <span class="close" onclick="closeModal()">&times;</span>
-    </div>
-    <div class="modal-body" id="modalBody"></div>
+  <div id="toast" class="toast">
+    <div id="toastMsg">—</div>
+    <small>Astuce : tu peux partager la fiche comme un lien WhatsApp / QR.</small>
   </div>
-</div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 /* ================================
    CONFIG SUPABASE (UNIQUE)
+   ✅ même keys que ta MAP
 ================================ */
 const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -293,112 +434,23 @@ window.SB = window.SB || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const SB = window.SB;
 
 /* ================================
-   ✅ NDIMBAL FICHE (IMPORTANT)
-   pro.html doit être dans le même repo/dossier que index.html
-   sinon mets un chemin absolu.
-================================ */
-const PRO_PAGE = "pro.html";
-function openProPage(slugOrId){
-  const key = decodeURIComponent(String(slugOrId || "")).trim();
-  if(!key) return;
-  // ✅ on supporte les 2 params, comme ça tu peux coder pro.html comme tu veux
-  const url = `${PRO_PAGE}?slug=${encodeURIComponent(key)}&pro=${encodeURIComponent(key)}`;
-  window.open(url, "_blank");
-}
-
-/* ================================
-   GLOBALS
-================================ */
-let map, markerCluster;
-let allProfessionals = [];
-let filteredProfessionals = [];
-let currentCategory = 'all';
-let currentRegion = 'all';
-
-const categoryIcons = {
-  restaurant:'🍽️', commerce:'🏪', logement:'🏠', taxi:'🚕', notable:'👔',
-  batiment:'🔨', voiture:'🚗', voyage:'✈️', loisir:'🎭', hotel:'🏨'
-};
-
-/* ================================
-   URL PARAMS
+   PARAMS
 ================================ */
 function getParam(name){
   const url = new URL(window.location.href);
   return url.searchParams.get(name);
 }
-const slugWanted = (getParam("pro") || "").trim();
+function canon(x){ return String(x ?? "").trim(); }
+function canonLower(x){ return canon(x).toLowerCase(); }
+
+// Supporte ?slug=xxx ou ?pro=xxx (comme ta MAP)
+const KEY = canon(getParam("slug") || getParam("pro") || "");
 
 /* ================================
-   INIT
-================================ */
-document.addEventListener('DOMContentLoaded', async ()=>{
-  initMap();
-  await loadProfessionals();
-  setupEventListeners();
-  document.getElementById('loader').classList.add('hidden');
-
-  // ✅ si ?pro=xxx => ouvrir la fiche directement (au lieu du modal)
-  if(slugWanted){
-    openProPage(slugWanted);
-  }
-});
-
-/* ================================
-   MAP
-================================ */
-function initMap(){
-  map = L.map('map').setView([14.4974,-14.4524], 7);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© OpenStreetMap | DIGIYLYFE',
-    maxZoom: 19
-  }).addTo(map);
-
-  markerCluster = L.markerClusterGroup({
-    showCoverageOnHover:false,
-    maxClusterRadius:50
-  });
-  map.addLayer(markerCluster);
-
-  if(window.innerWidth<=768) document.getElementById('menuBtn').style.display='block';
-}
-function centerMap(){ map.setView([14.4974,-14.4524], 7); }
-
-function locateUser(){
-  if(!navigator.geolocation) return alert("Géolocalisation non supportée");
-  navigator.geolocation.getCurrentPosition(
-    (pos)=>{
-      const { latitude, longitude } = pos.coords;
-      map.setView([latitude, longitude], 13);
-      L.marker([latitude, longitude]).addTo(map).bindPopup("📍 Vous êtes ici").openPopup();
-    },
-    ()=> alert("Impossible de récupérer votre position")
-  );
-}
-function toggleSidebar(){ document.getElementById('sidebar').classList.toggle('open'); }
-function goBackHub(){ window.location.href = "https://beauville.github.io/digiy-hub/"; }
-
-/* ================================
-   NORMALIZE (Saly = Thiès)
+   CATEGORY LABELS
 ================================ */
 function fold(s){
   return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-}
-function normRegion(r, city){
-  const v = fold(r || city || '');
-  if(!v) return '';
-  if(v.includes('dakar')) return 'dakar';
-  if(v.includes('thies') || v.includes('thiès') || v.includes('saly') || v.includes('mbour')) return 'thies';
-  if(v.includes('ziguinchor')) return 'ziguinchor';
-  if(v.includes('saint-louis') || v.includes('saintlouis')) return 'saint-louis';
-  if(v.includes('fatick')) return 'fatick';
-  if(v.includes('kaolack')) return 'kaolack';
-  if(v.includes('louga')) return 'louga';
-  if(v.includes('tambacounda')) return 'tambacounda';
-  if(v.includes('diourbel')) return 'diourbel';
-  if(v.includes('matam')) return 'matam';
-  return (r||'').toString().toLowerCase().replace(/\s+/g,'-');
 }
 function normCategory(cat){
   const c = fold(cat);
@@ -414,240 +466,404 @@ function normCategory(cat){
   if(c.includes('voiture')) return 'voiture';
   return 'commerce';
 }
-
-/* ================================
-   DATA LOAD
-   ✅ zero fetch manuel => plus jamais "No API key found"
-   ✅ demo only si erreur ou vide
-================================ */
-async function loadProfessionals(){
-  try{
-    const { data, error } = await SB
-      .from('professionals')
-      .select('*')
-      .order('created_at', { ascending:false });
-
-    if(error){
-      console.warn("Supabase error => fallback demo:", error);
-      allProfessionals = generateDemoData(60);
-    }else{
-      const arr = data || [];
-      allProfessionals = (arr.length ? arr : generateDemoData(60)).map(p => ({
-        ...p,
-        region: normRegion(p.region, p.city),
-        category: normCategory(p.category || p.cat || p.type || ''),
-      }));
-    }
-
-    filteredProfessionals = [...allProfessionals];
-    displayMarkers(filteredProfessionals);
-    updateCounts();
-  }catch(err){
-    console.warn("Load error => fallback demo:", err);
-    allProfessionals = generateDemoData(60);
-    filteredProfessionals = [...allProfessionals];
-    displayMarkers(filteredProfessionals);
-    updateCounts();
-  }
-}
-
-/* ================================
-   DEMO DATA (presence map)
-================================ */
-function generateDemoData(total=60){
-  const categories = Object.keys(categoryIcons);
-  const regions = ['dakar','thies','diourbel','saint-louis','kaolack','ziguinchor','louga','tambacounda','fatick','matam'];
-  const demo=[];
-  for(let i=0;i<total;i++){
-    const cat = categories[i % categories.length];
-    const reg = regions[Math.floor(Math.random()*regions.length)];
-    demo.push({
-      id:`demo-${i}`,
-      slug:`demo-${i}`,
-      name:`Pro Démo ${i+1}`,
-      category:cat,
-      region:reg,
-      city: reg.charAt(0).toUpperCase()+reg.slice(1),
-      description:"🧪 Démo NDIMBAL — exemple de fiche (à remplacer par vrais partenaires).",
-      phone:"+221770000000",
-      rating:(4+Math.random()).toFixed(1),
-      latitude: 14.4974 + (Math.random()-0.5)*2.2,
-      longitude:-14.4524 + (Math.random()-0.5)*3.0,
-      hours:"Lun-Sam 8h-20h",
-      services:["Service 1","Service 2"],
-      badge_text:"🧪 Démo"
-    });
-  }
-  return demo;
-}
-
-/* ================================
-   MARKERS
-================================ */
-function displayMarkers(pros){
-  markerCluster.clearLayers();
-
-  pros.forEach(pro=>{
-    const lat = pro.latitude ?? pro.lat ?? pro.gps_lat;
-    const lng = pro.longitude ?? pro.lng ?? pro.gps_lng;
-
-    if(lat == null || lng == null) return;
-
-    const cat = pro.category || 'commerce';
-    const icon = L.divIcon({
-      className:'custom-div-icon',
-      html:`<div class="custom-marker marker-${cat}">${categoryIcons[cat] || '📍'}</div>`,
-      iconSize:[35,35],
-      iconAnchor:[17,17]
-    });
-
-    const marker = L.marker([Number(lat), Number(lng)], { icon });
-    marker._digiy_pro_id = String(pro.id);
-    marker._digiy_slug = String(pro.slug || "");
-
-    marker.bindPopup(createPopupContent(pro));
-
-    // ✅ clic direct sur le point => fiche pro (plus de froid)
-    marker.on("click", ()=>{
-      // on laisse le popup s'ouvrir normalement, mais tu peux aussi ouvrir direct:
-      // openProPage(pro.slug || pro.id);
-    });
-
-    markerCluster.addLayer(marker);
-  });
-}
-
-function createPopupContent(pro){
-  const key = String(pro.slug || pro.id || "");
-  return `
-    <div class="popup-header">
-      <div class="popup-title">${escapeHTML(pro.name || "Professionnel")}</div>
-      <div class="popup-category">${getCategoryLabel(pro.category)}</div>
-    </div>
-    <div class="popup-body">
-      <div class="popup-info">📍 ${escapeHTML(pro.city || "")} ${pro.region ? "• " + escapeHTML(getRegionLabel(pro.region)) : ""}</div>
-      <div class="popup-info">⭐ ${escapeHTML(pro.rating || "5.0")} • 📞 ${escapeHTML(pro.phone || "N/A")}</div>
-      <div class="popup-description">${escapeHTML((pro.description || "Service professionnel").slice(0,110))}${(pro.description||"").length>110?'…':''}</div>
-      <div class="popup-actions">
-        <!-- ✅ NDIMBAL => ouvre la FICHE -->
-        <button class="popup-btn popup-btn-primary" onclick='openProPage("${escapeAttr(key)}")'>👁️ Fiche</button>
-        <button class="popup-btn popup-btn-secondary" onclick='contactPro("${escapeAttr(key)}")'>📞 Contact</button>
-      </div>
-    </div>
-  `;
-}
-
-/* ================================
-   FILTERS
-================================ */
-function filterProfessionals(){
-  const term = document.getElementById('searchInput').value.toLowerCase().trim();
-  let res = [...allProfessionals];
-
-  if(currentCategory !== 'all') res = res.filter(p => (p.category||'') === currentCategory);
-  if(currentRegion !== 'all') res = res.filter(p => (p.region||'') === currentRegion);
-
-  if(term){
-    res = res.filter(p => {
-      const t = (p.name||'')+' '+(p.city||'')+' '+(p.description||'')+' '+(p.slug||'');
-      return t.toLowerCase().includes(term);
-    });
-  }
-
-  filteredProfessionals = res;
-  displayMarkers(res);
-  updateCounts();
-}
-
-function updateCounts(){
-  document.getElementById('totalPros').textContent = String(filteredProfessionals.length);
-  document.getElementById('count-all').textContent = `${filteredProfessionals.length} résultats`;
-
-  Object.keys(categoryIcons).forEach(cat=>{
-    const c = filteredProfessionals.filter(p=>(p.category||'')===cat).length;
-    const el = document.getElementById(`count-${cat}`);
-    if(el) el.textContent = `${c} résultats`;
-  });
-}
-
-/* ================================
-   MODAL + ACTIONS (gardé)
-================================ */
-function findLocalProBySlugOrId(key){
-  const k = String(key || "").trim();
-  if(!k) return null;
-  return allProfessionals.find(p => String(p.slug||"") === k) ||
-         allProfessionals.find(p => String(p.id||"") === k) ||
-         null;
-}
-
-/* ✅ IMPORTANT : maintenant, "Détails" = fiche pro
-   Si tu veux encore le modal quelque part, tu peux créer un bouton "Aperçu".
-*/
-async function openDetailsModal(slugOrId){
-  openProPage(slugOrId);
-}
-
-function closeModal(){ document.getElementById('detailsModal').style.display = 'none'; }
-
-function contactPro(slugOrId){
-  const key = decodeURIComponent(String(slugOrId||""));
-  const pro = findLocalProBySlugOrId(key);
-  if(!pro || !pro.phone) return alert("Numéro non disponible");
-  window.location.href = `tel:${pro.phone}`;
-}
-
-/* ================================
-   HELPERS
-================================ */
 function getCategoryLabel(category){
   const labels = {
-    restaurant:'🍽️ Restaurant', commerce:'🏪 Commerce', logement:'🏠 Logement',
-    taxi:'🚕 Taxi/VTC', notable:'👔 Notable', batiment:'🔨 Bâtiment',
-    voiture:'🚗 Voiture', voyage:'✈️ Voyage', loisir:'🎭 Loisir', hotel:'🏨 Hôtel'
+    restaurant:'🍽️ Restaurant',
+    commerce:'🏪 Commerce',
+    logement:'🏠 Logement',
+    taxi:'🚕 Taxi/VTC',
+    notable:'👔 Notable',
+    batiment:'🔨 Bâtiment',
+    voiture:'🚗 Voiture',
+    voyage:'✈️ Voyage',
+    loisir:'🎭 Loisir',
+    hotel:'🏨 Hôtel'
   };
   return labels[category] || '📍 Service';
 }
 function getRegionLabel(region){
   return (region||'').toString().replace(/-/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
 }
+
+/* ================================
+   UI HELPERS
+================================ */
 function escapeHTML(str){
   return (str ?? "").toString()
     .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
     .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 }
-function escapeAttr(str){
-  return escapeHTML(String(str||"")).replaceAll("`","&#096;");
+function showToast(msg){
+  const t = document.getElementById("toast");
+  document.getElementById("toastMsg").innerHTML = msg;
+  t.style.display = "block";
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=> t.style.display="none", 3200);
+}
+function setMetaTitleDesc(name, cat, city){
+  const title = `${name} — ${cat} • ${city} | DIGIY NDIMBAL`;
+  document.title = title;
+  const meta = document.querySelector('meta[name="description"]');
+  if(meta) meta.setAttribute("content", `Fiche pro : ${name} — ${cat} à ${city}. Horaires, services, contact, localisation.`);
 }
 
 /* ================================
-   EVENTS
+   DATA ADAPTER
+   -> supporte plusieurs colonnes possibles
 ================================ */
-function setupEventListeners(){
-  document.getElementById('searchInput').addEventListener('input', filterProfessionals);
+function pickLat(p){ return p.latitude ?? p.lat ?? p.gps_lat ?? null; }
+function pickLng(p){ return p.longitude ?? p.lng ?? p.gps_lng ?? null; }
 
-  document.querySelectorAll('.category-item').forEach(item=>{
-    item.addEventListener('click', ()=>{
-      document.querySelectorAll('.category-item').forEach(i=>i.classList.remove('active'));
-      item.classList.add('active');
-      currentCategory = item.dataset.category;
-      filterProfessionals();
-    });
-  });
+function parseServices(p){
+  // Supabase peut renvoyer text, json, array…
+  const s = p.services;
+  if(Array.isArray(s)) return s.filter(Boolean).map(x=>String(x));
+  if(typeof s === "string"){
+    // ex: "a,b,c" ou "['a','b']"
+    const t = s.trim();
+    if(!t) return [];
+    try{
+      const j = JSON.parse(t);
+      if(Array.isArray(j)) return j.map(x=>String(x));
+    }catch(e){}
+    return t.split(",").map(x=>x.trim()).filter(Boolean);
+  }
+  if(s && typeof s === "object"){
+    // ex: {a:true}
+    return Object.keys(s);
+  }
+  return [];
+}
 
-  document.querySelectorAll('.region-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.region-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      currentRegion = btn.dataset.region;
-      filterProfessionals();
-    });
-  });
+function parsePhotos(p){
+  // champs possibles : photos, gallery, images, cover_url
+  const out = [];
 
-  window.onclick = (event)=>{
-    if(event.target && event.target.id === 'detailsModal') closeModal();
+  const add = (u)=>{ if(u && typeof u === "string"){ const x=u.trim(); if(x) out.push(x); } };
+
+  add(p.cover_url);
+  add(p.cover);
+  add(p.photo_url);
+
+  const arr = p.photos ?? p.gallery ?? p.images ?? null;
+  if(Array.isArray(arr)) arr.forEach(add);
+  else if(typeof arr === "string"){
+    const t = arr.trim();
+    if(t){
+      try{
+        const j = JSON.parse(t);
+        if(Array.isArray(j)) j.forEach(add);
+        else add(t);
+      }catch(e){
+        // split
+        t.split(",").forEach(add);
+      }
+    }
+  }
+  // dédoublonne
+  return Array.from(new Set(out));
+}
+
+function buildWA(phone, name){
+  const p = String(phone||"").replace(/\s+/g,'');
+  if(!p) return "";
+  const msg = encodeURIComponent(`Salam ${name || ""} — je viens de DIGIY NDIMBAL ♾️`);
+  // accepte +221...
+  const cleaned = p.replace(/^00/,'+');
+  const digits = cleaned.startsWith("+") ? cleaned.slice(1) : cleaned;
+  return `https://wa.me/${digits}?text=${msg}`;
+}
+
+function googleMapsLink(lat, lng, name){
+  if(lat==null || lng==null) return "";
+  const q = encodeURIComponent(`${lat},${lng} (${name||"Pro"})`);
+  return `https://www.google.com/maps?q=${q}`;
+}
+
+/* ================================
+   JSON-LD SEO
+================================ */
+function injectJsonLd(p){
+  // LocalBusiness / Organization minimal, safe
+  const name = p.name || "Professionnel";
+  const cat = getCategoryLabel(p._cat || normCategory(p.category || p.cat || p.type || ""));
+  const city = p.city || "";
+  const region = p.region ? getRegionLabel(p.region) : "";
+  const phone = p.phone || "";
+  const email = p.email || "";
+  const hours = p.hours || "";
+  const desc = (p.description || "").slice(0, 300);
+  const photos = p._photos || [];
+  const lat = pickLat(p);
+  const lng = pickLng(p);
+
+  const data = {
+    "@context":"https://schema.org",
+    "@type":"LocalBusiness",
+    "name": name,
+    "description": desc || undefined,
+    "image": photos.length ? photos : undefined,
+    "telephone": phone || undefined,
+    "email": email || undefined,
+    "address":{
+      "@type":"PostalAddress",
+      "addressLocality": city || undefined,
+      "addressRegion": region || undefined,
+      "addressCountry":"SN"
+    },
+    "geo": (lat!=null && lng!=null) ? ({
+      "@type":"GeoCoordinates",
+      "latitude": Number(lat),
+      "longitude": Number(lng)
+    }) : undefined,
+    "openingHours": hours || undefined
+  };
+
+  const clean = JSON.parse(JSON.stringify(data)); // retire undefined
+  const s = document.createElement("script");
+  s.type = "application/ld+json";
+  s.textContent = JSON.stringify(clean);
+  document.head.appendChild(s);
+}
+
+/* ================================
+   LOAD LOGIC
+   1) try slug exact
+   2) try slug case-insensitive (fallback)
+   3) try id
+   4) fallback demo
+================================ */
+async function fetchPro(key){
+  if(!key) return null;
+
+  // slug exact
+  let q = await SB.from("professionals").select("*").eq("slug", key).maybeSingle();
+  if(!q.error && q.data) return q.data;
+
+  // slug case-insensitive (fallback)
+  // Supabase/PostgREST : ilike possible via .ilike
+  q = await SB.from("professionals").select("*").ilike("slug", key).maybeSingle();
+  if(!q.error && q.data) return q.data;
+
+  // id
+  q = await SB.from("professionals").select("*").eq("id", key).maybeSingle();
+  if(!q.error && q.data) return q.data;
+
+  return null;
+}
+
+function demoPro(key){
+  const i = key && key.startsWith("demo-") ? Number(key.replace("demo-","")) : 1;
+  const name = `Pro Démo ${isFinite(i)?(i+1):"1"}`;
+  return {
+    id: key || "demo-1",
+    slug: key || "demo-1",
+    name,
+    category: "commerce",
+    region: "thies",
+    city: "Saly",
+    description: "🧪 Ceci est une fiche démo NDIMBAL. Quand tu ajoutes les vraies infos (photos, histoire, horaires, services), la fiche devient vivante et SEO-friendly.",
+    phone: "+221770000000",
+    email: "contact@digiylyfe.com",
+    rating: (4 + Math.random()).toFixed(1),
+    hours: "Lun-Sam 08h-20h",
+    services: ["Service 1", "Service 2", "Service 3"],
+    cover_url: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=70",
+    photos: [
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=1600&q=70",
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=70",
+      "https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1600&q=70"
+    ],
+    badge_text: "🧪 Démo"
   };
 }
+
+/* ================================
+   RENDER
+================================ */
+function renderPro(p){
+  const name = p.name || "Professionnel";
+  const slug = p.slug || p.id || "—";
+  const city = p.city || "Sénégal";
+  const region = p.region ? getRegionLabel(p.region) : "";
+  const catNorm = normCategory(p.category || p.cat || p.type || "");
+  p._cat = catNorm;
+
+  const rating = (p.rating != null && String(p.rating).trim() !== "") ? String(p.rating) : "5.0";
+  const phone = p.phone || "";
+  const email = p.email || "N/A";
+  const hours = p.hours || "N/A";
+
+  const photos = parsePhotos(p);
+  p._photos = photos;
+
+  const services = parseServices(p);
+  const desc = p.description || "—";
+
+  const lat = pickLat(p);
+  const lng = pickLng(p);
+
+  // Cover
+  const coverEl = document.getElementById("coverImg");
+  coverEl.src = photos[0] || "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1600&q=70";
+
+  // Badge
+  const badgeEl = document.getElementById("badge");
+  const badgeText = (p.badge_text || "").trim();
+  if(badgeText){
+    badgeEl.textContent = badgeText;
+    badgeEl.hidden = false;
+    badgeEl.className = "badge ok";
+  }else{
+    // si tu veux : badge “vérifié” quand un champ verified=true existe
+    if(p.verified === true){
+      badgeEl.textContent = "✅ Vérifié";
+      badgeEl.hidden = false;
+      badgeEl.className = "badge ok";
+    }else{
+      badgeEl.hidden = true;
+    }
+  }
+
+  // Titles
+  document.getElementById("proName").textContent = name;
+  document.getElementById("proSlug").textContent = slug;
+  document.getElementById("proRating").textContent = rating;
+
+  const meta = `${getCategoryLabel(catNorm)} • 📍 ${city}${region ? " — " + region : ""}`;
+  document.getElementById("proMeta").textContent = meta;
+
+  // Description + services
+  document.getElementById("proDesc").textContent = desc;
+  const sWrap = document.getElementById("proServices");
+  sWrap.innerHTML = "";
+  services.slice(0, 24).forEach(s=>{
+    const span = document.createElement("span");
+    span.className = "tag";
+    span.textContent = s;
+    sWrap.appendChild(span);
+  });
+
+  // Gallery
+  const g = document.getElementById("gallery");
+  g.innerHTML = "";
+  const gal = photos.slice(0, 6);
+  if(gal.length){
+    gal.forEach(u=>{
+      const d = document.createElement("div");
+      d.className = "photo";
+      d.innerHTML = `<img src="${escapeHTML(u)}" alt="Photo ${escapeHTML(name)}" loading="lazy" decoding="async">`;
+      g.appendChild(d);
+    });
+  }else{
+    g.innerHTML = `<div class="desc" style="color:var(--muted)">Aucune photo pour l’instant. Ajoute 3 à 6 images réelles : boutique, équipe, produits, façade…</div>`;
+  }
+
+  // KVs
+  document.getElementById("kvCategory").textContent = getCategoryLabel(catNorm);
+  document.getElementById("kvRegion").textContent = region || "—";
+  document.getElementById("kvCity").textContent = city || "—";
+  document.getElementById("kvHours").textContent = hours;
+  document.getElementById("kvEmail").textContent = email;
+  document.getElementById("kvPhone").textContent = phone || "N/A";
+
+  // Location line
+  const loc = `📍 ${city}${region ? " — " + region : ""}`;
+  document.getElementById("locLine").textContent = loc;
+
+  const gpsNote = document.getElementById("gpsNote");
+  if(lat!=null && lng!=null){
+    gpsNote.innerHTML = `Coordonnées GPS : <strong>${Number(lat).toFixed(6)}</strong>, <strong>${Number(lng).toFixed(6)}</strong>`;
+  }else{
+    gpsNote.textContent = "⚠️ GPS non renseigné : ajoute latitude/longitude pour un repère parfait sur la carte.";
+  }
+
+  // CTA links
+  const btnCall = document.getElementById("btnCall");
+  btnCall.href = phone ? `tel:${phone}` : "#";
+  btnCall.onclick = (e)=>{ if(!phone){ e.preventDefault(); alert("Numéro non disponible"); } };
+
+  const btnWA = document.getElementById("btnWA");
+  const wa = buildWA(phone, name);
+  btnWA.href = wa || "#";
+  btnWA.onclick = (e)=>{ if(!wa){ e.preventDefault(); alert("WhatsApp indisponible (numéro manquant)"); } };
+
+  const btnOpenMap = document.getElementById("btnOpenMap");
+  const gmap = googleMapsLink(lat, lng, name);
+  btnOpenMap.href = gmap || "#";
+  btnOpenMap.target = "_blank";
+  btnOpenMap.rel = "noopener";
+  btnOpenMap.onclick = (e)=>{ if(!gmap){ e.preventDefault(); alert("GPS manquant pour ouvrir la carte."); } };
+
+  // Share
+  const shareBtn = document.getElementById("btnShare");
+  shareBtn.onclick = async ()=>{
+    const url = window.location.href;
+    try{
+      if(navigator.share){
+        await navigator.share({ title: document.title, text: `${name} — fiche NDIMBAL`, url });
+        showToast(`✅ Partagé : <strong>${escapeHTML(name)}</strong>`);
+      }else{
+        await navigator.clipboard.writeText(url);
+        showToast(`🔗 Lien copié : <strong>${escapeHTML(name)}</strong>`);
+      }
+    }catch(e){
+      try{
+        await navigator.clipboard.writeText(url);
+        showToast(`🔗 Lien copié : <strong>${escapeHTML(name)}</strong>`);
+      }catch(err){
+        alert("Impossible de partager automatiquement. Copie le lien dans la barre d’adresse.");
+      }
+    }
+  };
+
+  // Meta tags
+  setMetaTitleDesc(name, getCategoryLabel(catNorm), city);
+
+  // JSON-LD
+  injectJsonLd(p);
+
+  // show
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("content").style.display = "grid";
+}
+
+/* ================================
+   INIT
+================================ */
+(async function init(){
+  // Si pas de KEY, on évite page vide
+  if(!KEY){
+    const fallback = demoPro("demo-1");
+    showToast("⚠️ Aucun slug/id fourni — affichage démo.");
+    renderPro(fallback);
+    return;
+  }
+
+  // Charge depuis Supabase
+  let data = null;
+  try{
+    data = await fetchPro(KEY);
+  }catch(e){
+    data = null;
+  }
+
+  if(!data){
+    // si c’est un demo-xx -> ok
+    if(KEY.startsWith("demo-")){
+      renderPro(demoPro(KEY));
+      return;
+    }
+    // sinon fallback démo (mais on le dit clairement)
+    showToast(`⚠️ Pro introuvable (<strong>${escapeHTML(KEY)}</strong>) — affichage démo.`);
+    renderPro(demoPro("demo-1"));
+    return;
+  }
+
+  // normalize region display: si déjà "thies" etc. on garde
+  if(data.region) data.region = String(data.region);
+  renderPro(data);
+})();
 </script>
 
 </body>
