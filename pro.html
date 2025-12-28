@@ -114,6 +114,77 @@
       background:rgba(255,255,255,.04);
     }
     .err{border-color:rgba(239,68,68,.35)}
+
+    /* ===========================
+       🧵 BOUTIQUE ASTOU (FICHE)
+       =========================== */
+    .shop{
+      border:1px solid rgba(250,204,21,.18);
+      background: radial-gradient(900px 400px at 10% 0%, rgba(250,204,21,.10), transparent 60%),
+                  radial-gradient(900px 400px at 110% 10%, rgba(249,115,22,.10), transparent 60%),
+                  rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px;
+      overflow:hidden;
+    }
+    .shopTop{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+    .shopTitle{font-weight:1000; font-size:16px}
+    .shopSub{color:var(--muted); font-weight:800; font-size:13px; margin-top:3px}
+    .shopBadge{
+      background:rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.14);
+      padding:7px 10px; border-radius:999px;
+      font-weight:1000; font-size:12px;
+      white-space:nowrap;
+    }
+    .shopGrid{
+      display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
+      margin-top:12px;
+    }
+    @media (max-width:600px){ .shopGrid{grid-template-columns:1fr} }
+    .item{
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.22);
+      border-radius:16px;
+      overflow:hidden;
+      display:grid; grid-template-columns:96px 1fr;
+      min-height:96px;
+    }
+    .itemImg{background:#0a0f1f}
+    .itemImg img{width:100%; height:100%; object-fit:cover; display:block}
+    .itemBody{padding:10px}
+    .itemName{font-weight:1000; font-size:13px; margin:0 0 4px}
+    .itemDesc{color:var(--muted); font-weight:800; font-size:12px; margin:0 0 8px; line-height:1.25}
+    .itemRow{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .price{
+      font-weight:1000; font-size:13px;
+      color:#0b1020;
+      background:linear-gradient(135deg, rgba(250,204,21,.95), rgba(249,115,22,.95));
+      padding:6px 9px; border-radius:999px;
+      white-space:nowrap;
+    }
+    .miniBtn{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      border-radius:999px;
+      padding:6px 9px;
+      font-weight:1000;
+      font-size:12px;
+      text-decoration:none;
+      display:inline-flex; align-items:center; gap:6px;
+      transition:transform .15s ease, border-color .15s ease, background .15s ease;
+      white-space:nowrap;
+    }
+    .miniBtn:hover{transform:translateY(-1px); border-color:rgba(250,204,21,.35); background:rgba(255,255,255,.10)}
+    .shopNote{
+      margin-top:12px;
+      color:var(--muted);
+      font-weight:800;
+      font-size:13px;
+      border-top:1px solid rgba(255,255,255,.10);
+      padding-top:10px;
+    }
   </style>
 </head>
 
@@ -156,6 +227,12 @@
             <div class="section">
               <h2>Histoire & présentation</h2>
               <p class="desc" id="desc">—</p>
+            </div>
+
+            <!-- ✅ BOUTIQUE ASTOU (injectée seulement pour astou-boutique) -->
+            <div class="section" id="astouShopSec" hidden>
+              <h2>🧵 Boutique Astou</h2>
+              <div id="astouShop"></div>
             </div>
 
             <div class="section" id="galSec" hidden>
@@ -243,7 +320,6 @@ function toArray(val){
     const j = JSON.parse(val);
     return Array.isArray(j) ? j.filter(Boolean) : [];
   }catch(e){
-    // peut être "a,b,c"
     return safe(val).split(",").map(s=>s.trim()).filter(Boolean);
   }
 }
@@ -258,25 +334,94 @@ function getGPS(p){
 }
 
 function hoursToRows(hoursVal){
-  // accepte: hours_json (objet), ou "Lun-Sam 8h-20h" (string)
   if(!hoursVal) return [];
   if(typeof hoursVal === 'object' && !Array.isArray(hoursVal)){
-    // { mon:"08:00-18:00", tue:"...", ... }
     const order = ["mon","tue","wed","thu","fri","sat","sun"];
     const fr = {mon:"Lundi",tue:"Mardi",wed:"Mercredi",thu:"Jeudi",fri:"Vendredi",sat:"Samedi",sun:"Dimanche"};
-    return order
-      .filter(k => hoursVal[k])
-      .map(k => ({ day: fr[k], val: String(hoursVal[k]) }));
+    return order.filter(k => hoursVal[k]).map(k => ({ day: fr[k], val: String(hoursVal[k]) }));
   }
-  // string fallback
   return [{ day:"Horaires", val: safe(hoursVal) }];
 }
 
 function computeOpenNow(hoursVal){
-  // version simple : si pas structuré -> "Voir horaires"
   if(!hoursVal) return "—";
-  if(typeof hoursVal === 'object') return "Voir horaires";
   return "Voir horaires";
+}
+
+/* ===========================
+   🧵 BOUTIQUE ASTOU (HTML)
+   =========================== */
+function renderAstouShop(p){
+  // si tu as déjà des champs prix/stock/produits dans Supabase, on pourra les brancher.
+  // Là: une jolie vitrine surprise (vite à changer ensuite).
+  const waPhone = normalizeWhatsApp(p.cta_primary_url || p.whatsapp_url || p.phone);
+  const waLink = waPhone ? ("https://wa.me/" + waPhone + "?text=" + encodeURIComponent("Salam Astou 🙏 je viens de DIGIYLYFE. Je veux commander : ")) : "";
+  const shopCover = pick(p, "cover_url") || "https://digiylyfe.com/wp-content/uploads/2025/06/ASTOU-BOUTIK.png";
+
+  const items = [
+    {
+      name:"Torchons & serviettes",
+      desc:"Couture propre • finitions nettes",
+      price:"Sur demande",
+      img: shopCover,
+      msg:"Torchons & serviettes"
+    },
+    {
+      name:"Draps & housses",
+      desc:"Sur mesure • qualité durable",
+      price:"Sur demande",
+      img: shopCover,
+      msg:"Draps & housses"
+    },
+    {
+      name:"Rideaux & voilages",
+      desc:"Maison & appart • style local",
+      price:"Sur demande",
+      img: shopCover,
+      msg:"Rideaux & voilages"
+    },
+    {
+      name:"Couture maison",
+      desc:"Personnalisation • réparations",
+      price:"Sur demande",
+      img: shopCover,
+      msg:"Couture maison"
+    }
+  ];
+
+  const itemHTML = items.map(it => `
+    <div class="item">
+      <div class="itemImg"><img src="${safe(it.img)}" alt="${safe(it.name)}" loading="lazy" decoding="async"></div>
+      <div class="itemBody">
+        <p class="itemName">🧵 ${safe(it.name)}</p>
+        <p class="itemDesc">${safe(it.desc)}</p>
+        <div class="itemRow">
+          <span class="price">💰 ${safe(it.price)}</span>
+          ${waLink ? `<a class="miniBtn" href="${waLink + encodeURIComponent(it.msg)}" target="_blank" rel="noopener">💬 Commander</a>` : `<span class="miniBtn" style="opacity:.6; cursor:not-allowed;">💬 WhatsApp</span>`}
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  return `
+    <div class="shop">
+      <div class="shopTop">
+        <div>
+          <div class="shopTitle">Bienvenue chez Astou ✨</div>
+          <div class="shopSub">Linge de maison & couture sur mesure • Saly</div>
+        </div>
+        <div class="shopBadge">🛍️ Promo locale</div>
+      </div>
+
+      <div class="shopGrid">
+        ${itemHTML}
+      </div>
+
+      <div class="shopNote">
+        💡 Astou répond vite sur WhatsApp. Dis-lui ce que tu veux + la taille (ex: 2m x 1,8m) et elle te fait le prix.
+      </div>
+    </div>
+  `;
 }
 
 /* main */
@@ -334,7 +479,7 @@ function computeOpenNow(hoursVal){
 
   $("name").textContent = name;
   $("catPill").textContent = "🏷️ " + cat;
-  $("locPill").textContent = "📍 " + [city, region].filter(Boolean).join(" • ") || "—";
+  $("locPill").textContent = "📍 " + ([city, region].filter(Boolean).join(" • ") || "—");
   $("ratePill").textContent = "⭐ " + rating;
 
   $("desc").textContent = desc;
@@ -360,6 +505,12 @@ function computeOpenNow(hoursVal){
   if(site && site.startsWith("http")){
     $("btnSite").href = site;
     $("btnSite").hidden = false;
+  }
+
+  // ✅ BOUTIQUE ASTOU : seulement pour astou-boutique
+  if(String(slug).toLowerCase() === "astou-boutique"){
+    $("astouShopSec").hidden = false;
+    $("astouShop").innerHTML = renderAstouShop(p);
   }
 
   // Gallery
@@ -403,12 +554,11 @@ function computeOpenNow(hoursVal){
 
   // GPS / itinerary
   const gps = getGPS(p);
+  $("mapSec").hidden = false;
   if(gps){
-    $("mapSec").hidden = false;
     $("gpsNote").textContent = "📍 GPS : " + gps.lat.toFixed(6) + ", " + gps.lng.toFixed(6);
     $("btnMaps").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(gps.lat + "," + gps.lng)}`;
   }else{
-    $("mapSec").hidden = false;
     $("gpsNote").textContent = "⚠️ Ce pro n’a pas encore de coordonnées GPS. (À compléter dans sa fiche.)";
     $("btnMaps").href = "https://www.google.com/maps";
   }
