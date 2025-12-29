@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DIGIY NDIMBAL MAP — Saly QG ∞ (Supabase)</title>
+<title>DIGIY NDIMBAL MAP — Saly QG ∞</title>
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -49,21 +49,21 @@
   .digiy-header {
     background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
     color: #111;
-    padding: 16px 24px;
+    padding: 12px 16px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,.15);
     position: relative;
     z-index: 1000;
   }
   .digiy-header h1 {
-    font-size: clamp(18px, 4vw, 28px);
+    font-size: clamp(16px, 4vw, 28px);
     font-weight: 900;
     letter-spacing: .5px;
     margin: 0;
     text-shadow: 0 1px 2px rgba(255,255,255,.3);
   }
   .digiy-header p {
-    font-size: clamp(12px, 2.5vw, 14px);
+    font-size: clamp(11px, 2.5vw, 14px);
     margin: 4px 0 0;
     opacity: .85;
     font-weight: 600;
@@ -74,7 +74,7 @@
   /* ============================================ */
   .search-panel {
     position: absolute;
-    top: 120px;
+    top: 90px;
     left: 20px;
     z-index: 999;
     background: rgba(255,255,255,.96);
@@ -85,6 +85,29 @@
     border: 1px solid var(--line);
     width: 320px;
     max-width: calc(100vw - 40px);
+    transition: all .3s ease;
+  }
+
+  /* Bouton toggle mobile */
+  .search-toggle {
+    display: none;
+    position: absolute;
+    top: 95px;
+    left: 20px;
+    z-index: 1000;
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    color: #111;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-weight: 900;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .search-toggle:active {
+    transform: scale(0.95);
   }
 
   .search-panel input {
@@ -121,7 +144,7 @@
   }
 
   .partner-list {
-    max-height: 300px;
+    max-height: 250px;
     overflow-y: auto;
     margin-top: 12px;
     border-top: 1px solid var(--line);
@@ -154,19 +177,12 @@
     font-size: 12px;
   }
 
-  .loading-msg {
-    text-align: center;
-    padding: 20px;
-    color: var(--muted);
-    font-weight: 600;
-  }
-
   /* ============================================ */
   /* 🗺️ CARTE */
   /* ============================================ */
   #map {
     position: absolute;
-    top: 110px;
+    top: 80px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -247,20 +263,77 @@
   }
 
   /* ============================================ */
-  /* 📱 MOBILE */
+  /* 📱 MOBILE - RESPONSIVE FIX */
   /* ============================================ */
-  @media (max-width: 640px) {
-    .search-panel {
-      top: 100px;
-      left: 10px;
-      width: calc(100vw - 20px);
-      padding: 12px;
-    }
-    #map {
-      top: 90px;
+  @media (max-width: 768px) {
+    .digiy-header {
+      padding: 10px 12px;
     }
     .digiy-header h1 {
-      font-size: 18px;
+      font-size: 16px;
+    }
+    .digiy-header p {
+      font-size: 11px;
+    }
+
+    /* IMPORTANT : Panneau caché par défaut sur mobile */
+    .search-panel {
+      top: 70px;
+      left: 10px;
+      right: 10px;
+      width: calc(100% - 20px);
+      max-width: none;
+      padding: 14px;
+      max-height: calc(100vh - 150px);
+      overflow-y: auto;
+      transform: translateY(-120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Panneau visible quand ouvert */
+    .search-panel.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Bouton toggle visible sur mobile */
+    .search-toggle {
+      display: block;
+      top: 75px;
+      left: 10px;
+    }
+
+    .partner-list {
+      max-height: 200px;
+    }
+
+    #map {
+      top: 70px;
+    }
+
+    /* Ajuster les popups sur mobile */
+    .leaflet-popup-content {
+      min-width: 240px;
+      padding: 14px;
+    }
+  }
+
+  /* Très petits écrans */
+  @media (max-width: 480px) {
+    .search-toggle {
+      font-size: 13px;
+      padding: 10px 14px;
+    }
+
+    .partner-list {
+      max-height: 150px;
+    }
+
+    .popup-btn {
+      font-size: 11px;
+      padding: 8px;
     }
   }
 </style>
@@ -273,8 +346,13 @@
   <p>📍 L'entraide digitale du Sénégal • Pierre par pierre</p>
 </header>
 
+<!-- BOUTON TOGGLE MOBILE -->
+<button class="search-toggle" id="searchToggle" onclick="toggleSearch()">
+  🔍 Rechercher
+</button>
+
 <!-- PANNEAU DE RECHERCHE -->
-<div class="search-panel">
+<div class="search-panel" id="searchPanel">
   <input type="search" id="searchInput" placeholder="🔍 Rechercher (chauffeur, villa, plombier...)" />
   
   <select id="categoryFilter">
@@ -286,9 +364,7 @@
     <option value="explore">🌴 Explore</option>
   </select>
 
-  <div class="partner-count" id="partnerCount">
-    <div class="loading-msg">⏳ Chargement des partenaires...</div>
-  </div>
+  <div class="partner-count" id="partnerCount">9 partenaires • QG Saly</div>
 
   <div class="partner-list" id="partnerList"></div>
 </div>
@@ -296,255 +372,177 @@
 <!-- CARTE -->
 <div id="map"></div>
 
-<!-- Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- Leaflet JS -->
+<!-- Leaflet JS - CHARGEMENT DANS L'ORDRE -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
 // ============================================
-// 🔐 SUPABASE — DÉJÀ POSÉ
+// 🔍 TOGGLE SEARCH PANEL (MOBILE)
 // ============================================
-const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
-
-let supabaseClient;
-if (typeof window.supabase !== 'undefined') {
-  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} else {
-  console.error('Supabase library not loaded');
+function toggleSearch() {
+  const panel = document.getElementById('searchPanel');
+  const button = document.getElementById('searchToggle');
+  
+  if (panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    button.textContent = '🔍 Rechercher';
+  } else {
+    panel.classList.add('open');
+    button.textContent = '✕ Fermer';
+  }
 }
 
 // ============================================
-// 🗺️ DIGIY NDIMBAL MAP — Saly QG
+// 🗺️ DONNÉES & INITIALISATION
 // ============================================
 
-// Coordonnées QG Saly (Astou Boutique) - Par défaut
+// Coordonnées QG Saly (Astou Boutique)
 const QG_SALY = {
   lat: 14.4574,
   lng: -16.9984,
   name: "QG DIGIYLYFE Saly"
 };
 
+// Base de données partenaires Saly
+const partners = [
+  {
+    id: "baptiste-saly",
+    name: "🏝️ Chez Baptiste — Saly",
+    category: "hebergement",
+    description: "Appartement meublé — 2 chambres, salon, cuisine",
+    price: "30 000 FCFA / nuit",
+    whatsapp: "https://wa.me/221771342889?text=Salam%20je%20veux%20réserver%20Chez%20Baptiste%20Saly%20🙏",
+    link: "https://digiylyfe.com/partenaires-chez-baptiste/",
+    icon: "🏝️",
+    keywords: "saly appartement meuble 2 chambres cuisine hebergement"
+  },
+  {
+    id: "lamine",
+    name: "🚗 Lamine — Chauffeur",
+    category: "driver",
+    description: "Transferts AIBD et circuits • Saly – Thiès – Dakar",
+    price: "Sur demande",
+    whatsapp: "https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE%20(j'aimerais%20réserver%20un%20trajet)",
+    link: "https://digiylyfe.com/partenaires-lamine/",
+    icon: "🚗",
+    keywords: "chauffeur taxi transport aibd dakar saly"
+  },
+  {
+    id: "michel",
+    name: "✂️ Michel — Styliste",
+    category: "market",
+    description: "Robes personnalisées • Saly – Thiès",
+    price: "Sur mesure",
+    whatsapp: "https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE%20je%20veux%20une%20création%20👗",
+    link: "https://digiylyfe.com/page-partenaire-michel/",
+    icon: "✂️",
+    keywords: "styliste couture robes personnalisees vetements saly"
+  },
+  {
+    id: "zal",
+    name: "⚡ Zal & Kourant — Électriciens",
+    category: "construction",
+    description: "Électricité maison & bâtiment • Saly",
+    price: "Devis rapide",
+    whatsapp: "https://wa.me/221772084781?text=Salam%20Zal%20je%20viens%20de%20DIGIYLYFE",
+    link: "https://digiylyfe.com/partenaires-zal-kourant/",
+    icon: "⚡",
+    keywords: "electricien electricite maison depannage saly"
+  },
+  {
+    id: "helage",
+    name: "💧 Helage — Plombier",
+    category: "construction",
+    description: "Plomberie multi-services • Saly – Petite Côte",
+    price: "Sur demande / devis",
+    whatsapp: "https://wa.me/221774513523?text=Salam%20Helage%2C%20je%20viens%20de%20DIGIYLYFE",
+    link: "tel:+221774513523",
+    icon: "💧",
+    keywords: "plombier plomberie depannage fuite robinet saly"
+  },
+  {
+    id: "astou",
+    name: "🧵 Astou — Linge de maison",
+    category: "market",
+    description: "Linge de maison & couture sur mesure • Saly",
+    price: "Promo locale",
+    whatsapp: "https://wa.me/221778765785?text=Salam%20Astou%20je%20viens%20de%20DIGIYLYFE",
+    link: "https://digiylyfe.com/partenaires-astou/",
+    icon: "🧵",
+    keywords: "linge maison couture serviette torchon drap saly"
+  },
+  {
+    id: "daouda",
+    name: "🌴 Daouda Explore",
+    category: "explore",
+    description: "Guide local — circuits authentiques • Saly",
+    price: "Circuits sur mesure",
+    whatsapp: "https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE%20circuit%20🌴",
+    link: "https://digiylyfe.com/partenaires-daouda/",
+    icon: "🌴",
+    keywords: "guide touristique circuit marche saly"
+  },
+  {
+    id: "tonton-elhadji",
+    name: "👜 Tonton Elhadji",
+    category: "market",
+    description: "Sélection sacs & montres — qualité • Saly",
+    price: "Stock limité",
+    whatsapp: "https://wa.me/221778329612?text=Salam%20Tonton%20DIGIYLYFE%20👜",
+    link: "https://digiylyfe.com/partenaire-tonton-elhadji/",
+    icon: "👜",
+    keywords: "sacs montres accessoires maroquinerie saly"
+  },
+  {
+    id: "mbaye",
+    name: "👷 Mbaye Diouf — Bâtisseur",
+    category: "construction",
+    description: "Villas modernes, piscines • Dakar – Thiès – Petite Côte",
+    price: "Visite chantier",
+    whatsapp: "https://wa.me/221776427113?text=Salam%20Mbaye%20je%20veux%20parler%20d%E2%80%99un%20projet%20🏗️%20(DIGIYLYFE)",
+    link: "https://digiylyfe.com/partenaires-mbaye/",
+    icon: "👷",
+    keywords: "batisseur villa piscine travaux construction saly"
+  }
+];
+
 // Variables globales
 let map;
 let markers;
 let allMarkers = [];
-let partners = [];
 
-// Attendre que Leaflet ET Supabase soient chargés
-window.addEventListener('load', function() {
-  if (typeof L === 'undefined' || typeof window.supabase === 'undefined') {
-    console.error('Leaflet ou Supabase non chargé, nouvelle tentative...');
-    setTimeout(initApp, 500);
+// ============================================
+// ⏳ INITIALISATION APRÈS CHARGEMENT
+// ============================================
+(function() {
+  // Attendre que tout soit chargé
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
   } else {
-    initApp();
+    initAll();
   }
-});
+})();
 
-async function initApp() {
+function initAll() {
   console.log('🦅 Initialisation DIGIY NDIMBAL MAP...');
   
-  // Charger les partenaires depuis Supabase
-  await loadPartnersFromSupabase();
-  
-  // Initialiser la carte
-  initMap();
-  
-  // Initialiser la recherche
-  initSearch();
-}
-
-// ============================================
-// 📥 CHARGEMENT SUPABASE
-// ============================================
-async function loadPartnersFromSupabase() {
-  try {
-    console.log('📥 Chargement des partenaires depuis Supabase...');
-    
-    // Récupérer les partenaires de la table 'partners'
-    const { data, error } = await supabaseClient
-      .from('partners')
-      .select('*')
-      .eq('location', 'Saly') // Filtrer par Saly
-      .order('name', { ascending: true });
-
-    if (error) {
-      console.error('❌ Erreur Supabase:', error);
-      // Fallback sur les données locales
-      useFallbackData();
-      return;
-    }
-
-    if (data && data.length > 0) {
-      console.log(`✅ ${data.length} partenaires chargés depuis Supabase`);
-      partners = data.map(p => ({
-        id: p.id || p.slug,
-        name: p.name,
-        category: p.category,
-        description: p.description || '',
-        price: p.price || 'Sur demande',
-        whatsapp: p.whatsapp_url,
-        link: p.website_url || p.whatsapp_url,
-        icon: p.icon || getCategoryIcon(p.category),
-        keywords: p.keywords || '',
-        lat: p.latitude || QG_SALY.lat,
-        lng: p.longitude || QG_SALY.lng
-      }));
-    } else {
-      console.log('⚠️ Aucun partenaire trouvé, utilisation des données locales');
-      useFallbackData();
-    }
-
-  } catch (err) {
-    console.error('❌ Erreur de connexion Supabase:', err);
-    useFallbackData();
+  // Vérifier que Leaflet est chargé
+  if (typeof L === 'undefined') {
+    console.error('❌ Leaflet non chargé, nouvelle tentative...');
+    setTimeout(initAll, 100);
+    return;
   }
-}
-
-// Données de fallback si Supabase échoue
-function useFallbackData() {
-  console.log('📦 Utilisation des données locales de fallback');
-  partners = [
-    {
-      id: "baptiste-saly",
-      name: "🏝️ Chez Baptiste — Saly",
-      category: "hebergement",
-      description: "Appartement meublé — 2 chambres, salon, cuisine",
-      price: "30 000 FCFA / nuit",
-      whatsapp: "https://wa.me/221771342889?text=Salam%20je%20veux%20réserver%20Chez%20Baptiste%20Saly%20🙏",
-      link: "https://digiylyfe.com/partenaires-chez-baptiste/",
-      icon: "🏝️",
-      keywords: "saly appartement meuble 2 chambres cuisine hebergement",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "lamine",
-      name: "🚗 Lamine — Chauffeur",
-      category: "driver",
-      description: "Transferts AIBD et circuits • Saly – Thiès – Dakar",
-      price: "Sur demande",
-      whatsapp: "https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE%20(j'aimerais%20réserver%20un%20trajet)",
-      link: "https://digiylyfe.com/partenaires-lamine/",
-      icon: "🚗",
-      keywords: "chauffeur taxi transport aibd dakar saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "michel",
-      name: "✂️ Michel — Styliste",
-      category: "market",
-      description: "Robes personnalisées • Saly – Thiès",
-      price: "Sur mesure",
-      whatsapp: "https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE%20je%20veux%20une%20création%20👗",
-      link: "https://digiylyfe.com/page-partenaire-michel/",
-      icon: "✂️",
-      keywords: "styliste couture robes personnalisees vetements saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "zal",
-      name: "⚡ Zal & Kourant — Électriciens",
-      category: "construction",
-      description: "Électricité maison & bâtiment • Saly",
-      price: "Devis rapide",
-      whatsapp: "https://wa.me/221772084781?text=Salam%20Zal%20je%20viens%20de%20DIGIYLYFE",
-      link: "https://digiylyfe.com/partenaires-zal-kourant/",
-      icon: "⚡",
-      keywords: "electricien electricite maison depannage saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "helage",
-      name: "💧 Helage — Plombier",
-      category: "construction",
-      description: "Plomberie multi-services • Saly – Petite Côte",
-      price: "Sur demande / devis",
-      whatsapp: "https://wa.me/221774513523?text=Salam%20Helage%2C%20je%20viens%20de%20DIGIYLYFE",
-      link: "tel:+221774513523",
-      icon: "💧",
-      keywords: "plombier plomberie depannage fuite robinet saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "astou",
-      name: "🧵 Astou — Linge de maison",
-      category: "market",
-      description: "Linge de maison & couture sur mesure • Saly",
-      price: "Promo locale",
-      whatsapp: "https://wa.me/221778765785?text=Salam%20Astou%20je%20viens%20de%20DIGIYLYFE",
-      link: "https://digiylyfe.com/partenaires-astou/",
-      icon: "🧵",
-      keywords: "linge maison couture serviette torchon drap saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "daouda",
-      name: "🌴 Daouda Explore",
-      category: "explore",
-      description: "Guide local — circuits authentiques • Saly",
-      price: "Circuits sur mesure",
-      whatsapp: "https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE%20circuit%20🌴",
-      link: "https://digiylyfe.com/partenaires-daouda/",
-      icon: "🌴",
-      keywords: "guide touristique circuit marche saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "tonton-elhadji",
-      name: "👜 Tonton Elhadji",
-      category: "market",
-      description: "Sélection sacs & montres — qualité • Saly",
-      price: "Stock limité",
-      whatsapp: "https://wa.me/221778329612?text=Salam%20Tonton%20DIGIYLYFE%20👜",
-      link: "https://digiylyfe.com/partenaire-tonton-elhadji/",
-      icon: "👜",
-      keywords: "sacs montres accessoires maroquinerie saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    },
-    {
-      id: "mbaye",
-      name: "👷 Mbaye Diouf — Bâtisseur",
-      category: "construction",
-      description: "Villas modernes, piscines • Dakar – Thiès – Petite Côte",
-      price: "Visite chantier",
-      whatsapp: "https://wa.me/221776427113?text=Salam%20Mbaye%20je%20veux%20parler%20d%E2%80%99un%20projet%20🏗️%20(DIGIYLYFE)",
-      link: "https://digiylyfe.com/partenaires-mbaye/",
-      icon: "👷",
-      keywords: "batisseur villa piscine travaux construction saly",
-      lat: QG_SALY.lat,
-      lng: QG_SALY.lng
-    }
-  ];
-}
-
-function getCategoryIcon(category) {
-  const icons = {
-    hebergement: '🏨',
-    driver: '🚗',
-    market: '🛒',
-    construction: '🏗️',
-    explore: '🌴'
-  };
-  return icons[category] || '📍';
+  
+  initMap();
+  initSearch();
+  initMobileHandlers();
 }
 
 // ============================================
 // 🗺️ INITIALISATION CARTE
 // ============================================
 function initMap() {
-  console.log('🗺️ Initialisation de la carte...');
-  
   // Initialisation carte
   map = L.map('map', {
     zoomControl: true,
@@ -564,10 +562,10 @@ function initMap() {
     zoomToBoundsOnClick: true
   });
 
-  // Ajouter tous les partenaires
+  // Ajouter tous les partenaires au QG
   allMarkers = [];
   partners.forEach(partner => {
-    const marker = L.marker([partner.lat, partner.lng], {
+    const marker = L.marker([QG_SALY.lat, QG_SALY.lng], {
       icon: createCustomIcon(partner.icon)
     }).bindPopup(createPopup(partner));
     
@@ -582,7 +580,7 @@ function initMap() {
   const qgMarker = L.marker([QG_SALY.lat, QG_SALY.lng], {
     icon: L.divIcon({
       className: 'custom-marker',
-      html: `<div class="digiy-marker" style="width:48px;height:48px;border-width:4px;"><span style="font-size:24px;">∞</span></div>`,
+      html: '<div class="digiy-marker" style="width:48px;height:48px;border-width:4px;"><span style="font-size:24px;">∞</span></div>',
       iconSize: [48, 48],
       iconAnchor: [24, 48],
       popupAnchor: [0, -48]
@@ -590,20 +588,20 @@ function initMap() {
   }).bindPopup(`
     <div class="popup-header">🏢 QG DIGIYLYFE Saly</div>
     <div class="popup-meta">📍 Centre de coordination</div>
-    <div class="popup-desc">${partners.length} partenaires locaux • 0% commission • Entraide digitale</div>
+    <div class="popup-desc">9 partenaires locaux • 0% commission • Entraide digitale</div>
     <div class="popup-cta">
       <a href="https://digiylyfe.com" target="_blank" class="popup-btn view">🌐 DIGIYLYFE</a>
     </div>
   `).addTo(map);
 
-  console.log(`✅ Carte initialisée avec ${partners.length} partenaires`);
+  console.log('✅ Carte initialisée avec ' + partners.length + ' partenaires');
 }
 
 // Fonction pour créer un marker personnalisé
 function createCustomIcon(icon) {
   return L.divIcon({
     className: 'custom-marker',
-    html: `<div class="digiy-marker"><span>${icon}</span></div>`,
+    html: '<div class="digiy-marker"><span>' + icon + '</span></div>',
     iconSize: [36, 36],
     iconAnchor: [18, 36],
     popupAnchor: [0, -36]
@@ -616,9 +614,9 @@ function createPopup(partner) {
     <div class="popup-header">${partner.name}</div>
     <div class="popup-meta">📍 ${partner.category.toUpperCase()}</div>
     <div class="popup-desc">${partner.description}</div>
-    ${partner.price ? `<div class="popup-meta">💰 ${partner.price}</div>` : ''}
+    ${partner.price ? '<div class="popup-meta">💰 ' + partner.price + '</div>' : ''}
     <div class="popup-cta">
-      ${partner.whatsapp ? `<a href="${partner.whatsapp}" target="_blank" class="popup-btn whatsapp">💬 WhatsApp</a>` : ''}
+      ${partner.whatsapp ? '<a href="' + partner.whatsapp + '" target="_blank" class="popup-btn whatsapp">💬 WhatsApp</a>' : ''}
       <a href="${partner.link}" target="_blank" class="popup-btn view">🔎 Voir</a>
     </div>
   `;
@@ -630,8 +628,6 @@ function createPopup(partner) {
 function initSearch() {
   const searchInput = document.getElementById('searchInput');
   const categoryFilter = document.getElementById('categoryFilter');
-  const partnerCount = document.getElementById('partnerCount');
-  const partnerList = document.getElementById('partnerList');
 
   function normalizeText(text) {
     return text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -642,7 +638,7 @@ function initSearch() {
     const category = categoryFilter.value;
     
     // Filtrer les partenaires
-    const filtered = partners.filter(p => {
+    const filtered = partners.filter(function(p) {
       const matchCategory = category === 'all' || p.category === category;
       const matchSearch = !searchTerm || 
         normalizeText(p.name + ' ' + p.description + ' ' + p.keywords).includes(searchTerm);
@@ -650,35 +646,28 @@ function initSearch() {
     });
 
     // Mettre à jour le compteur
-    partnerCount.innerHTML = `${filtered.length} partenaire${filtered.length > 1 ? 's' : ''} • QG Saly`;
+    const partnerCount = document.getElementById('partnerCount');
+    partnerCount.textContent = filtered.length + ' partenaire' + (filtered.length > 1 ? 's' : '') + ' • QG Saly';
 
     // Mettre à jour la liste
-    partnerList.innerHTML = filtered.map(p => `
-      <div class="partner-item" onclick="focusPartner('${p.id}')">
-        <strong>${p.name}</strong>
-        <span>${p.description}</span>
-      </div>
-    `).join('');
+    const partnerList = document.getElementById('partnerList');
+    partnerList.innerHTML = filtered.map(function(p) {
+      return '<div class="partner-item" onclick="focusPartner(\'' + p.id + '\')">' +
+        '<strong>' + p.name + '</strong>' +
+        '<span>' + p.description + '</span>' +
+        '</div>';
+    }).join('');
 
     // Mettre à jour les markers sur la carte
     if (markers) {
       markers.clearLayers();
-      allMarkers.forEach(marker => {
-        if (filtered.find(p => p.id === marker.partnerData.id)) {
+      allMarkers.forEach(function(marker) {
+        if (filtered.find(function(p) { return p.id === marker.partnerData.id; })) {
           markers.addLayer(marker);
         }
       });
     }
   }
-
-  // Focus sur un partenaire
-  window.focusPartner = function(partnerId) {
-    const marker = allMarkers.find(m => m.partnerData.id === partnerId);
-    if (marker) {
-      map.setView([marker.partnerData.lat, marker.partnerData.lng], 17);
-      marker.openPopup();
-    }
-  };
 
   // Event listeners
   searchInput.addEventListener('input', updateDisplay);
@@ -688,12 +677,41 @@ function initSearch() {
   updateDisplay();
 }
 
-// Fallback si window.load a déjà eu lieu
-if (document.readyState === 'complete') {
-  initApp();
+// Focus sur un partenaire
+window.focusPartner = function(partnerId) {
+  const marker = allMarkers.find(function(m) { return m.partnerData.id === partnerId; });
+  if (marker) {
+    map.setView([QG_SALY.lat, QG_SALY.lng], 17);
+    marker.openPopup();
+    
+    // Fermer le panneau sur mobile après sélection
+    if (window.innerWidth <= 768) {
+      const panel = document.getElementById('searchPanel');
+      const button = document.getElementById('searchToggle');
+      panel.classList.remove('open');
+      button.textContent = '🔍 Rechercher';
+    }
+  }
+};
+
+// ============================================
+// 📱 HANDLERS MOBILE
+// ============================================
+function initMobileHandlers() {
+  // Fermer le panneau si on clique sur la carte (mobile uniquement)
+  if (window.innerWidth <= 768) {
+    document.getElementById('map').addEventListener('click', function() {
+      const panel = document.getElementById('searchPanel');
+      const button = document.getElementById('searchToggle');
+      if (panel.classList.contains('open')) {
+        panel.classList.remove('open');
+        button.textContent = '🔍 Rechercher';
+      }
+    });
+  }
 }
 
-console.log('🦅 DIGIY NDIMBAL MAP Saly (Supabase) — Prêt ! Pierre par pierre ∞');
+console.log('🦅 DIGIY NDIMBAL MAP Saly — Prêt ! Pierre par pierre ∞');
 </script>
 
 </body>
