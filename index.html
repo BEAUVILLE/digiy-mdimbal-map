@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DIGIY NDIMBAL MAP — Saly Multi-QG ∞</title>
+<title>DIGIY NDIMBAL MAP — Saly Multi-QG × Modules ∞</title>
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -12,39 +12,38 @@
 
 <style>
   /* ============================================ */
-  /* 🎨 THÈME SABLE & OR — DIGIYLYFE Premium */
+  /* 🎨 THÈME DIGIY — Inspiré MARKET */
   /* ============================================ */
   :root{
-    --bg-1: #f7f3ea;
-    --bg-2: #efe7d6;
-    --ink: #1f2937;
-    --muted: #6b7280;
-    --card: #ffffff;
-    --line: rgba(31,41,55,.08);
-    --shadow: 0 10px 30px rgba(0,0,0,.06);
-
-    --gold-1: #d1b464;
-    --gold-2: #b89231;
-    --gold-3: #f3e6b3;
-
-    --accent-cta-1: #b38728;
-    --accent-cta-2: #f9d976;
-
-    --radius-xl: 28px;
-    --radius-lg: 18px;
+    --bg:#020617;
+    --card:#030712;
+    --accent:#facc15;
+    --accent2:#22c55e;
+    --ink:#f9fafb;
+    --muted:#cbd5e1;
+    --border:rgba(148,163,184,0.35);
 
     /* Couleurs QG */
     --qg-centre: #f97316;
     --qg-station: #0ea5e9;
     --qg-niakhal: #10b981;
+
+    /* Couleurs Modules DIGIY */
+    --module-driver: #0ea5e9;
+    --module-resto: #f97316;
+    --module-loc: #10b981;
+    --module-market: #ec4899;
+    --module-build: #eab308;
+    --module-explore: #8b5cf6;
+    --module-jobs: #6366f1;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     color: var(--ink);
-    background: linear-gradient(180deg, var(--bg-1), #fbfaf7 40%, #ffffff 100%);
+    background: var(--bg);
     overflow: hidden;
   }
 
@@ -52,43 +51,77 @@
   /* 📌 HEADER DIGIY */
   /* ============================================ */
   .digiy-header {
-    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    background: linear-gradient(135deg, #facc15, #f97316);
     color: #111;
-    padding: 12px 16px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 16px rgba(250,204,21,0.4);
     position: relative;
     z-index: 1000;
   }
-  .digiy-header h1 {
-    font-size: clamp(16px, 4vw, 28px);
-    font-weight: 900;
-    letter-spacing: .5px;
-    margin: 0;
-    text-shadow: 0 1px 2px rgba(255,255,255,.3);
+
+  .header-brand {
+    display: flex;
+    gap: 12px;
+    align-items: center;
   }
-  .digiy-header p {
-    font-size: clamp(11px, 2.5vw, 14px);
-    margin: 4px 0 0;
-    opacity: .85;
-    font-weight: 600;
+
+  .brand-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: radial-gradient(circle at 30% 0%, #facc15, #f97316);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 8px 20px rgba(250,204,21,0.5);
+  }
+
+  .brand-text h1 {
+    font-size: clamp(18px, 4vw, 24px);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .brand-text p {
+    font-size: clamp(11px, 2.5vw, 13px);
+    opacity: 0.85;
+    font-weight: 700;
+    margin: 2px 0 0;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .stat-badge {
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
   }
 
   /* ============================================ */
-  /* 🔍 BARRE DE RECHERCHE */
+  /* 🔍 PANNEAU RECHERCHE */
   /* ============================================ */
   .search-panel {
     position: absolute;
     top: 90px;
     left: 20px;
     z-index: 999;
-    background: rgba(255,255,255,.96);
-    backdrop-filter: blur(10px);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--line);
-    width: 320px;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 18px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+    border: 1px solid var(--border);
+    width: 360px;
     max-width: calc(100vw - 40px);
     transition: all .3s ease;
   }
@@ -99,14 +132,14 @@
     top: 95px;
     left: 20px;
     z-index: 1000;
-    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    background: linear-gradient(135deg, var(--accent), #f97316);
     color: #111;
     border: none;
-    padding: 12px 16px;
-    border-radius: 12px;
+    padding: 12px 18px;
+    border-radius: 14px;
     font-weight: 900;
     font-size: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    box-shadow: 0 6px 16px rgba(250,204,21,0.4);
     cursor: pointer;
     transition: all .2s;
   }
@@ -116,161 +149,239 @@
 
   .search-panel input {
     width: 100%;
-    padding: 12px 14px;
+    padding: 13px 16px;
     font-size: 14px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    margin-bottom: 12px;
+    background: rgba(15,23,42,0.8);
+    color: var(--ink);
+    margin-bottom: 14px;
     transition: all .2s ease;
+    font-weight: 600;
   }
   .search-panel input:focus {
     outline: none;
-    border-color: var(--gold-1);
-    box-shadow: 0 0 0 3px rgba(209,180,100,.25);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(250,204,21,0.2);
   }
 
   .search-panel select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 11px 14px;
     font-size: 13px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    background: white;
-    margin-bottom: 12px;
+    background: rgba(15,23,42,0.8);
+    color: var(--ink);
+    margin-bottom: 14px;
     cursor: pointer;
-  }
-
-  .qg-filters {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-  }
-
-  .qg-filter {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
     font-weight: 700;
+  }
+
+  .filter-section {
+    margin-bottom: 16px;
+  }
+
+  .filter-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .filter-btn {
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 800;
     cursor: pointer;
     transition: all .2s;
     border: 2px solid transparent;
+    text-align: center;
+    white-space: nowrap;
   }
 
-  .qg-filter.all {
-    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+  .filter-btn.all {
+    background: linear-gradient(135deg, var(--accent), #f97316);
     color: #111;
   }
-  .qg-filter.all.active {
-    border-color: #111;
+  .filter-btn.all.active {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(250,204,21,0.5);
   }
 
-  .qg-filter.centre {
+  /* QG Filters */
+  .filter-btn.qg-centre {
     background: var(--qg-centre);
     color: white;
   }
-  .qg-filter.centre.active {
-    border-color: #7c2d12;
+  .filter-btn.qg-centre.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(249,115,22,0.6);
   }
 
-  .qg-filter.station {
+  .filter-btn.qg-station {
     background: var(--qg-station);
     color: white;
   }
-  .qg-filter.station.active {
-    border-color: #075985;
+  .filter-btn.qg-station.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(14,165,233,0.6);
   }
 
-  .qg-filter.niakhal {
+  .filter-btn.qg-niakhal {
     background: var(--qg-niakhal);
     color: white;
   }
-  .qg-filter.niakhal.active {
-    border-color: #065f46;
+  .filter-btn.qg-niakhal.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.6);
   }
 
-  .qg-filter:hover {
+  /* Module Filters */
+  .filter-btn.module-driver {
+    background: var(--module-driver);
+    color: white;
+  }
+  .filter-btn.module-driver.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(14,165,233,0.6);
+  }
+
+  .filter-btn.module-resto {
+    background: var(--module-resto);
+    color: white;
+  }
+  .filter-btn.module-resto.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(249,115,22,0.6);
+  }
+
+  .filter-btn.module-loc {
+    background: var(--module-loc);
+    color: white;
+  }
+  .filter-btn.module-loc.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(16,185,129,0.6);
+  }
+
+  .filter-btn.module-market {
+    background: var(--module-market);
+    color: white;
+  }
+  .filter-btn.module-market.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(236,72,153,0.6);
+  }
+
+  .filter-btn.module-build {
+    background: var(--module-build);
+    color: white;
+  }
+  .filter-btn.module-build.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(234,179,8,0.6);
+  }
+
+  .filter-btn.module-explore {
+    background: var(--module-explore);
+    color: white;
+  }
+  .filter-btn.module-explore.active {
+    border-color: #fff;
+    box-shadow: 0 4px 12px rgba(139,92,246,0.6);
+  }
+
+  .filter-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,.2);
   }
 
   .partner-count {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--muted);
-    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 14px 0 10px;
+    text-align: center;
   }
 
-  .qg-stats {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .stat-item {
+    padding: 8px;
+    border-radius: 10px;
+    text-align: center;
     font-size: 11px;
-    font-weight: 700;
-  }
-
-  .qg-stat {
-    padding: 4px 8px;
-    border-radius: 8px;
+    font-weight: 800;
     color: white;
   }
-  .qg-stat.centre { background: var(--qg-centre); }
-  .qg-stat.station { background: var(--qg-station); }
-  .qg-stat.niakhal { background: var(--qg-niakhal); }
 
   .partner-list {
-    max-height: 250px;
+    max-height: 280px;
     overflow-y: auto;
-    margin-top: 12px;
-    border-top: 1px solid var(--line);
-    padding-top: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
   }
 
   .partner-item {
-    padding: 8px 10px;
-    margin: 4px 0;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-left: 4px solid var(--gold-1);
-    border-radius: 10px;
+    padding: 12px;
+    margin: 6px 0;
+    background: rgba(15,23,42,0.6);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
     cursor: pointer;
     transition: all .2s ease;
-    font-size: 13px;
-  }
-
-  .partner-item.qg-centre {
-    border-left-color: var(--qg-centre);
-  }
-  .partner-item.qg-station {
-    border-left-color: var(--qg-station);
-  }
-  .partner-item.qg-niakhal {
-    border-left-color: var(--qg-niakhal);
   }
 
   .partner-item:hover {
-    background: linear-gradient(135deg, var(--gold-3), #fde68a);
-    border-color: var(--gold-1);
+    background: rgba(15,23,42,0.9);
+    border-left-width: 6px;
     transform: translateX(4px);
   }
+
   .partner-item strong {
     display: block;
-    font-size: 14px;
-    margin-bottom: 2px;
+    font-size: 15px;
+    margin-bottom: 4px;
     color: var(--ink);
   }
-  .partner-item span {
-    color: var(--muted);
+
+  .partner-item .desc {
     font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
   }
-  .partner-item .qg-badge {
+
+  .partner-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+
+  .badge {
     display: inline-block;
     font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-top: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 800;
     color: white;
-    font-weight: 700;
   }
 
   /* ============================================ */
@@ -287,72 +398,73 @@
 
   /* Marker personnalisé */
   .digiy-marker {
-    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    background: linear-gradient(135deg, var(--accent), #f97316);
     border: 3px solid white;
     border-radius: 50% 50% 50% 0;
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     transform: rotate(-45deg);
-    box-shadow: 0 4px 12px rgba(0,0,0,.3);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 19px;
   }
   .digiy-marker span {
     transform: rotate(45deg);
   }
 
-  /* Markers QG colorés */
-  .digiy-marker.qg-centre {
-    background: var(--qg-centre);
-  }
-  .digiy-marker.qg-station {
-    background: var(--qg-station);
-  }
-  .digiy-marker.qg-niakhal {
-    background: var(--qg-niakhal);
-  }
+  /* Markers colorés par module */
+  .digiy-marker.module-driver { background: var(--module-driver); }
+  .digiy-marker.module-resto { background: var(--module-resto); }
+  .digiy-marker.module-loc { background: var(--module-loc); }
+  .digiy-marker.module-market { background: var(--module-market); }
+  .digiy-marker.module-build { background: var(--module-build); }
+  .digiy-marker.module-explore { background: var(--module-explore); }
 
   /* Popup personnalisée */
   .leaflet-popup-content-wrapper {
-    border-radius: var(--radius-lg);
+    border-radius: 18px;
     padding: 0;
     overflow: hidden;
-    box-shadow: 0 12px 32px rgba(0,0,0,.2);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.3);
+    background: var(--card);
   }
   .leaflet-popup-content {
     margin: 0;
-    padding: 16px;
-    min-width: 280px;
+    padding: 18px;
+    min-width: 300px;
   }
   .popup-header {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 900;
-    margin-bottom: 8px;
-    color: var(--ink);
+    margin-bottom: 10px;
+    color: var(--accent);
   }
-  .popup-meta {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 6px;
+  .popup-badges {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
   }
-  .popup-qg-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 6px;
+  .popup-badge {
+    padding: 5px 10px;
+    border-radius: 8px;
     font-size: 11px;
     font-weight: 800;
     color: white;
-    margin-bottom: 8px;
   }
-  .popup-qg-badge.centre { background: var(--qg-centre); }
-  .popup-qg-badge.station { background: var(--qg-station); }
-  .popup-qg-badge.niakhal { background: var(--qg-niakhal); }
   .popup-desc {
-    font-size: 13px;
+    font-size: 14px;
     margin-bottom: 12px;
-    color: #4b5563;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .popup-price {
+    font-size: 13px;
+    color: var(--accent2);
+    font-weight: 800;
+    margin-bottom: 14px;
   }
   .popup-cta {
     display: flex;
@@ -360,25 +472,26 @@
   }
   .popup-btn {
     flex: 1;
-    padding: 10px;
+    padding: 11px;
     text-align: center;
     text-decoration: none;
-    font-weight: 800;
-    font-size: 12px;
-    border-radius: 10px;
+    font-weight: 900;
+    font-size: 13px;
+    border-radius: 12px;
     transition: all .2s ease;
   }
   .popup-btn.whatsapp {
-    background: linear-gradient(135deg, #35d07f, #0d9f54);
-    color: white;
+    background: rgba(34,197,94,0.2);
+    border: 1px solid var(--accent2);
+    color: #bbf7d0;
   }
   .popup-btn.view {
-    background: linear-gradient(135deg, var(--accent-cta-2), var(--accent-cta-1));
+    background: linear-gradient(135deg, var(--accent), #f97316);
     color: #111;
+    box-shadow: 0 6px 16px rgba(250,204,21,0.4);
   }
   .popup-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,.2);
   }
 
   /* ============================================ */
@@ -386,13 +499,11 @@
   /* ============================================ */
   @media (max-width: 768px) {
     .digiy-header {
-      padding: 10px 12px;
+      padding: 12px 14px;
     }
-    .digiy-header h1 {
-      font-size: 16px;
-    }
-    .digiy-header p {
-      font-size: 11px;
+
+    .header-stats {
+      display: none;
     }
 
     .search-panel {
@@ -401,8 +512,8 @@
       right: 10px;
       width: calc(100% - 20px);
       max-width: none;
-      padding: 14px;
-      max-height: calc(100vh - 150px);
+      padding: 16px;
+      max-height: calc(100vh - 140px);
       overflow-y: auto;
       transform: translateY(-120%);
       opacity: 0;
@@ -421,6 +532,16 @@
       left: 10px;
     }
 
+    .filter-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .filter-btn {
+      font-size: 11px;
+      padding: 8px 10px;
+    }
+
     .partner-list {
       max-height: 200px;
     }
@@ -430,34 +551,44 @@
     }
 
     .leaflet-popup-content {
-      min-width: 240px;
-      padding: 14px;
+      min-width: 260px;
+      padding: 16px;
     }
 
-    .qg-filters {
-      gap: 4px;
-    }
-
-    .qg-filter {
-      font-size: 11px;
-      padding: 5px 10px;
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media (max-width: 480px) {
-    .search-toggle {
-      font-size: 13px;
-      padding: 10px 14px;
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      font-size: 22px;
     }
 
-    .partner-list {
-      max-height: 150px;
+    .filter-btn {
+      font-size: 10px;
+      padding: 7px 8px;
     }
 
     .popup-btn {
-      font-size: 11px;
-      padding: 8px;
+      font-size: 12px;
+      padding: 9px;
     }
+  }
+
+  /* Scrollbar custom */
+  .partner-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .partner-list::-webkit-scrollbar-track {
+    background: rgba(15,23,42,0.5);
+    border-radius: 10px;
+  }
+  .partner-list::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border-radius: 10px;
   }
 </style>
 </head>
@@ -465,8 +596,18 @@
 
 <!-- HEADER -->
 <header class="digiy-header">
-  <h1>🗺️ DIGIY NDIMBAL MAP — Saly Multi-QG ∞</h1>
-  <p>📍 L'entraide digitale du Sénégal • Pierre par pierre</p>
+  <div class="header-brand">
+    <div class="brand-logo">🗺️</div>
+    <div class="brand-text">
+      <h1>DIGIY NDIMBAL MAP</h1>
+      <p>Saly Multi-QG × Modules • 0% Commission ∞</p>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-badge">9 Partenaires</div>
+    <div class="stat-badge">3 QG</div>
+    <div class="stat-badge">6 Modules</div>
+  </div>
 </header>
 
 <!-- BOUTON TOGGLE MOBILE -->
@@ -476,7 +617,7 @@
 
 <!-- PANNEAU DE RECHERCHE -->
 <div class="search-panel" id="searchPanel">
-  <input type="search" id="searchInput" placeholder="🔍 Rechercher (chauffeur, villa, plombier...)" />
+  <input type="search" id="searchInput" placeholder="🔍 Rechercher (nom, service, quartier...)" />
   
   <select id="categoryFilter">
     <option value="all">🌟 Toutes catégories</option>
@@ -488,25 +629,53 @@
   </select>
 
   <!-- FILTRES QG -->
-  <div class="qg-filters">
-    <div class="qg-filter all active" data-qg="all" onclick="filterByQG('all')">
-      ∞ Tous QG
-    </div>
-    <div class="qg-filter centre" data-qg="centre" onclick="filterByQG('centre')">
-      🏪 Centre
-    </div>
-    <div class="qg-filter station" data-qg="station" onclick="filterByQG('station')">
-      🏖️ Station
-    </div>
-    <div class="qg-filter niakhal" data-qg="niakhal" onclick="filterByQG('niakhal')">
-      🏡 Niakhal
+  <div class="filter-section">
+    <span class="filter-label">📍 Par Quartier (QG)</span>
+    <div class="filter-grid">
+      <div class="filter-btn all active" data-type="qg" data-value="all" onclick="filterBy('qg', 'all')">
+        ∞ Tous
+      </div>
+      <div class="filter-btn qg-centre" data-type="qg" data-value="centre" onclick="filterBy('qg', 'centre')">
+        🏪 Centre
+      </div>
+      <div class="filter-btn qg-station" data-type="qg" data-value="station" onclick="filterBy('qg', 'station')">
+        🏖️ Station
+      </div>
+      <div class="filter-btn qg-niakhal" data-type="qg" data-value="niakhal" onclick="filterBy('qg', 'niakhal')">
+        🏡 Niakhal
+      </div>
     </div>
   </div>
 
-  <div class="partner-count" id="partnerCount">9 partenaires • 3 QG Saly</div>
+  <!-- FILTRES MODULE -->
+  <div class="filter-section">
+    <span class="filter-label">🎯 Par Module DIGIY</span>
+    <div class="filter-grid">
+      <div class="filter-btn all active" data-type="module" data-value="all" onclick="filterBy('module', 'all')">
+        ∞ Tous
+      </div>
+      <div class="filter-btn module-driver" data-type="module" data-value="DIGIY_DRIVER" onclick="filterBy('module', 'DIGIY_DRIVER')">
+        🚗 DRIVER
+      </div>
+      <div class="filter-btn module-loc" data-type="module" data-value="DIGIY_LOC" onclick="filterBy('module', 'DIGIY_LOC')">
+        🏠 LOC
+      </div>
+      <div class="filter-btn module-market" data-type="module" data-value="DIGIY_MARKET" onclick="filterBy('module', 'DIGIY_MARKET')">
+        🛒 MARKET
+      </div>
+      <div class="filter-btn module-build" data-type="module" data-value="DIGIY_BUILD" onclick="filterBy('module', 'DIGIY_BUILD')">
+        🏗️ BUILD
+      </div>
+      <div class="filter-btn module-explore" data-type="module" data-value="DIGIY_EXPLORE" onclick="filterBy('module', 'DIGIY_EXPLORE')">
+        🌴 EXPLORE
+      </div>
+    </div>
+  </div>
 
-  <!-- STATS QG -->
-  <div class="qg-stats" id="qgStats"></div>
+  <div class="partner-count" id="partnerCount">9 partenaires • 3 QG • 6 modules</div>
+
+  <!-- STATS EN TEMPS RÉEL -->
+  <div class="stats-grid" id="statsGrid"></div>
 
   <div class="partner-list" id="partnerList"></div>
 </div>
@@ -520,7 +689,7 @@
 
 <script>
 // ============================================
-// 🔍 TOGGLE SEARCH PANEL (MOBILE)
+// 🔍 TOGGLE SEARCH PANEL
 // ============================================
 function toggleSearch() {
   const panel = document.getElementById('searchPanel');
@@ -536,7 +705,7 @@ function toggleSearch() {
 }
 
 // ============================================
-// 🗺️ DÉFINITION DES QG SALY
+// 🗺️ DÉFINITION DES QG
 // ============================================
 const QG_SALY = {
   centre: {
@@ -572,20 +741,34 @@ const QG_SALY = {
 };
 
 // ============================================
-// 📊 BASE DE DONNÉES PARTENAIRES AVEC QG
+// 📊 MODULES DIGIY
+// ============================================
+const DIGIY_MODULES = {
+  DIGIY_DRIVER: { name: 'DIGIY DRIVER', emoji: '🚗', color: '#0ea5e9' },
+  DIGIY_RESTO: { name: 'DIGIY RESTO', emoji: '🍽️', color: '#f97316' },
+  DIGIY_LOC: { name: 'DIGIY LOC', emoji: '🏠', color: '#10b981' },
+  DIGIY_MARKET: { name: 'DIGIY MARKET', emoji: '🛒', color: '#ec4899' },
+  DIGIY_BUILD: { name: 'DIGIY BUILD', emoji: '🏗️', color: '#eab308' },
+  DIGIY_EXPLORE: { name: 'DIGIY EXPLORE', emoji: '🌴', color: '#8b5cf6' },
+  DIGIY_JOBS: { name: 'DIGIY JOBS', emoji: '💼', color: '#6366f1' }
+};
+
+// ============================================
+// 📊 PARTENAIRES AVEC QG + MODULE
 // ============================================
 const partners = [
-  // QG CENTRE (Astou - Market/Textile)
+  // QG CENTRE
   {
     id: "astou",
     name: "🧵 Astou — Linge de maison",
     category: "market",
-    description: "Linge de maison & couture sur mesure • Saly",
+    module: "DIGIY_MARKET",
+    description: "Linge de maison & couture sur mesure",
     price: "Promo locale",
-    whatsapp: "https://wa.me/221778765785?text=Salam%20Astou%20je%20viens%20de%20DIGIYLYFE",
+    whatsapp: "https://wa.me/221778765785?text=Salam%20Astou%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaires-astou/",
     icon: "🧵",
-    keywords: "linge maison couture serviette torchon drap saly",
+    keywords: "linge maison couture serviette drap saly",
     qg: 'centre',
     isHub: true
   },
@@ -593,38 +776,41 @@ const partners = [
     id: "tonton-elhadji",
     name: "👜 Tonton Elhadji",
     category: "market",
-    description: "Sélection sacs & montres — qualité • Saly",
+    module: "DIGIY_MARKET",
+    description: "Sacs & montres — qualité premium",
     price: "Stock limité",
-    whatsapp: "https://wa.me/221778329612?text=Salam%20Tonton%20DIGIYLYFE%20👜",
+    whatsapp: "https://wa.me/221778329612?text=Salam%20Tonton%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaire-tonton-elhadji/",
     icon: "👜",
-    keywords: "sacs montres accessoires maroquinerie saly",
+    keywords: "sacs montres accessoires saly",
     qg: 'centre'
   },
   {
     id: "michel",
     name: "✂️ Michel — Styliste",
     category: "market",
+    module: "DIGIY_MARKET",
     description: "Robes personnalisées • Saly – Thiès",
     price: "Sur mesure",
-    whatsapp: "https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE%20je%20veux%20une%20création%20👗",
+    whatsapp: "https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE",
     link: "https://digiylyfe.com/page-partenaire-michel/",
     icon: "✂️",
-    keywords: "styliste couture robes personnalisees vetements saly",
+    keywords: "styliste couture robes saly",
     qg: 'centre'
   },
 
-  // QG STATION (Baptiste - Hébergement/Tourisme)
+  // QG STATION
   {
     id: "baptiste-saly",
     name: "🏝️ Chez Baptiste — Saly",
     category: "hebergement",
-    description: "Appartement meublé — 2 chambres, salon, cuisine",
+    module: "DIGIY_LOC",
+    description: "Appartement meublé 2 chambres",
     price: "30 000 FCFA / nuit",
-    whatsapp: "https://wa.me/221771342889?text=Salam%20je%20veux%20réserver%20Chez%20Baptiste%20Saly%20🙏",
+    whatsapp: "https://wa.me/221771342889?text=Salam%20Baptiste%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaires-chez-baptiste/",
     icon: "🏝️",
-    keywords: "saly appartement meuble 2 chambres cuisine hebergement",
+    keywords: "appartement hebergement saly",
     qg: 'station',
     isHub: true
   },
@@ -632,26 +818,28 @@ const partners = [
     id: "daouda",
     name: "🌴 Daouda Explore",
     category: "explore",
-    description: "Guide local — circuits authentiques • Saly",
+    module: "DIGIY_EXPLORE",
+    description: "Guide local circuits authentiques",
     price: "Circuits sur mesure",
-    whatsapp: "https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE%20circuit%20🌴",
+    whatsapp: "https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaires-daouda/",
     icon: "🌴",
-    keywords: "guide touristique circuit marche saly",
+    keywords: "guide touristique circuit saly",
     qg: 'station'
   },
 
-  // QG NIAKH NIAKHAL (Lamine - Services/Construction)
+  // QG NIAKH NIAKHAL
   {
     id: "lamine",
     name: "🚗 Lamine — Chauffeur",
     category: "driver",
-    description: "Transferts AIBD et circuits • Saly – Thiès – Dakar",
+    module: "DIGIY_DRIVER",
+    description: "Transferts AIBD et circuits",
     price: "Sur demande",
-    whatsapp: "https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE%20(j'aimerais%20réserver%20un%20trajet)",
+    whatsapp: "https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaires-lamine/",
     icon: "🚗",
-    keywords: "chauffeur taxi transport aibd dakar saly",
+    keywords: "chauffeur taxi transport saly",
     qg: 'niakhal',
     isHub: true
   },
@@ -659,36 +847,39 @@ const partners = [
     id: "zal",
     name: "⚡ Zal & Kourant — Électriciens",
     category: "construction",
-    description: "Électricité maison & bâtiment • Saly",
+    module: "DIGIY_BUILD",
+    description: "Électricité maison & bâtiment",
     price: "Devis rapide",
-    whatsapp: "https://wa.me/221772084781?text=Salam%20Zal%20je%20viens%20de%20DIGIYLYFE",
+    whatsapp: "https://wa.me/221772084781?text=Salam%20Zal%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaires-zal-kourant/",
     icon: "⚡",
-    keywords: "electricien electricite maison depannage saly",
+    keywords: "electricien electricite saly",
     qg: 'niakhal'
   },
   {
     id: "helage",
     name: "💧 Helage — Plombier",
     category: "construction",
-    description: "Plomberie multi-services • Saly – Petite Côte",
-    price: "Sur demande / devis",
-    whatsapp: "https://wa.me/221774513523?text=Salam%20Helage%2C%20je%20viens%20de%20DIGIYLYFE",
+    module: "DIGIY_BUILD",
+    description: "Plomberie multi-services",
+    price: "Sur demande",
+    whatsapp: "https://wa.me/221774513523?text=Salam%20Helage%20DIGIYLYFE",
     link: "tel:+221774513523",
     icon: "💧",
-    keywords: "plombier plomberie depannage fuite robinet saly",
+    keywords: "plombier plomberie saly",
     qg: 'niakhal'
   },
   {
     id: "mbaye",
     name: "👷 Mbaye Diouf — Bâtisseur",
     category: "construction",
-    description: "Villas modernes, piscines • Dakar – Thiès – Petite Côte",
+    module: "DIGIY_BUILD",
+    description: "Villas modernes, piscines",
     price: "Visite chantier",
-    whatsapp: "https://wa.me/221776427113?text=Salam%20Mbaye%20je%20veux%20parler%20d%E2%80%99un%20projet%20🏗️%20(DIGIYLYFE)",
+    whatsapp: "https://wa.me/221776427113?text=Salam%20Mbaye%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaires-mbaye/",
     icon: "👷",
-    keywords: "batisseur villa piscine travaux construction saly",
+    keywords: "batisseur villa construction saly",
     qg: 'niakhal'
   }
 ];
@@ -698,9 +889,10 @@ let map;
 let markers;
 let allMarkers = [];
 let currentQGFilter = 'all';
+let currentModuleFilter = 'all';
 
 // ============================================
-// ⏳ INITIALISATION APRÈS CHARGEMENT
+// ⏳ INITIALISATION
 // ============================================
 (function() {
   if (document.readyState === 'loading') {
@@ -711,10 +903,9 @@ let currentQGFilter = 'all';
 })();
 
 function initAll() {
-  console.log('🦅 Initialisation DIGIY NDIMBAL MAP Multi-QG...');
+  console.log('🦅 DIGIY NDIMBAL MAP Multi-QG × Modules...');
   
   if (typeof L === 'undefined') {
-    console.error('❌ Leaflet non chargé, nouvelle tentative...');
     setTimeout(initAll, 100);
     return;
   }
@@ -722,14 +913,13 @@ function initAll() {
   initMap();
   initSearch();
   initMobileHandlers();
-  updateQGStats();
+  updateStats();
 }
 
 // ============================================
 // 🗺️ INITIALISATION CARTE
 // ============================================
 function initMap() {
-  // Centre de la carte (entre les 3 QG)
   const centerLat = (QG_SALY.centre.lat + QG_SALY.station.lat + QG_SALY.niakhal.lat) / 3;
   const centerLng = (QG_SALY.centre.lng + QG_SALY.station.lng + QG_SALY.niakhal.lng) / 3;
 
@@ -749,12 +939,13 @@ function initMap() {
     zoomToBoundsOnClick: true
   });
 
-  // Ajouter les partenaires par QG
   allMarkers = [];
   partners.forEach(function(partner) {
     const qgData = QG_SALY[partner.qg];
+    const moduleData = DIGIY_MODULES[partner.module];
+    
     const marker = L.marker([qgData.lat, qgData.lng], {
-      icon: createCustomIcon(partner.icon, partner.qg)
+      icon: createCustomIcon(partner.icon, partner.module)
     }).bindPopup(createPopup(partner));
     
     marker.partnerData = partner;
@@ -764,7 +955,7 @@ function initMap() {
 
   map.addLayer(markers);
 
-  // Ajouter les markers QG
+  // Markers QG
   Object.keys(QG_SALY).forEach(function(qgKey) {
     const qg = QG_SALY[qgKey];
     const qgPartners = partners.filter(function(p) { return p.qg === qgKey; });
@@ -772,7 +963,7 @@ function initMap() {
     const qgMarker = L.marker([qg.lat, qg.lng], {
       icon: L.divIcon({
         className: 'custom-marker',
-        html: '<div class="digiy-marker qg-' + qgKey + '" style="width:52px;height:52px;border-width:4px;"><span style="font-size:28px;">∞</span></div>',
+        html: '<div class="digiy-marker" style="width:52px;height:52px;border-width:4px;background:' + qg.color + ';"><span style="font-size:28px;">∞</span></div>',
         iconSize: [52, 52],
         iconAnchor: [26, 52],
         popupAnchor: [0, -52]
@@ -780,29 +971,34 @@ function initMap() {
     }).bindPopup(createQGPopup(qg, qgPartners)).addTo(map);
   });
 
-  console.log('✅ Carte initialisée : ' + partners.length + ' partenaires, 3 QG');
+  console.log('✅ Carte : ' + partners.length + ' partenaires, 3 QG');
 }
 
-function createCustomIcon(icon, qg) {
+function createCustomIcon(icon, module) {
+  const moduleClass = module.toLowerCase().replace('digiy_', 'module-');
   return L.divIcon({
     className: 'custom-marker',
-    html: '<div class="digiy-marker qg-' + qg + '"><span>' + icon + '</span></div>',
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -36]
+    html: '<div class="digiy-marker ' + moduleClass + '"><span>' + icon + '</span></div>',
+    iconSize: [38, 38],
+    iconAnchor: [19, 38],
+    popupAnchor: [0, -38]
   });
 }
 
 function createPopup(partner) {
   const qgData = QG_SALY[partner.qg];
-  const hubBadge = partner.isHub ? '<span style="background:#facc15;color:#111;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;margin-left:6px;">HUB</span>' : '';
+  const moduleData = DIGIY_MODULES[partner.module];
+  const hubBadge = partner.isHub ? '<span class="popup-badge" style="background:#facc15;color:#111;">HUB</span>' : '';
   
   return `
-    <div class="popup-header">${partner.name} ${hubBadge}</div>
-    <div class="popup-qg-badge ${partner.qg}">${qgData.emoji} ${qgData.name}</div>
-    <div class="popup-meta">📍 ${partner.category.toUpperCase()}</div>
+    <div class="popup-header">${partner.name}</div>
+    <div class="popup-badges">
+      <span class="popup-badge" style="background:${qgData.color}">${qgData.emoji} ${qgData.name}</span>
+      <span class="popup-badge" style="background:${moduleData.color}">${moduleData.emoji} ${moduleData.name}</span>
+      ${hubBadge}
+    </div>
     <div class="popup-desc">${partner.description}</div>
-    ${partner.price ? '<div class="popup-meta">💰 ' + partner.price + '</div>' : ''}
+    ${partner.price ? '<div class="popup-price">💰 ' + partner.price + '</div>' : ''}
     <div class="popup-cta">
       ${partner.whatsapp ? '<a href="' + partner.whatsapp + '" target="_blank" class="popup-btn whatsapp">💬 WhatsApp</a>' : ''}
       <a href="${partner.link}" target="_blank" class="popup-btn view">🔎 Voir</a>
@@ -815,13 +1011,10 @@ function createQGPopup(qg, qgPartners) {
   
   return `
     <div class="popup-header">${qg.emoji} ${qg.name}</div>
-    <div class="popup-meta">📍 ${qg.description}</div>
-    ${hub ? '<div class="popup-desc"><strong>Hub:</strong> ' + hub.name + '</div>' : ''}
-    <div class="popup-meta">👥 ${qgPartners.length} partenaire${qgPartners.length > 1 ? 's' : ''}</div>
-    <div style="margin-top:12px;font-size:12px;color:#6b7280;">
-      ${qgPartners.map(function(p) { return p.icon + ' ' + p.name.split('—')[0]; }).join('<br>')}
-    </div>
-    <div class="popup-cta" style="margin-top:12px;">
+    <div class="popup-desc">${qg.description}</div>
+    ${hub ? '<div class="popup-price"><strong>Hub:</strong> ' + hub.name + '</div>' : ''}
+    <div class="popup-desc">👥 ${qgPartners.length} partenaire${qgPartners.length > 1 ? 's' : ''}</div>
+    <div class="popup-cta">
       <a href="https://digiylyfe.com" target="_blank" class="popup-btn view">🌐 DIGIYLYFE</a>
     </div>
   `;
@@ -844,22 +1037,27 @@ function initSearch() {
     
     const filtered = partners.filter(function(p) {
       const matchQG = currentQGFilter === 'all' || p.qg === currentQGFilter;
+      const matchModule = currentModuleFilter === 'all' || p.module === currentModuleFilter;
       const matchCategory = category === 'all' || p.category === category;
       const matchSearch = !searchTerm || 
         normalizeText(p.name + ' ' + p.description + ' ' + p.keywords).includes(searchTerm);
-      return matchQG && matchCategory && matchSearch;
+      return matchQG && matchModule && matchCategory && matchSearch;
     });
 
     const partnerCount = document.getElementById('partnerCount');
-    partnerCount.textContent = filtered.length + ' partenaire' + (filtered.length > 1 ? 's' : '') + ' • 3 QG Saly';
+    partnerCount.textContent = filtered.length + ' partenaire' + (filtered.length > 1 ? 's' : '');
 
     const partnerList = document.getElementById('partnerList');
     partnerList.innerHTML = filtered.map(function(p) {
       const qgData = QG_SALY[p.qg];
-      return '<div class="partner-item qg-' + p.qg + '" onclick="focusPartner(\'' + p.id + '\')">' +
+      const moduleData = DIGIY_MODULES[p.module];
+      return '<div class="partner-item" onclick="focusPartner(\'' + p.id + '\')">' +
         '<strong>' + p.name + '</strong>' +
-        '<span>' + p.description + '</span>' +
-        '<div class="qg-badge" style="background:' + qgData.color + '">' + qgData.emoji + ' ' + qgData.name + '</div>' +
+        '<div class="desc">' + p.description + '</div>' +
+        '<div class="partner-badges">' +
+        '<span class="badge" style="background:' + qgData.color + '">' + qgData.emoji + ' ' + qgData.name + '</span>' +
+        '<span class="badge" style="background:' + moduleData.color + '">' + moduleData.emoji + ' ' + moduleData.name + '</span>' +
+        '</div>' +
         '</div>';
     }).join('');
 
@@ -871,6 +1069,8 @@ function initSearch() {
         }
       });
     }
+
+    updateStats();
   }
 
   searchInput.addEventListener('input', updateDisplay);
@@ -879,25 +1079,30 @@ function initSearch() {
   updateDisplay();
 }
 
-// Filtre par QG
-window.filterByQG = function(qg) {
-  currentQGFilter = qg;
-  
-  document.querySelectorAll('.qg-filter').forEach(function(el) {
-    el.classList.remove('active');
-  });
-  document.querySelector('.qg-filter[data-qg="' + qg + '"]').classList.add('active');
+window.filterBy = function(type, value) {
+  if (type === 'qg') {
+    currentQGFilter = value;
+    document.querySelectorAll('.filter-btn[data-type="qg"]').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    document.querySelector('.filter-btn[data-type="qg"][data-value="' + value + '"]').classList.add('active');
+    
+    if (value !== 'all') {
+      const qgData = QG_SALY[value];
+      map.setView([qgData.lat, qgData.lng], 16);
+    }
+  } else if (type === 'module') {
+    currentModuleFilter = value;
+    document.querySelectorAll('.filter-btn[data-type="module"]').forEach(function(el) {
+      el.classList.remove('active');
+    });
+    document.querySelector('.filter-btn[data-type="module"][data-value="' + value + '"]').classList.add('active');
+  }
   
   const searchInput = document.getElementById('searchInput');
   searchInput.dispatchEvent(new Event('input'));
-  
-  if (qg !== 'all') {
-    const qgData = QG_SALY[qg];
-    map.setView([qgData.lat, qgData.lng], 16);
-  }
 };
 
-// Focus sur un partenaire
 window.focusPartner = function(partnerId) {
   const marker = allMarkers.find(function(m) { return m.partnerData.id === partnerId; });
   if (marker) {
@@ -914,17 +1119,24 @@ window.focusPartner = function(partnerId) {
   }
 };
 
-// Stats QG
-function updateQGStats() {
-  const stats = {};
+function updateStats() {
+  const qgStats = {};
+  const moduleStats = {};
+  
   partners.forEach(function(p) {
-    stats[p.qg] = (stats[p.qg] || 0) + 1;
+    qgStats[p.qg] = (qgStats[p.qg] || 0) + 1;
+    moduleStats[p.module] = (moduleStats[p.module] || 0) + 1;
   });
   
-  const qgStats = document.getElementById('qgStats');
-  qgStats.innerHTML = Object.keys(stats).map(function(qgKey) {
-    return '<div class="qg-stat ' + qgKey + '">' + QG_SALY[qgKey].emoji + ' ' + stats[qgKey] + '</div>';
-  }).join('');
+  const statsGrid = document.getElementById('statsGrid');
+  const statItems = [];
+  
+  Object.keys(qgStats).forEach(function(qgKey) {
+    const qg = QG_SALY[qgKey];
+    statItems.push('<div class="stat-item" style="background:' + qg.color + '">' + qg.emoji + ' ' + qgStats[qgKey] + '</div>');
+  });
+  
+  statsGrid.innerHTML = statItems.join('');
 }
 
 // ============================================
@@ -943,7 +1155,7 @@ function initMobileHandlers() {
   }
 }
 
-console.log('🦅 DIGIY NDIMBAL MAP Multi-QG — Prêt ! Pierre par pierre ∞');
+console.log('🦅 DIGIY NDIMBAL MAP Multi-QG × Modules — Prêt ! ∞');
 </script>
 
 </body>
