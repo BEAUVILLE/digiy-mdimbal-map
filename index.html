@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>DIGIY NDIMBAL MAP — Saly QG ∞</title>
+<title>DIGIY NDIMBAL MAP — Saly Multi-QG ∞</title>
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -32,6 +32,11 @@
 
     --radius-xl: 28px;
     --radius-lg: 18px;
+
+    /* Couleurs QG */
+    --qg-centre: #f97316;
+    --qg-station: #0ea5e9;
+    --qg-niakhal: #10b981;
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -88,7 +93,6 @@
     transition: all .3s ease;
   }
 
-  /* Bouton toggle mobile */
   .search-toggle {
     display: none;
     position: absolute;
@@ -136,12 +140,83 @@
     cursor: pointer;
   }
 
+  .qg-filters {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .qg-filter {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    border: 2px solid transparent;
+  }
+
+  .qg-filter.all {
+    background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+    color: #111;
+  }
+  .qg-filter.all.active {
+    border-color: #111;
+  }
+
+  .qg-filter.centre {
+    background: var(--qg-centre);
+    color: white;
+  }
+  .qg-filter.centre.active {
+    border-color: #7c2d12;
+  }
+
+  .qg-filter.station {
+    background: var(--qg-station);
+    color: white;
+  }
+  .qg-filter.station.active {
+    border-color: #075985;
+  }
+
+  .qg-filter.niakhal {
+    background: var(--qg-niakhal);
+    color: white;
+  }
+  .qg-filter.niakhal.active {
+    border-color: #065f46;
+  }
+
+  .qg-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,.2);
+  }
+
   .partner-count {
     font-size: 13px;
     font-weight: 700;
     color: var(--muted);
     margin-top: 8px;
   }
+
+  .qg-stats {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .qg-stat {
+    padding: 4px 8px;
+    border-radius: 8px;
+    color: white;
+  }
+  .qg-stat.centre { background: var(--qg-centre); }
+  .qg-stat.station { background: var(--qg-station); }
+  .qg-stat.niakhal { background: var(--qg-niakhal); }
 
   .partner-list {
     max-height: 250px;
@@ -156,11 +231,23 @@
     margin: 4px 0;
     background: var(--card);
     border: 1px solid var(--line);
+    border-left: 4px solid var(--gold-1);
     border-radius: 10px;
     cursor: pointer;
     transition: all .2s ease;
     font-size: 13px;
   }
+
+  .partner-item.qg-centre {
+    border-left-color: var(--qg-centre);
+  }
+  .partner-item.qg-station {
+    border-left-color: var(--qg-station);
+  }
+  .partner-item.qg-niakhal {
+    border-left-color: var(--qg-niakhal);
+  }
+
   .partner-item:hover {
     background: linear-gradient(135deg, var(--gold-3), #fde68a);
     border-color: var(--gold-1);
@@ -175,6 +262,15 @@
   .partner-item span {
     color: var(--muted);
     font-size: 12px;
+  }
+  .partner-item .qg-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-top: 4px;
+    color: white;
+    font-weight: 700;
   }
 
   /* ============================================ */
@@ -207,6 +303,17 @@
     transform: rotate(45deg);
   }
 
+  /* Markers QG colorés */
+  .digiy-marker.qg-centre {
+    background: var(--qg-centre);
+  }
+  .digiy-marker.qg-station {
+    background: var(--qg-station);
+  }
+  .digiy-marker.qg-niakhal {
+    background: var(--qg-niakhal);
+  }
+
   /* Popup personnalisée */
   .leaflet-popup-content-wrapper {
     border-radius: var(--radius-lg);
@@ -230,6 +337,18 @@
     color: var(--muted);
     margin-bottom: 6px;
   }
+  .popup-qg-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 8px;
+  }
+  .popup-qg-badge.centre { background: var(--qg-centre); }
+  .popup-qg-badge.station { background: var(--qg-station); }
+  .popup-qg-badge.niakhal { background: var(--qg-niakhal); }
   .popup-desc {
     font-size: 13px;
     margin-bottom: 12px;
@@ -263,7 +382,7 @@
   }
 
   /* ============================================ */
-  /* 📱 MOBILE - RESPONSIVE FIX */
+  /* 📱 MOBILE - RESPONSIVE */
   /* ============================================ */
   @media (max-width: 768px) {
     .digiy-header {
@@ -276,7 +395,6 @@
       font-size: 11px;
     }
 
-    /* IMPORTANT : Panneau caché par défaut sur mobile */
     .search-panel {
       top: 70px;
       left: 10px;
@@ -291,14 +409,12 @@
       pointer-events: none;
     }
 
-    /* Panneau visible quand ouvert */
     .search-panel.open {
       transform: translateY(0);
       opacity: 1;
       pointer-events: all;
     }
 
-    /* Bouton toggle visible sur mobile */
     .search-toggle {
       display: block;
       top: 75px;
@@ -313,14 +429,21 @@
       top: 70px;
     }
 
-    /* Ajuster les popups sur mobile */
     .leaflet-popup-content {
       min-width: 240px;
       padding: 14px;
     }
+
+    .qg-filters {
+      gap: 4px;
+    }
+
+    .qg-filter {
+      font-size: 11px;
+      padding: 5px 10px;
+    }
   }
 
-  /* Très petits écrans */
   @media (max-width: 480px) {
     .search-toggle {
       font-size: 13px;
@@ -342,7 +465,7 @@
 
 <!-- HEADER -->
 <header class="digiy-header">
-  <h1>🗺️ DIGIY NDIMBAL MAP — Saly QG ∞</h1>
+  <h1>🗺️ DIGIY NDIMBAL MAP — Saly Multi-QG ∞</h1>
   <p>📍 L'entraide digitale du Sénégal • Pierre par pierre</p>
 </header>
 
@@ -364,7 +487,26 @@
     <option value="explore">🌴 Explore</option>
   </select>
 
-  <div class="partner-count" id="partnerCount">9 partenaires • QG Saly</div>
+  <!-- FILTRES QG -->
+  <div class="qg-filters">
+    <div class="qg-filter all active" data-qg="all" onclick="filterByQG('all')">
+      ∞ Tous QG
+    </div>
+    <div class="qg-filter centre" data-qg="centre" onclick="filterByQG('centre')">
+      🏪 Centre
+    </div>
+    <div class="qg-filter station" data-qg="station" onclick="filterByQG('station')">
+      🏖️ Station
+    </div>
+    <div class="qg-filter niakhal" data-qg="niakhal" onclick="filterByQG('niakhal')">
+      🏡 Niakhal
+    </div>
+  </div>
+
+  <div class="partner-count" id="partnerCount">9 partenaires • 3 QG Saly</div>
+
+  <!-- STATS QG -->
+  <div class="qg-stats" id="qgStats"></div>
 
   <div class="partner-list" id="partnerList"></div>
 </div>
@@ -372,7 +514,7 @@
 <!-- CARTE -->
 <div id="map"></div>
 
-<!-- Leaflet JS - CHARGEMENT DANS L'ORDRE -->
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
@@ -394,73 +536,46 @@ function toggleSearch() {
 }
 
 // ============================================
-// 🗺️ DONNÉES & INITIALISATION
+// 🗺️ DÉFINITION DES QG SALY
 // ============================================
-
-// Coordonnées QG Saly (Astou Boutique)
 const QG_SALY = {
-  lat: 14.4574,
-  lng: -16.9984,
-  name: "QG DIGIYLYFE Saly"
+  centre: {
+    id: 'centre',
+    name: 'QG Saly Centre',
+    hub: 'Astou Boutique',
+    description: 'Hub textile, market & artisanat',
+    lat: 14.4574,
+    lng: -16.9984,
+    color: '#f97316',
+    emoji: '🏪'
+  },
+  station: {
+    id: 'station',
+    name: 'QG Saly Station',
+    hub: 'Chez Baptiste',
+    description: 'Hub hébergement, tourisme & loisirs',
+    lat: 14.4520,
+    lng: -16.9920,
+    color: '#0ea5e9',
+    emoji: '🏖️'
+  },
+  niakhal: {
+    id: 'niakhal',
+    name: 'QG Niakh Niakhal',
+    hub: 'Garage Lamine',
+    description: 'Hub services, construction & transport',
+    lat: 14.4610,
+    lng: -17.0050,
+    color: '#10b981',
+    emoji: '🏡'
+  }
 };
 
-// Base de données partenaires Saly
+// ============================================
+// 📊 BASE DE DONNÉES PARTENAIRES AVEC QG
+// ============================================
 const partners = [
-  {
-    id: "baptiste-saly",
-    name: "🏝️ Chez Baptiste — Saly",
-    category: "hebergement",
-    description: "Appartement meublé — 2 chambres, salon, cuisine",
-    price: "30 000 FCFA / nuit",
-    whatsapp: "https://wa.me/221771342889?text=Salam%20je%20veux%20réserver%20Chez%20Baptiste%20Saly%20🙏",
-    link: "https://digiylyfe.com/partenaires-chez-baptiste/",
-    icon: "🏝️",
-    keywords: "saly appartement meuble 2 chambres cuisine hebergement"
-  },
-  {
-    id: "lamine",
-    name: "🚗 Lamine — Chauffeur",
-    category: "driver",
-    description: "Transferts AIBD et circuits • Saly – Thiès – Dakar",
-    price: "Sur demande",
-    whatsapp: "https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE%20(j'aimerais%20réserver%20un%20trajet)",
-    link: "https://digiylyfe.com/partenaires-lamine/",
-    icon: "🚗",
-    keywords: "chauffeur taxi transport aibd dakar saly"
-  },
-  {
-    id: "michel",
-    name: "✂️ Michel — Styliste",
-    category: "market",
-    description: "Robes personnalisées • Saly – Thiès",
-    price: "Sur mesure",
-    whatsapp: "https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE%20je%20veux%20une%20création%20👗",
-    link: "https://digiylyfe.com/page-partenaire-michel/",
-    icon: "✂️",
-    keywords: "styliste couture robes personnalisees vetements saly"
-  },
-  {
-    id: "zal",
-    name: "⚡ Zal & Kourant — Électriciens",
-    category: "construction",
-    description: "Électricité maison & bâtiment • Saly",
-    price: "Devis rapide",
-    whatsapp: "https://wa.me/221772084781?text=Salam%20Zal%20je%20viens%20de%20DIGIYLYFE",
-    link: "https://digiylyfe.com/partenaires-zal-kourant/",
-    icon: "⚡",
-    keywords: "electricien electricite maison depannage saly"
-  },
-  {
-    id: "helage",
-    name: "💧 Helage — Plombier",
-    category: "construction",
-    description: "Plomberie multi-services • Saly – Petite Côte",
-    price: "Sur demande / devis",
-    whatsapp: "https://wa.me/221774513523?text=Salam%20Helage%2C%20je%20viens%20de%20DIGIYLYFE",
-    link: "tel:+221774513523",
-    icon: "💧",
-    keywords: "plombier plomberie depannage fuite robinet saly"
-  },
+  // QG CENTRE (Astou - Market/Textile)
   {
     id: "astou",
     name: "🧵 Astou — Linge de maison",
@@ -470,18 +585,9 @@ const partners = [
     whatsapp: "https://wa.me/221778765785?text=Salam%20Astou%20je%20viens%20de%20DIGIYLYFE",
     link: "https://digiylyfe.com/partenaires-astou/",
     icon: "🧵",
-    keywords: "linge maison couture serviette torchon drap saly"
-  },
-  {
-    id: "daouda",
-    name: "🌴 Daouda Explore",
-    category: "explore",
-    description: "Guide local — circuits authentiques • Saly",
-    price: "Circuits sur mesure",
-    whatsapp: "https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE%20circuit%20🌴",
-    link: "https://digiylyfe.com/partenaires-daouda/",
-    icon: "🌴",
-    keywords: "guide touristique circuit marche saly"
+    keywords: "linge maison couture serviette torchon drap saly",
+    qg: 'centre',
+    isHub: true
   },
   {
     id: "tonton-elhadji",
@@ -492,7 +598,86 @@ const partners = [
     whatsapp: "https://wa.me/221778329612?text=Salam%20Tonton%20DIGIYLYFE%20👜",
     link: "https://digiylyfe.com/partenaire-tonton-elhadji/",
     icon: "👜",
-    keywords: "sacs montres accessoires maroquinerie saly"
+    keywords: "sacs montres accessoires maroquinerie saly",
+    qg: 'centre'
+  },
+  {
+    id: "michel",
+    name: "✂️ Michel — Styliste",
+    category: "market",
+    description: "Robes personnalisées • Saly – Thiès",
+    price: "Sur mesure",
+    whatsapp: "https://wa.me/221783718492?text=Salam%20Michel%20DIGIYLYFE%20je%20veux%20une%20création%20👗",
+    link: "https://digiylyfe.com/page-partenaire-michel/",
+    icon: "✂️",
+    keywords: "styliste couture robes personnalisees vetements saly",
+    qg: 'centre'
+  },
+
+  // QG STATION (Baptiste - Hébergement/Tourisme)
+  {
+    id: "baptiste-saly",
+    name: "🏝️ Chez Baptiste — Saly",
+    category: "hebergement",
+    description: "Appartement meublé — 2 chambres, salon, cuisine",
+    price: "30 000 FCFA / nuit",
+    whatsapp: "https://wa.me/221771342889?text=Salam%20je%20veux%20réserver%20Chez%20Baptiste%20Saly%20🙏",
+    link: "https://digiylyfe.com/partenaires-chez-baptiste/",
+    icon: "🏝️",
+    keywords: "saly appartement meuble 2 chambres cuisine hebergement",
+    qg: 'station',
+    isHub: true
+  },
+  {
+    id: "daouda",
+    name: "🌴 Daouda Explore",
+    category: "explore",
+    description: "Guide local — circuits authentiques • Saly",
+    price: "Circuits sur mesure",
+    whatsapp: "https://wa.me/221771342889?text=Salam%20Daouda%20DIGIYLYFE%20circuit%20🌴",
+    link: "https://digiylyfe.com/partenaires-daouda/",
+    icon: "🌴",
+    keywords: "guide touristique circuit marche saly",
+    qg: 'station'
+  },
+
+  // QG NIAKH NIAKHAL (Lamine - Services/Construction)
+  {
+    id: "lamine",
+    name: "🚗 Lamine — Chauffeur",
+    category: "driver",
+    description: "Transferts AIBD et circuits • Saly – Thiès – Dakar",
+    price: "Sur demande",
+    whatsapp: "https://wa.me/221784413680?text=Salam%20Lamine%20DIGIYLYFE%20(j'aimerais%20réserver%20un%20trajet)",
+    link: "https://digiylyfe.com/partenaires-lamine/",
+    icon: "🚗",
+    keywords: "chauffeur taxi transport aibd dakar saly",
+    qg: 'niakhal',
+    isHub: true
+  },
+  {
+    id: "zal",
+    name: "⚡ Zal & Kourant — Électriciens",
+    category: "construction",
+    description: "Électricité maison & bâtiment • Saly",
+    price: "Devis rapide",
+    whatsapp: "https://wa.me/221772084781?text=Salam%20Zal%20je%20viens%20de%20DIGIYLYFE",
+    link: "https://digiylyfe.com/partenaires-zal-kourant/",
+    icon: "⚡",
+    keywords: "electricien electricite maison depannage saly",
+    qg: 'niakhal'
+  },
+  {
+    id: "helage",
+    name: "💧 Helage — Plombier",
+    category: "construction",
+    description: "Plomberie multi-services • Saly – Petite Côte",
+    price: "Sur demande / devis",
+    whatsapp: "https://wa.me/221774513523?text=Salam%20Helage%2C%20je%20viens%20de%20DIGIYLYFE",
+    link: "tel:+221774513523",
+    icon: "💧",
+    keywords: "plombier plomberie depannage fuite robinet saly",
+    qg: 'niakhal'
   },
   {
     id: "mbaye",
@@ -503,7 +688,8 @@ const partners = [
     whatsapp: "https://wa.me/221776427113?text=Salam%20Mbaye%20je%20veux%20parler%20d%E2%80%99un%20projet%20🏗️%20(DIGIYLYFE)",
     link: "https://digiylyfe.com/partenaires-mbaye/",
     icon: "👷",
-    keywords: "batisseur villa piscine travaux construction saly"
+    keywords: "batisseur villa piscine travaux construction saly",
+    qg: 'niakhal'
   }
 ];
 
@@ -511,12 +697,12 @@ const partners = [
 let map;
 let markers;
 let allMarkers = [];
+let currentQGFilter = 'all';
 
 // ============================================
 // ⏳ INITIALISATION APRÈS CHARGEMENT
 // ============================================
 (function() {
-  // Attendre que tout soit chargé
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAll);
   } else {
@@ -525,9 +711,8 @@ let allMarkers = [];
 })();
 
 function initAll() {
-  console.log('🦅 Initialisation DIGIY NDIMBAL MAP...');
+  console.log('🦅 Initialisation DIGIY NDIMBAL MAP Multi-QG...');
   
-  // Vérifier que Leaflet est chargé
   if (typeof L === 'undefined') {
     console.error('❌ Leaflet non chargé, nouvelle tentative...');
     setTimeout(initAll, 100);
@@ -537,36 +722,39 @@ function initAll() {
   initMap();
   initSearch();
   initMobileHandlers();
+  updateQGStats();
 }
 
 // ============================================
 // 🗺️ INITIALISATION CARTE
 // ============================================
 function initMap() {
-  // Initialisation carte
+  // Centre de la carte (entre les 3 QG)
+  const centerLat = (QG_SALY.centre.lat + QG_SALY.station.lat + QG_SALY.niakhal.lat) / 3;
+  const centerLng = (QG_SALY.centre.lng + QG_SALY.station.lng + QG_SALY.niakhal.lng) / 3;
+
   map = L.map('map', {
     zoomControl: true,
     scrollWheelZoom: true
-  }).setView([QG_SALY.lat, QG_SALY.lng], 15);
+  }).setView([centerLat, centerLng], 14);
 
-  // Tuile OpenStreetMap
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap | DIGIYLYFE ∞',
     maxZoom: 19
   }).addTo(map);
 
-  // Cluster de markers
   markers = L.markerClusterGroup({
     spiderfyOnMaxZoom: true,
     showCoverageOnHover: false,
     zoomToBoundsOnClick: true
   });
 
-  // Ajouter tous les partenaires au QG
+  // Ajouter les partenaires par QG
   allMarkers = [];
-  partners.forEach(partner => {
-    const marker = L.marker([QG_SALY.lat, QG_SALY.lng], {
-      icon: createCustomIcon(partner.icon)
+  partners.forEach(function(partner) {
+    const qgData = QG_SALY[partner.qg];
+    const marker = L.marker([qgData.lat, qgData.lng], {
+      icon: createCustomIcon(partner.icon, partner.qg)
     }).bindPopup(createPopup(partner));
     
     marker.partnerData = partner;
@@ -576,48 +764,65 @@ function initMap() {
 
   map.addLayer(markers);
 
-  // Ajouter le marker QG
-  const qgMarker = L.marker([QG_SALY.lat, QG_SALY.lng], {
-    icon: L.divIcon({
-      className: 'custom-marker',
-      html: '<div class="digiy-marker" style="width:48px;height:48px;border-width:4px;"><span style="font-size:24px;">∞</span></div>',
-      iconSize: [48, 48],
-      iconAnchor: [24, 48],
-      popupAnchor: [0, -48]
-    })
-  }).bindPopup(`
-    <div class="popup-header">🏢 QG DIGIYLYFE Saly</div>
-    <div class="popup-meta">📍 Centre de coordination</div>
-    <div class="popup-desc">9 partenaires locaux • 0% commission • Entraide digitale</div>
-    <div class="popup-cta">
-      <a href="https://digiylyfe.com" target="_blank" class="popup-btn view">🌐 DIGIYLYFE</a>
-    </div>
-  `).addTo(map);
+  // Ajouter les markers QG
+  Object.keys(QG_SALY).forEach(function(qgKey) {
+    const qg = QG_SALY[qgKey];
+    const qgPartners = partners.filter(function(p) { return p.qg === qgKey; });
+    
+    const qgMarker = L.marker([qg.lat, qg.lng], {
+      icon: L.divIcon({
+        className: 'custom-marker',
+        html: '<div class="digiy-marker qg-' + qgKey + '" style="width:52px;height:52px;border-width:4px;"><span style="font-size:28px;">∞</span></div>',
+        iconSize: [52, 52],
+        iconAnchor: [26, 52],
+        popupAnchor: [0, -52]
+      })
+    }).bindPopup(createQGPopup(qg, qgPartners)).addTo(map);
+  });
 
-  console.log('✅ Carte initialisée avec ' + partners.length + ' partenaires');
+  console.log('✅ Carte initialisée : ' + partners.length + ' partenaires, 3 QG');
 }
 
-// Fonction pour créer un marker personnalisé
-function createCustomIcon(icon) {
+function createCustomIcon(icon, qg) {
   return L.divIcon({
     className: 'custom-marker',
-    html: '<div class="digiy-marker"><span>' + icon + '</span></div>',
+    html: '<div class="digiy-marker qg-' + qg + '"><span>' + icon + '</span></div>',
     iconSize: [36, 36],
     iconAnchor: [18, 36],
     popupAnchor: [0, -36]
   });
 }
 
-// Fonction pour créer le contenu popup
 function createPopup(partner) {
+  const qgData = QG_SALY[partner.qg];
+  const hubBadge = partner.isHub ? '<span style="background:#facc15;color:#111;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:800;margin-left:6px;">HUB</span>' : '';
+  
   return `
-    <div class="popup-header">${partner.name}</div>
+    <div class="popup-header">${partner.name} ${hubBadge}</div>
+    <div class="popup-qg-badge ${partner.qg}">${qgData.emoji} ${qgData.name}</div>
     <div class="popup-meta">📍 ${partner.category.toUpperCase()}</div>
     <div class="popup-desc">${partner.description}</div>
     ${partner.price ? '<div class="popup-meta">💰 ' + partner.price + '</div>' : ''}
     <div class="popup-cta">
       ${partner.whatsapp ? '<a href="' + partner.whatsapp + '" target="_blank" class="popup-btn whatsapp">💬 WhatsApp</a>' : ''}
       <a href="${partner.link}" target="_blank" class="popup-btn view">🔎 Voir</a>
+    </div>
+  `;
+}
+
+function createQGPopup(qg, qgPartners) {
+  const hub = qgPartners.find(function(p) { return p.isHub; });
+  
+  return `
+    <div class="popup-header">${qg.emoji} ${qg.name}</div>
+    <div class="popup-meta">📍 ${qg.description}</div>
+    ${hub ? '<div class="popup-desc"><strong>Hub:</strong> ' + hub.name + '</div>' : ''}
+    <div class="popup-meta">👥 ${qgPartners.length} partenaire${qgPartners.length > 1 ? 's' : ''}</div>
+    <div style="margin-top:12px;font-size:12px;color:#6b7280;">
+      ${qgPartners.map(function(p) { return p.icon + ' ' + p.name.split('—')[0]; }).join('<br>')}
+    </div>
+    <div class="popup-cta" style="margin-top:12px;">
+      <a href="https://digiylyfe.com" target="_blank" class="popup-btn view">🌐 DIGIYLYFE</a>
     </div>
   `;
 }
@@ -637,28 +842,27 @@ function initSearch() {
     const searchTerm = normalizeText(searchInput.value.trim());
     const category = categoryFilter.value;
     
-    // Filtrer les partenaires
     const filtered = partners.filter(function(p) {
+      const matchQG = currentQGFilter === 'all' || p.qg === currentQGFilter;
       const matchCategory = category === 'all' || p.category === category;
       const matchSearch = !searchTerm || 
         normalizeText(p.name + ' ' + p.description + ' ' + p.keywords).includes(searchTerm);
-      return matchCategory && matchSearch;
+      return matchQG && matchCategory && matchSearch;
     });
 
-    // Mettre à jour le compteur
     const partnerCount = document.getElementById('partnerCount');
-    partnerCount.textContent = filtered.length + ' partenaire' + (filtered.length > 1 ? 's' : '') + ' • QG Saly';
+    partnerCount.textContent = filtered.length + ' partenaire' + (filtered.length > 1 ? 's' : '') + ' • 3 QG Saly';
 
-    // Mettre à jour la liste
     const partnerList = document.getElementById('partnerList');
     partnerList.innerHTML = filtered.map(function(p) {
-      return '<div class="partner-item" onclick="focusPartner(\'' + p.id + '\')">' +
+      const qgData = QG_SALY[p.qg];
+      return '<div class="partner-item qg-' + p.qg + '" onclick="focusPartner(\'' + p.id + '\')">' +
         '<strong>' + p.name + '</strong>' +
         '<span>' + p.description + '</span>' +
+        '<div class="qg-badge" style="background:' + qgData.color + '">' + qgData.emoji + ' ' + qgData.name + '</div>' +
         '</div>';
     }).join('');
 
-    // Mettre à jour les markers sur la carte
     if (markers) {
       markers.clearLayers();
       allMarkers.forEach(function(marker) {
@@ -669,22 +873,38 @@ function initSearch() {
     }
   }
 
-  // Event listeners
   searchInput.addEventListener('input', updateDisplay);
   categoryFilter.addEventListener('change', updateDisplay);
 
-  // Initialisation
   updateDisplay();
 }
+
+// Filtre par QG
+window.filterByQG = function(qg) {
+  currentQGFilter = qg;
+  
+  document.querySelectorAll('.qg-filter').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelector('.qg-filter[data-qg="' + qg + '"]').classList.add('active');
+  
+  const searchInput = document.getElementById('searchInput');
+  searchInput.dispatchEvent(new Event('input'));
+  
+  if (qg !== 'all') {
+    const qgData = QG_SALY[qg];
+    map.setView([qgData.lat, qgData.lng], 16);
+  }
+};
 
 // Focus sur un partenaire
 window.focusPartner = function(partnerId) {
   const marker = allMarkers.find(function(m) { return m.partnerData.id === partnerId; });
   if (marker) {
-    map.setView([QG_SALY.lat, QG_SALY.lng], 17);
+    const qgData = QG_SALY[marker.partnerData.qg];
+    map.setView([qgData.lat, qgData.lng], 17);
     marker.openPopup();
     
-    // Fermer le panneau sur mobile après sélection
     if (window.innerWidth <= 768) {
       const panel = document.getElementById('searchPanel');
       const button = document.getElementById('searchToggle');
@@ -694,11 +914,23 @@ window.focusPartner = function(partnerId) {
   }
 };
 
+// Stats QG
+function updateQGStats() {
+  const stats = {};
+  partners.forEach(function(p) {
+    stats[p.qg] = (stats[p.qg] || 0) + 1;
+  });
+  
+  const qgStats = document.getElementById('qgStats');
+  qgStats.innerHTML = Object.keys(stats).map(function(qgKey) {
+    return '<div class="qg-stat ' + qgKey + '">' + QG_SALY[qgKey].emoji + ' ' + stats[qgKey] + '</div>';
+  }).join('');
+}
+
 // ============================================
 // 📱 HANDLERS MOBILE
 // ============================================
 function initMobileHandlers() {
-  // Fermer le panneau si on clique sur la carte (mobile uniquement)
   if (window.innerWidth <= 768) {
     document.getElementById('map').addEventListener('click', function() {
       const panel = document.getElementById('searchPanel');
@@ -711,7 +943,7 @@ function initMobileHandlers() {
   }
 }
 
-console.log('🦅 DIGIY NDIMBAL MAP Saly — Prêt ! Pierre par pierre ∞');
+console.log('🦅 DIGIY NDIMBAL MAP Multi-QG — Prêt ! Pierre par pierre ∞');
 </script>
 
 </body>
