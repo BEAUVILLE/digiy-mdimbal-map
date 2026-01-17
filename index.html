@@ -119,6 +119,7 @@
     font-size:11px;
     font-weight:1000;
     cursor:pointer;
+    user-select:none;
   }
   .stat-btn:active{ transform:scale(.98); }
   .stat-link{
@@ -472,6 +473,25 @@
     line-height:1.35;
     margin-top:6px;
   }
+
+  /* Floating toggle (utile mobile/desktop) */
+  .loc-float-toggle{
+    position:absolute;
+    z-index:1200;
+    right:12px;
+    bottom:16px;
+    padding:10px 12px;
+    border-radius:999px;
+    background:rgba(2,6,23,.72);
+    color:#e5e7eb;
+    border:1px solid rgba(148,163,184,.35);
+    font-weight:1000;
+    cursor:pointer;
+    backdrop-filter: blur(10px);
+    box-shadow:0 14px 34px rgba(0,0,0,0.35);
+    user-select:none;
+  }
+  .loc-float-toggle:active{ transform:scale(.98); }
 </style>
 </head>
 
@@ -490,6 +510,12 @@
   <div class="header-stats">
     <a class="stat-link" href="https://digiylyfe.com" target="_blank" rel="noopener">← HUB</a>
     <button class="stat-btn" type="button" onclick="locateMe()">📍 Moi</button>
+
+    <!-- ✅ LOC LIVE toggle -->
+    <button class="stat-btn
+
+" type="button" onclick="toggleLocLive()" id="btnLocLive">🏠 LOC LIVE: ON</button>
+
     <div class="stat-badge" id="statPartners">—</div>
   </div>
 </header>
@@ -576,13 +602,22 @@
 <!-- MAP -->
 <div id="map"></div>
 
+<!-- Floating toggle LOC (toujours visible) -->
+<button class="loc-float-toggle" id="locFloatToggle" type="button" onclick="toggleLocLive()">🏠 LOC LIVE</button>
+
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
+<!-- ✅ Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 /* =========================================================
    NDIMBAL MAP — V4 (COMPACT + GPS + LAT/LNG + DISTANCE)
+   + LAYER DIGIY LOC LIVE (Supabase views)
+   - v_ndimbal_loc (slug,title,whatsapp,address_label,lat,lng)
+   - v_loc_pin_occupancy_today (pin_slug,is_occupied_today)
 ========================================================= */
 
 function toggleSearch(){
@@ -678,6 +713,13 @@ const partners = [
   }
 ];
 
+/* =========================
+   SUPABASE (TES CLÉS)
+========================= */
+const SUPABASE_URL = "https://wesqmwjjtsefyjnluosj.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc3Ftd2pqdHNlZnlqbmx1b3NqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUxNzg4ODIsImV4cCI6MjA4MDc1NDg4Mn0.dZfYOc2iL2_wRYL3zExZFsFSBK6AbMeOid2LrIjcTdA";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 let map, markers, allMarkers=[];
 let currentQGFilter='all';
 let currentModuleFilter='all';
@@ -686,6 +728,190 @@ let mePos=null; // {lat,lng}
 let distanceMeters='all';
 let groupFilter='all';
 
+/* =========================
+   DIGIY LOC LIVE (Supabase)
+========================= */
+let locLiveEnabled = true;
+let locLiveCluster = null;
+let locLiveMarkers = [];
+let locLiveCount = 0;
+
+function digitsOnly(phone){
+  return String(phone || "").replace(/\D/g, "");
+}
+
+function openWaNumber(phone, message){
+  const txt = encodeURIComponent(message || "");
+  const digits = digitsOnly(phone);
+  if(!digits){
+    alert("Numéro WhatsApp manquant.");
+    return;
+  }
+  const url = "https://wa.me/" + digits + (txt ? "?text=" + txt : "");
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
+window.toggleLocLive = function(){
+  locLiveEnabled = !locLiveEnabled;
+
+  const btn = document.getElementById("btnLocLive");
+  const floatBtn = document.getElementById("locFloatToggle");
+
+  if(btn) btn.textContent = "🏠 LOC LIVE: " + (locLiveEnabled ? "ON" : "OFF");
+  if(floatBtn) floatBtn.textContent = "🏠 LOC LIVE: " + (locLiveEnabled ? "ON" : "OFF");
+
+  if(!locLiveCluster) return;
+
+  if(locLiveEnabled){
+    if(!map.hasLayer(locLiveCluster)) map.addLayer(locLiveCluster);
+  }else{
+    if(map.hasLayer(locLiveCluster)) map.removeLayer(locLiveCluster);
+  }
+};
+
+async function fetchLocOccupancyMap(){
+  const occ = new Map();
+  const { data, error } = await sb
+    .from("v_loc_pin_occupancy_today")
+    .select("pin_slug,is_occupied_today");
+
+  if(error){
+    console.warn("[LOC LIVE] occupancy view error:", error.message);
+    return occ;
+  }
+  (data || []).forEach(r=>{
+    const s = String(r.pin_slug || "").trim();
+    if(!s) return;
+    occ.set(s, !!r.is_occupied_today);
+  });
+  return occ;
+}
+
+function createLocLiveIcon(isOccupied){
+  const bg = isOccupied ? "#ef4444" : "#10b981"; // rouge occupé / vert dispo
+  const emoji = isOccupied ? "⛔" : "🏠";
+  const tip = isOccupied ? "Occupé" : "Disponible";
+  return L.divIcon({
+    className:'custom-marker',
+    html: `
+      <div class="digiy-marker module-loc" style="background:${bg};">
+        <span>${emoji}</span>
+      </div>
+      <div style="
+        position:absolute; transform:translate(-6px, -46px);
+        background:rgba(2,6,23,.85);
+        color:#e5e7eb;
+        border:1px solid rgba(148,163,184,.25);
+        border-radius:10px;
+        padding:2px 6px;
+        font:900 10px system-ui;
+        backdrop-filter: blur(8px);
+        white-space:nowrap;
+      ">${tip}</div>
+    `,
+    iconSize:[38,38], iconAnchor:[19,38], popupAnchor:[0,-38]
+  });
+}
+
+function createLocLivePopup(row, isOccupied){
+  const title = row.title || "Logement";
+  const label = row.address_label || "—";
+  const slug  = row.slug || "";
+  const wa    = row.whatsapp || "";
+  const pinUrl = "https://beauville.github.io/digiy-loc-pro/go-pin.html?slug=" + encodeURIComponent(slug);
+
+  const occBadge = isOccupied
+    ? `<span class="popup-badge" style="background:#ef4444">⛔ OCCUPÉ (aujourd’hui)</span>`
+    : `<span class="popup-badge" style="background:#10b981">✅ DISPONIBLE</span>`;
+
+  const waMsg = `Bonjour, je souhaite réserver / avoir des infos pour "${title}" via DIGIY LOC.`;
+
+  const waBtn = wa
+    ? `<a href="javascript:void(0)" onclick="openWaNumber('${esc(wa)}','${esc(waMsg)}')" class="popup-btn whatsapp">💬 WhatsApp</a>`
+    : `<a href="javascript:void(0)" onclick="alert('WhatsApp non renseigné sur ce PIN.');" class="popup-btn whatsapp">💬 WhatsApp</a>`;
+
+  return `
+    <div class="popup-header">${esc(title)}</div>
+    <div class="popup-badges">
+      <span class="popup-badge" style="background:${DIGIY_MODULES.DIGIY_LOC.color}">🏠 DIGIY LOC</span>
+      ${occBadge}
+    </div>
+    <div class="popup-desc">${esc(label)}</div>
+    <div class="popup-cta">
+      ${waBtn}
+      <a href="${pinUrl}" target="_blank" rel="noopener" class="popup-btn view">👀 Voir PIN</a>
+    </div>
+  `;
+}
+
+async function loadLocLivePins(){
+  if(!locLiveCluster){
+    locLiveCluster = L.markerClusterGroup({
+      spiderfyOnMaxZoom:true,
+      showCoverageOnHover:false,
+      zoomToBoundsOnClick:true
+    });
+  }
+
+  // clear old
+  try{ locLiveCluster.clearLayers(); }catch(e){}
+  locLiveMarkers = [];
+  locLiveCount = 0;
+
+  // fetch occupancy + pins
+  const occMap = await fetchLocOccupancyMap();
+
+  const { data, error } = await sb
+    .from("v_ndimbal_loc")
+    .select("slug,title,whatsapp,address_label,lat,lng");
+
+  if(error){
+    console.warn("[LOC LIVE] v_ndimbal_loc error:", error.message);
+    return;
+  }
+
+  (data || []).forEach(row=>{
+    const lat = Number(row.lat);
+    const lng = Number(row.lng);
+    if(!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+
+    const slug = String(row.slug || "").trim();
+    const isOcc = occMap.get(slug) === true;
+
+    const marker = L.marker([lat,lng], { icon: createLocLiveIcon(isOcc) })
+      .bindPopup(createLocLivePopup(row, isOcc));
+
+    marker._latlngReal = {lat,lng};
+    marker.locLiveData = row;
+
+    locLiveMarkers.push(marker);
+    locLiveCluster.addLayer(marker);
+    locLiveCount++;
+  });
+
+  if(locLiveEnabled){
+    if(!map.hasLayer(locLiveCluster)) map.addLayer(locLiveCluster);
+  }else{
+    if(map.hasLayer(locLiveCluster)) map.removeLayer(locLiveCluster);
+  }
+
+  // petit feedback header
+  const stat = document.getElementById("statPartners");
+  if(stat){
+    stat.textContent = `${(partners || []).length} partenaires + ${locLiveCount} LOC`;
+  }
+
+  console.log("[LOC LIVE] loaded:", locLiveCount);
+}
+
+/* Auto refresh LOC LIVE (toutes les 60s) */
+setInterval(()=>{
+  if(typeof sb !== "undefined" && map) loadLocLivePins();
+}, 60000);
+
+/* =========================
+   Helpers existants
+========================= */
 function esc(s){
   return String(s ?? '')
     .replaceAll('&','&amp;')
@@ -739,6 +965,9 @@ function initAll(){
 
   updateHeaderBadges(partners);
   console.log('✅ NDIMBAL MAP V4 READY');
+
+  // ✅ Charge LOC LIVE (Supabase)
+  loadLocLivePins();
 }
 
 function initMap(){
@@ -998,7 +1227,6 @@ function initSearch(){
   categoryFilter.addEventListener('change', updateDisplay);
   distanceEl.addEventListener('change', updateDisplay);
   groupEl.addEventListener('change', updateDisplay);
-
   updateDisplay();
 }
 
